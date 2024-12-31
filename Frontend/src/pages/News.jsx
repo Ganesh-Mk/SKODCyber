@@ -15,7 +15,7 @@ const News = () => {
 
   useEffect(() => {
     const fetchNews = async () => {
-      const apiKey = import.meta.env.VITE_NEWS_API_KEY;
+      const apiKey = "aa828320dbe94748a74f508cf0490535";
       console.log("API: ", apiKey);
       const url = `https://newsapi.org/v2/everything?q=cybersecurity&pageSize=50&apiKey=${apiKey}`;
 
