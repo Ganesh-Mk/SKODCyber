@@ -8,7 +8,7 @@ const Account = () => {
       name: 'Alex Thompson',
       email: 'alex.thompson@example.com',
       about: 'Passionate cybersecurity enthusiast with a focus on network security and penetration testing. Always eager to learn and share knowledge with the community.',
-      image: null,
+      image: "https://cdn-icons-png.flaticon.com/512/10398/10398223.png",
       social: {
         twitter: 'alexthompson',
         instagram: 'alex.security',
@@ -223,7 +223,7 @@ const Account = () => {
                       <img
                         src={imagePreview || editForm.image || '/api/placeholder/96/96'}
                         alt="Profile Preview"
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover "
                       />
                     </div>
                     <label className="px-4 py-2 bg-gray-100 rounded-lg cursor-pointer hover:bg-gray-200 transition-colors duration-300">
