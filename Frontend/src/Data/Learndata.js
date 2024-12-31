@@ -21,6 +21,48 @@ export const modules = [
     },
     additionalResources: [
       { title: "Cybersecurity Basics", type: "PDF", link: "/resources/cyber-basics" }
+    ],
+    quiz: [
+      {
+        question: "What is the primary purpose of cybersecurity?",
+        options: [
+          "To make computers run faster",
+          "To defend systems and data from malicious attacks and unauthorized access",
+          "To create better software programs",
+          "To improve internet connectivity"
+        ],
+        answer: 1
+      },
+      {
+        question: "Why do organizations invest in cybersecurity?",
+        options: [
+          "To increase profit margins",
+          "To improve software development",
+          "To prevent costly breaches and protect their reputation",
+          "To comply with tax regulations"
+        ],
+        answer: 2
+      },
+      {
+        question: "Which aspect describes cybersecurity as a process?",
+        options: [
+          "One-time system setup",
+          "Weekly system updates",
+          "Yearly security audits",
+          "Ongoing identification and management of risks"
+        ],
+        answer: 3
+      },
+      {
+        question: "What type of data does cybersecurity help protect?",
+        options: [
+          "Only financial information",
+          "Only personal passwords",
+          "Passwords, financial data, and intellectual property",
+          "Only business documents"
+        ],
+        answer: 2
+      }
     ]
   },
   {
@@ -45,6 +87,48 @@ export const modules = [
     },
     additionalResources: [
       { title: "Guide to Network Security", type: "Video", link: "/resources/network-security" }
+    ],
+    quiz: [
+      {
+        question: "Which of these is a common network threat?",
+        options: [
+          "System updates",
+          "Phishing attacks",
+          "Password strength",
+          "Network speed"
+        ],
+        answer: 1
+      },
+      {
+        question: "What is the purpose of a firewall in network security?",
+        options: [
+          "To speed up network traffic",
+          "To block unauthorized access",
+          "To improve internet connectivity",
+          "To store network data"
+        ],
+        answer: 1
+      },
+      {
+        question: "What does a VPN provide in network security?",
+        options: [
+          "Faster internet speed",
+          "Better hardware performance",
+          "Secure data transmission",
+          "Free internet access"
+        ],
+        answer: 2
+      },
+      {
+        question: "What is a man-in-the-middle attack?",
+        options: [
+          "A physical security breach",
+          "A software malfunction",
+          "Intercepting communications",
+          "A hardware failure"
+        ],
+        answer: 2
+      }
     ]
   },
   {
@@ -69,6 +153,48 @@ export const modules = [
     },
     additionalResources: [
       { title: "OWASP Top 10", type: "Website", link: "https://owasp.org/www-project-top-ten/" }
+    ],
+    quiz: [
+      {
+        question: "What is Cross-site Scripting (XSS)?",
+        options: [
+          "A programming language",
+          "A security feature",
+          "A method to inject malicious scripts into web pages",
+          "A web development tool"
+        ],
+        answer: 2
+      },
+      {
+        question: "Which security measure helps prevent unauthorized resource sharing between origins?",
+        options: [
+          "SQL Injection",
+          "Cross-Origin Resource Sharing (CORS)",
+          "Content Security Policy",
+          "Error handling"
+        ],
+        answer: 1
+      },
+      {
+        question: "What is the purpose of input validation in web security?",
+        options: [
+          "To make websites faster",
+          "To prevent malicious code injection",
+          "To improve user interface",
+          "To store user data"
+        ],
+        answer: 1
+      },
+      {
+        question: "What tool can help identify web application vulnerabilities?",
+        options: [
+          "Word processor",
+          "Spreadsheet software",
+          "Burp Suite",
+          "Email client"
+        ],
+        answer: 2
+      }
     ]
   },
   {
@@ -93,6 +219,48 @@ export const modules = [
     },
     additionalResources: [
       { title: "Cryptography Basics", type: "PDF", link: "/resources/cryptography" }
+    ],
+    quiz: [
+      {
+        question: "What is the main purpose of cryptography?",
+        options: [
+          "To speed up data transfer",
+          "To compress data",
+          "To encode information for authorized access only",
+          "To organize data"
+        ],
+        answer: 2
+      },
+      {
+        question: "In symmetric encryption, what is used for both encryption and decryption?",
+        options: [
+          "Different keys",
+          "The same key",
+          "No keys",
+          "Multiple keys"
+        ],
+        answer: 1
+      },
+      {
+        question: "What is PKI used for?",
+        options: [
+          "Password storage",
+          "Data compression",
+          "Secure communications between parties",
+          "File organization"
+        ],
+        answer: 2
+      },
+      {
+        question: "Which is an example of symmetric encryption?",
+        options: [
+          "RSA",
+          "AES",
+          "SSH",
+          "FTP"
+        ],
+        answer: 1
+      }
     ]
   },
   {
@@ -117,6 +285,48 @@ export const modules = [
     },
     additionalResources: [
       { title: "Beginner's Guide to Ethical Hacking", type: "Video", link: "/resources/ethical-hacking" }
+    ],
+    quiz: [
+      {
+        question: "What is the purpose of ethical hacking?",
+        options: [
+          "To damage systems",
+          "To steal data",
+          "To identify and fix vulnerabilities before malicious hackers exploit them",
+          "To slow down networks"
+        ],
+        answer: 2
+      },
+      {
+        question: "Which phase of penetration testing involves vulnerability analysis?",
+        options: [
+          "Planning",
+          "Scanning",
+          "Reporting",
+          "Implementation"
+        ],
+        answer: 1
+      },
+      {
+        question: "What is the final phase of penetration testing?",
+        options: [
+          "Scanning",
+          "Exploitation",
+          "Planning",
+          "Reporting"
+        ],
+        answer: 3
+      },
+      {
+        question: "Ethical hackers must follow what kind of process?",
+        options: [
+          "Unauthorized and illegal",
+          "Legal and authorized",
+          "Informal and quick",
+          "Secret and hidden"
+        ],
+        answer: 1
+      }
     ]
   },
   {
@@ -141,6 +351,48 @@ export const modules = [
     },
     additionalResources: [
       { title: "Incident Response Checklist", type: "PDF", link: "/resources/incident-response" }
+    ],
+    quiz: [
+      {
+        question: "What is the first step in incident response?",
+        options: [
+          "System restoration",
+          "Identifying security breaches",
+          "Legal action",
+          "Team training"
+        ],
+        answer: 1
+      },
+      {
+        question: "What is the purpose of digital forensics?",
+        options: [
+          "System maintenance",
+          "Network optimization",
+          "Collecting and analyzing digital evidence",
+          "Software development"
+        ],
+        answer: 2
+      },
+      {
+        question: "Which action helps minimize attack damage?",
+        options: [
+          "System isolation",
+          "Software updates",
+          "User training",
+          "Network expansion"
+        ],
+        answer: 0
+      },
+      {
+        question: "What type of data is examined in digital forensics?",
+        options: [
+          "Only email communications",
+          "Only system passwords",
+          "Logs, files, and network traffic",
+          "Only user documents"
+        ],
+        answer: 2
+      }
     ]
   },
   {
@@ -165,6 +417,48 @@ export const modules = [
     },
     additionalResources: [
       { title: "Cybersecurity Career Guide", type: "PDF", link: "/resources/career-guide" }
+    ],
+    quiz: [
+      {
+        question: "What regulation is important for cloud security compliance?",
+        options: [
+          "GDPR",
+          "HTML5",
+          "TCP/IP",
+          "DNS"
+        ],
+        answer: 0
+      },
+      {
+        question: "Which certification is essential for cybersecurity career growth?",
+        options: [
+          "HTML",
+          "CISSP",
+          "JavaScript",
+          "Python"
+        ],
+        answer: 1
+      },
+      {
+        question: "What is a primary focus of cloud security?",
+        options: [
+          "Increasing storage capacity",
+          "Controlling access to resources",
+          "Improving internet speed",
+          "Creating backups"
+        ],
+        answer: 1
+      },
+      {
+        question: "Which area represents a specialized cybersecurity career path?",
+        options: [
+          "Web design",
+          "Database administration",
+          "Incident response",
+          "Content creation"
+        ],
+        answer: 2
+      }
     ]
   },
   {
@@ -199,6 +493,48 @@ export const modules = [
     additionalResources: [
       { title: "Malware Analysis Tools", type: "Website", link: "/resources/malware-analysis" },
       { title: "Reverse Engineering Malware - Beginner to Expert", type: "Course", link: "/resources/reverse-engineering" }
+    ],
+    quiz: [
+      {
+        question: "What tool is commonly used for static malware analysis?",
+        options: [
+          "IDA Pro",
+          "Microsoft Word",
+          "Web browser",
+          "Email client"
+        ],
+        answer: 0
+      },
+      {
+        question: "What is the purpose of a sandbox in malware analysis?",
+        options: [
+          "To speed up malware",
+          "To create malware",
+          "To safely execute and observe malware",
+          "To distribute malware"
+        ],
+        answer: 2
+      },
+      {
+        question: "Which tool is used for capturing network traffic in dynamic analysis?",
+        options: [
+          "Notepad",
+          "Calculator",
+          "File Explorer",
+          "Wireshark"
+        ],
+        answer: 3
+      },
+      {
+        question: "What is examined during static analysis?",
+        options: [
+          "Running processes",
+          "Network connections",
+          "Malware code without execution",
+          "System performance"
+        ],
+        answer: 2
+      }
     ]
   },
   {
@@ -233,6 +569,48 @@ export const modules = [
     additionalResources: [
       { title: "Red Team vs Blue Team", type: "Video", link: "/resources/red-blue-teaming" },
       { title: "Blue Team Best Practices", type: "PDF", link: "/resources/blue-team-practices" }
+    ],
+    quiz: [
+      {
+        question: "What is the primary role of a Red Team?",
+        options: [
+          "System maintenance",
+          "Simulating real-world attacks",
+          "Software development",
+          "Network installation"
+        ],
+        answer: 1
+      },
+      {
+        question: "What tool do Blue Teams use for log analysis?",
+        options: [
+          "Word processor",
+          "Email client",
+          "SIEM systems",
+          "Web browser"
+        ],
+        answer: 2
+      },
+      {
+        question: "What occurs after a Red Team engagement?",
+        options: [
+          "System shutdown",
+          "Network restart",
+          "Debriefing session",
+          "Software update"
+        ],
+        answer: 2
+      },
+      {
+        question: "What is a key Blue Team responsibility?",
+        options: [
+          "Creating malware",
+          "Attacking systems",
+          "Defending infrastructure",
+          "Writing software"
+        ],
+        answer: 2
+      }
     ]
   },
   {
@@ -267,6 +645,48 @@ export const modules = [
     additionalResources: [
       { title: "Zero Trust Architecture Framework", type: "PDF", link: "/resources/zero-trust" },
       { title: "Guide to Implementing Zero Trust", type: "Website", link: "/resources/zero-trust-guide" }
+    ],
+    quiz: [
+      {
+        question: "What is the core principle of Zero Trust?",
+        options: [
+          "Trust all internal users",
+          "Never trust, always verify",
+          "Trust by default",
+          "Verify once"
+        ],
+        answer: 1
+      },
+      {
+        question: "What is a key component of Zero Trust Architecture?",
+        options: [
+          "Open access",
+          "Default trust",
+          "Identity and Access Management",
+          "Unlimited permissions"
+        ],
+        answer: 2
+      },
+      {
+        question: "What is the purpose of micro-segmentation?",
+        options: [
+          "Increase network speed",
+          "Expand network access",
+          "Prevent lateral movement",
+          "Allow unlimited access"
+        ],
+        answer: 2
+      },
+      {
+        question: "Which technology enforces IAM in Zero Trust?",
+        options: [
+          "Single sign-on",
+          "Open access",
+          "Unrestricted privileges",
+          "Default permissions"
+        ],
+        answer: 0
+      }
     ]
   }
 ];

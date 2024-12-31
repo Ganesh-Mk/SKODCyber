@@ -1,10 +1,11 @@
 import { useState, useRef } from 'react';
 import { Book, ChevronRight, PlayCircle, Award, ArrowRight } from 'lucide-react';
-import {modules} from '../Data/Learndata'
-
+import { modules } from '../Data/Learndata'
+import QuizModal from '../Components/QuizModal';
 
 const LearningPage = () => {
   const [activeModule, setActiveModule] = useState(1);
+  const [isQuizOpen, setIsQuizOpen] = useState(false);
   const contentRef = useRef(null);
 
   const handleNextModule = () => {
@@ -21,21 +22,20 @@ const LearningPage = () => {
       {/* Sidebar - Made narrower */}
       <div className="w-56 bg-white border-r border-gray-200 overflow-y-auto">
         <div className="p-4">
-          <h2 className="text-lg font-semibold text-gray-700 mb-4">Learning Modules</h2>
+          <h2 className="text-lg font-semibold text-gray-700 mb-4">Learning Concepts</h2>
           <div className="space-y-1">
             {modules.map((module) => (
               <button
                 key={module.id}
                 onClick={() => setActiveModule(module.id)}
-                className={`w-full text-left px-4 py-2 rounded-lg transition-colors duration-200 ${
-                  activeModule === module.id
-                    ? 'bg-indigo-50 text-indigo-600'
-                    : 'text-gray-600 hover:bg-gray-50'
-                }`}
+                className={`w-full text-left px-4 py-2 rounded-lg transition-colors duration-200 ${activeModule === module.id
+                  ? 'bg-indigo-50 text-indigo-600'
+                  : 'text-gray-600 hover:bg-gray-50'
+                  }`}
               >
                 <div className="flex items-center">
                   <Book className="h-4 w-4 mr-2" />
-                  <span>Module {module.id}</span>
+                  <span>Chapter {module.id}</span>
                   {activeModule === module.id && (
                     <ChevronRight className="h-4 w-4 ml-auto" />
                   )}
@@ -106,12 +106,12 @@ const LearningPage = () => {
 
           {/* Bottom Navigation - Improved spacing */}
           <div className="flex justify-between items-center border-t pt-8">
-            <button className="flex items-center px-6 py-3 bg-purple-100 text-purple-600 rounded-lg hover:bg-purple-200 transition-colors duration-200">
+            <button onClick={() => setIsQuizOpen(true)} className="flex items-center px-6 py-3 bg-purple-100 text-purple-600 rounded-lg hover:bg-purple-200 transition-colors duration-200">
               <Award className="h-5 w-5 mr-2" />
               Take Quiz
             </button>
-            
-            <button 
+
+            <button
               onClick={handleNextModule}
               className="flex items-center px-8 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors duration-200"
             >
@@ -121,6 +121,12 @@ const LearningPage = () => {
           </div>
         </div>
       </div>
+      <QuizModal
+        isOpen={isQuizOpen}
+        onClose={() => setIsQuizOpen(false)}
+        quiz={modules[activeModule - 1].quiz}
+        moduleId={activeModule}
+      />
     </div>
   );
 };
