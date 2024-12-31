@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { Search, Moon, Sun, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const News = () => {
@@ -19,14 +20,10 @@ const News = () => {
 
       try {
         setLoading(true);
-        const response = await fetch(url);
-        if (!response.ok) {
-          throw new Error(`Error: ${response.status}`);
-        }
+        const data = await axios.get(url);
 
-        const data = await response.json();
         // Enhanced validation
-        const validArticles = data.articles.filter(article =>
+        const validArticles = data.data.articles.filter(article =>
           article.title &&
           article.title !== '[Removed]' &&
           article.description &&
@@ -35,6 +32,7 @@ const News = () => {
           article.url !== 'https://removed.com' &&
           article.urlToImage
         );
+
         setArticles(validArticles);
       } catch (err) {
         setError(err.message);
