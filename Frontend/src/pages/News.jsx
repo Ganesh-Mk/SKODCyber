@@ -15,38 +15,29 @@ const News = () => {
 
   useEffect(() => {
     const fetchNews = async () => {
-      const apiKey = "aa828320dbe94748a74f508cf0490535";
-
-      // Configure axios with required headers
-      const instance = axios.create({
-        baseURL: 'https://newsapi.org/v2/',
-        headers: {
-          'User-Agent': 'Mozilla/5.0',
-          'Accept': 'application/json',
-          'X-Api-Key': apiKey
-        }
-      });
+      const apiKey = import.meta.env.VITE_NEWS_API_KEY;
+      const url = `https://newsapi.org/v2/everything?q=cybersecurity&pageSize=50&apiKey=${apiKey}`;
 
       try {
         setLoading(true);
-        const { data } = await instance.get('everything', {
-          params: {
-            q: 'cybersecurity',
-            pageSize: 10
-          }
-        });
+        const data = await axios.get(url);
 
-        const validArticles = data.articles?.filter(article =>
+        // Enhanced validation
+        const validArticles = data.data.articles.filter(article =>
           article.title &&
+          article.title !== '[Removed]' &&
           article.description &&
+          article.description !== '[Removed]' &&
           article.url &&
+          article.url !== 'https://removed.com' &&
           article.urlToImage
-        ) || [];
+        );
 
+        console.log("Validated articles:", validArticles);
         setArticles(validArticles);
       } catch (err) {
-        setError(err.response?.data?.message || err.message);
-        console.error("Error fetching news:", err);
+        console.log("Error fetching news:", err);
+        setError(err.message);
       } finally {
         setLoading(false);
       }
