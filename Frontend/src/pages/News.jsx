@@ -15,12 +15,16 @@ const News = () => {
 
   useEffect(() => {
     const fetchNews = async () => {
-      const apiKey = "5d281b8b964d441f89abb725bf627151";
+      const apiKey = import.meta.env.VITE_NEWS_API_KEY;
+      console.log("API: ", apiKey);
       const url = `https://newsapi.org/v2/everything?q=cybersecurity&pageSize=50&apiKey=${apiKey}`;
 
       try {
+        console.log("Fetching news...");
         setLoading(true);
+
         const data = await axios.get(url);
+        console.log("Fetched news:", data.data);
 
         // Enhanced validation
         const validArticles = data.data.articles.filter(article =>
@@ -33,8 +37,10 @@ const News = () => {
           article.urlToImage
         );
 
+        console.log("Validated articles:", validArticles);
         setArticles(validArticles);
       } catch (err) {
+        console.log("Error fetching news:", err);
         setError(err.message);
       } finally {
         setLoading(false);
