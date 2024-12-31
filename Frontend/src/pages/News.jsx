@@ -16,11 +16,10 @@ const News = () => {
   useEffect(() => {
     const fetchNews = async () => {
       const apiKey = "aa828320dbe94748a74f508cf0490535";
-      console.log("API: ", apiKey);
-      const url = `https://newsapi.org/v2/everything?q=cybersecurity&pageSize=50&apiKey=${apiKey}`;
+      const url = `https://newsapi.org/v2/everything?q=cybersecurity&pageSize=10&apiKey=${apiKey}`;
 
+      console.log("Fetching... API: ", apiKey);
       try {
-        console.log("Fetching news...");
         setLoading(true);
 
         const data = await axios.get(url);
