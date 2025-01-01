@@ -1,3 +1,4 @@
+
 export const modules = [
   {
     id: 1,
@@ -9,6 +10,7 @@ export const modules = [
       "Common security threats",
       "Overview of security tools"
     ],
+    videoUrl : "https://youtu.be/6fM_I3APtqU?si=RN8Rx3FNLF0sL96I",
     mainContent: {
       section1: {
         title: "What is Cybersecurity?",
@@ -75,6 +77,7 @@ export const modules = [
       "Secure network architecture",
       "Virtual Private Networks (VPNs)"
     ],
+    videoUrl : "https://youtu.be/3oTLTijODA4?si=NSEXQ8JxwDv2VzZg",
     mainContent: {
       section1: {
         title: "Network Threats",
@@ -141,6 +144,7 @@ export const modules = [
       "SQL injection",
       "Authentication and authorization best practices"
     ],
+    videoUrl : "https://youtu.be/OtcP8c4wZys?si=GfiVrmIONmnh51ke",
     mainContent: {
       section1: {
         title: "Web Application Vulnerabilities",
@@ -200,6 +204,7 @@ export const modules = [
   {
     id: 4,
     title: "Cryptography",
+    videoUrl : "https://youtu.be/6fM_I3APtqU?si=ApO1E_HDupOjtH79",
     description: "Discover the essential concepts of cryptography and how encryption secures data both in transit and at rest, ensuring the confidentiality and integrity of sensitive information.",
     keyPoints: [
       "Basics of cryptography",
@@ -266,6 +271,7 @@ export const modules = [
   {
     id: 5,
     title: "Ethical Hacking and Penetration Testing",
+    videoUrl : "https://youtu.be/OtcP8c4wZys?si=CRVVSjqO9AV95KZE",
     description: "Learn how ethical hackers identify and mitigate vulnerabilities to improve security by conducting authorized and controlled attacks on systems and applications.",
     keyPoints: [
       "Phases of penetration testing",
@@ -332,6 +338,7 @@ export const modules = [
   {
     id: 6,
     title: "Incident Response and Forensics",
+    videoUrl : "https://www.youtube.com/live/0NT7Pe-XU9Y?si=3Hy9m9drZDLJjAaL",
     description: "Learn the process of responding to and investigating security incidents, focusing on how to handle and analyze cyberattacks to preserve evidence for legal action.",
     keyPoints: [
       "Incident response process",
@@ -398,6 +405,7 @@ export const modules = [
   {
     id: 7,
     title: "Advanced Topics and Career Paths",
+    videoUrl : "https://www.youtube.com/live/lpa8uy4DyMo?si=v3e-dqQXxUavO1zu",
     description: "Explore advanced cybersecurity topics like cloud security, artificial intelligence, and the zero-trust architecture, while also learning about various career opportunities in the field of cybersecurity.",
     keyPoints: [
       "Cloud security",
@@ -464,6 +472,7 @@ export const modules = [
   {
     id: 8,
     title: "Advanced Malware Analysis",
+    videoUrl : "https://www.youtube.com/live/0NT7Pe-XU9Y?si=T_XCnkQtoJPJxKb7",
     description: "In this module, you will dive deep into advanced techniques for analyzing and dissecting malware, using both static and dynamic analysis methods. Gain hands-on experience in reverse engineering malware, behavior analysis, and using sandboxes to analyze the malicious activities of malware.",
     keyPoints: [
       "Static and dynamic analysis",
@@ -540,6 +549,7 @@ export const modules = [
   {
     id: 9,
     title: "Red Teaming and Blue Teaming",
+    videoUrl : "https://youtu.be/OtcP8c4wZys?si=KTmZ-T4phvtcyeM-",
     description: "This module introduces the concepts and methodologies used by Red and Blue teams to strengthen an organization’s cybersecurity posture. Understand how Red teams simulate real-world attacks and how Blue teams defend against them, with practical scenarios and strategies for each team.",
     keyPoints: [
       "Red team tactics",
@@ -616,6 +626,7 @@ export const modules = [
   {
     id: 10,
     title: "Zero Trust Architecture",
+    videoUrl : "https://www.youtube.com/live/0NT7Pe-XU9Y?si=a6c3Xgvq-qOMxHlT",
     description: "Zero Trust Architecture (ZTA) is a security model that assumes no one, either inside or outside the network, can be trusted by default. This module provides an in-depth understanding of Zero Trust principles and how organizations can implement them to secure their systems.",
     keyPoints: [
       "Zero trust principles",
@@ -690,3 +701,4 @@ export const modules = [
     ]
   }
 ];
+	
