@@ -1,255 +1,220 @@
-import { useState, useRef } from 'react';
-import { Book, ChevronRight, PlayCircle, Award, ArrowRight, Menu, Volume2, Maximize2, X } from 'lucide-react';
-import { modules } from '../Data/Learndata';
-import QuizModal from '../Components/QuizModal';
+import React, { useState } from "react";
+import { ArrowLeft, Book, ChevronRight, Award } from "lucide-react";
+import { modules } from "../Data/Learndata";
 
 const LearningPage = () => {
-  const [activeModule, setActiveModule] = useState(1);
+  const [selectedModule, setSelectedModule] = useState(null);
   const [isQuizOpen, setIsQuizOpen] = useState(false);
-  const [isSidebarOpen, setSidebarOpen] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const contentRef = useRef(null);
-  const videoRef = useRef(null);
+  const [quizAnswers, setQuizAnswers] = useState({});
+  const [showResults, setShowResults] = useState(false);
 
-  const handleNextModule = () => {
-    setActiveModule(prev => Math.min(prev + 1, modules.length));
-    contentRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
-    setSidebarOpen(false);
-    setIsPlaying(false);
+  const handleBack = () => {
+    setSelectedModule(null);
+    setIsQuizOpen(false);
+    setQuizAnswers({});
+    setShowResults(false);
   };
 
-  const handlePrevModule = () => {
-    setActiveModule(prev => Math.max(prev - 1, 1));
-    contentRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
-    setSidebarOpen(false);
-    setIsPlaying(false);
+  const handleAnswer = (questionIndex, answerIndex) => {
+    setQuizAnswers((prev) => ({
+      ...prev,
+      [questionIndex]: answerIndex,
+    }));
+  };
+
+  const calculateScore = (quiz) => {
+    let correct = 0;
+    Object.entries(quizAnswers).forEach(([questionIndex, answer]) => {
+      if (answer === quiz[questionIndex].answer) correct++;
+    });
+    return (correct / quiz.length) * 100;
   };
 
   const getYouTubeEmbedUrl = (url) => {
     try {
       const urlObj = new URL(url);
-      let videoId;
-  
-      if (urlObj.hostname === 'youtu.be') {
-        videoId = urlObj.pathname.substring(1);
-      } else {
-        const searchParams = new URLSearchParams(urlObj.search);
-        videoId = searchParams.get('v');
-      }
-  
-      return videoId ? `https://www.youtube.com/embed/${videoId}?enablejsapi=1` : '';
+      const videoId =
+        urlObj.hostname === "youtu.be"
+          ? urlObj.pathname.substring(1)
+          : new URLSearchParams(urlObj.search).get("v");
+      return videoId
+        ? `https://www.youtube.com/embed/${videoId}?enablejsapi=1`
+        : "";
     } catch {
-      return '';
+      return "";
     }
   };
-  
 
-  const VideoPlayer = ({ videoUrl }) => {
-    if (!isPlaying) {
-      return (
-        <div 
-          className="bg-gray-800 rounded-xl aspect-video mb-6 md:mb-8 flex items-center justify-center cursor-pointer group relative"
-          onClick={() => setIsPlaying(true)}
-        >
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-          <PlayCircle className="h-12 w-12 md:h-16 md:w-16 text-white opacity-60 group-hover:opacity-80 transition-opacity" />
-          <div className="absolute bottom-4 right-4 flex space-x-2">
-            <Volume2 className="h-5 w-5 text-white opacity-60" />
-            <Maximize2 className="h-5 w-5 text-white opacity-60" />
-          </div>
-          <div className="absolute bottom-4 left-4">
-            <h3 className="text-white text-sm md:text-base font-medium">
-              {modules[activeModule - 1].title}
-            </h3>
-          </div>
-        </div>
-      );
-    }
+  if (selectedModule) {
+    const module = modules[selectedModule - 1];
 
     return (
-      <div className="rounded-xl overflow-hidden aspect-video mb-6 md:mb-8 relative group">
-        <iframe
-          ref={videoRef}
-          className="w-full h-full"
-          src={getYouTubeEmbedUrl(videoUrl)}
-          title="Video Player"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-        />
-        <button 
-          onClick={() => setIsPlaying(false)}
-          className="absolute top-4 right-4 p-2 bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-        >
-          <X className="h-4 w-4 text-white" />
-        </button>
+      <div className="min-h-screen bg-gray-50 p-4 sm:p-6 md:p-8 lg:p-12">
+        <div className="max-w-6xl mx-auto">
+          <button
+            onClick={handleBack}
+            className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 mb-4 sm:mb-6 md:mb-8 group"
+          >
+            <ArrowLeft className="h-5 w-5 transform group-hover:-translate-x-1 transition-transform" />
+            <span>Back to Modules</span>
+          </button>
+
+          <div className="space-y-4 sm:space-y-6 md:space-y-8">
+            <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 p-4 sm:p-6 md:p-8 lg:p-10">
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 sm:mb-6">
+                {module.title}
+              </h1>
+              <p className="text-gray-600 mb-6 sm:mb-8">{module.description}</p>
+
+              <div className="aspect-video mb-6 sm:mb-8 md:mb-10 rounded-xl overflow-hidden bg-gray-900">
+                <iframe
+                  className="w-full h-full"
+                  src={getYouTubeEmbedUrl(module.videoUrl)}
+                  title="Video Player"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
+
+              <div className="prose max-w-none space-y-6 sm:space-y-8 md:space-y-10">
+                {Object.entries(module.mainContent).map(([key, section]) => (
+                  <div key={key}>
+                    <h2 className="text-lg sm:text-xl md:text-2xl font-semibold mb-3 sm:mb-4">
+                      {section.title}
+                    </h2>
+                    <p className="text-gray-600 leading-relaxed text-sm sm:text-base">
+                      {section.content}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 p-4 sm:p-6 md:p-8">
+              <h3 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6">
+                Key Learning Points
+              </h3>
+              <ul className="space-y-3 sm:space-y-4">
+                {module.keyPoints.map((point, index) => (
+                  <li key={index} className="flex items-start">
+                    <ChevronRight className="h-5 w-5 text-indigo-500 mr-3 sm:mr-4 mt-0.5" />
+                    <span className="text-gray-600 text-sm sm:text-base">{point}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="bg-indigo-50 rounded-xl p-4 sm:p-6 md:p-8 shadow-md hover:shadow-xl transition-shadow duration-300">
+              <h3 className="text-lg sm:text-xl font-semibold text-indigo-900 mb-4 sm:mb-6">
+                Additional Resources
+              </h3>
+              <div className="space-y-3 sm:space-y-4">
+                {module.additionalResources.map((resource, index) => (
+                  <a
+                    key={index}
+                    href={resource.link}
+                    className="flex items-center text-indigo-600 hover:text-indigo-700 text-sm sm:text-base"
+                  >
+                    <Book className="h-5 w-5 mr-3 sm:mr-4" />
+                    {resource.title} ({resource.type})
+                  </a>
+                ))}
+              </div>
+            </div>
+
+            {!isQuizOpen ? (
+              <button
+                onClick={() => setIsQuizOpen(true)}
+                className="w-full py-4 sm:py-6 bg-purple-100 text-purple-600 rounded-xl hover:bg-purple-200 shadow-md hover:shadow-xl transition-all duration-300 flex items-center justify-center text-sm sm:text-base"
+              >
+                <Award className="h-5 w-5 mr-2 sm:mr-3" />
+                Take Module Quiz
+              </button>
+            ) : (
+              <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 p-4 sm:p-6 md:p-8">
+                <h3 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6">Module Quiz</h3>
+                {module.quiz.map((question, qIndex) => (
+                  <div key={qIndex} className="mb-4 sm:mb-6">
+                    <p className="font-medium mb-2 sm:mb-3 text-sm sm:text-base">{question.question}</p>
+                    <div className="space-y-2">
+                      {question.options.map((option, oIndex) => (
+                        <button
+                          key={oIndex}
+                          onClick={() => handleAnswer(qIndex, oIndex)}
+                          className={`w-full text-left p-3 rounded-lg border text-sm sm:text-base ${
+                            quizAnswers[qIndex] === oIndex
+                              ? "border-indigo-500 bg-indigo-50"
+                              : "border-gray-200 hover:bg-gray-50"
+                          } shadow-sm hover:shadow-md transition-shadow duration-300`}
+                        >
+                          {option}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+                {!showResults ? (
+                  <button
+                    onClick={() => setShowResults(true)}
+                    className="w-full py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 shadow-md hover:shadow-xl transition-all duration-300 text-sm sm:text-base"
+                  >
+                    Submit Quiz
+                  </button>
+                ) : (
+                  <div className="text-center">
+                    <p className="text-xl sm:text-2xl font-bold mb-2">
+                      Your Score: {calculateScore(module.quiz)}%
+                    </p>
+                    <button
+                      onClick={() => {
+                        setQuizAnswers({});
+                        setShowResults(false);
+                      }}
+                      className="text-indigo-600 hover:text-indigo-700 text-sm sm:text-base"
+                    >
+                      Retake Quiz
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     );
-  };
+  }
 
   return (
-    <div className="flex flex-col md:flex-row h-screen bg-gray-50 pt-16">
-      {/* Mobile Header */}
-      <div className="md:hidden flex items-center justify-between p-4 bg-white border-b">
-        <button onClick={() => setSidebarOpen(!isSidebarOpen)} className="p-2">
-          <Menu className="h-6 w-6" />
-        </button>
-        <h2 className="text-lg font-semibold">Chapter {activeModule}</h2>
-      </div>
-
-      {/* Sidebar */}
-      <div className={`
-        fixed md:static inset-0 z-30 bg-white border-r border-gray-200
-        transform transition-transform duration-300 ease-in-out
-        ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-        md:translate-x-0 w-72 md:w-56 overflow-y-auto
-      `}>
-        <div className="p-4">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-700">Learning Concepts</h2>
-            <button 
-              className="md:hidden p-2 hover:bg-gray-100 rounded-lg"
-              onClick={() => setSidebarOpen(false)}
+    <div className="min-h-screen bg-gray-50 p-8 md:p-12 lg:p-16">
+      <div className="max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {modules.map((module) => (
+            <div
+              key={module.id}
+              onClick={() => setSelectedModule(module.id)}
+              className="group cursor-pointer h-[320px]"
             >
-              <X className="h-5 w-5" />
-            </button>
-          </div>
-          <div className="space-y-1">
-            {modules.map((module) => (
-              <button
-                key={module.id}
-                onClick={() => {
-                  setActiveModule(module.id);
-                  setSidebarOpen(false);
-                  setIsPlaying(false);
-                }}
-                className={`w-full text-left px-4 py-2 rounded-lg transition-colors duration-200 
-                  ${activeModule === module.id ? 'bg-indigo-50 text-indigo-600' : 'text-gray-600 hover:bg-gray-50'}`}
-              >
-                <div className="flex items-center">
-                  <Book className="h-4 w-4 mr-2" />
-                  <span>Chapter {module.id}</span>
-                  {activeModule === module.id && <ChevronRight className="h-4 w-4 ml-auto" />}
+              <div className="bg-white rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 ease-in-out transform hover:-translate-y-1 overflow-hidden h-full flex flex-col">
+                <div className="aspect-video bg-gradient-to-br from-indigo-500 to-purple-600 relative w-full">
+                  <img
+                    src={`/public/Images/module${module.id}.avif`}
+                    alt={`Banner for ${module.title}`}
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
                 </div>
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Overlay for mobile sidebar */}
-      {isSidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
-      {/* Main Content */}
-      <div ref={contentRef} className="flex-1 overflow-y-auto px-4 md:px-8">
-        <div className="max-w-4xl mx-auto py-4 md:py-8">
-          {/* Module Header */}
-          <div className="mb-6 md:mb-8">
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
-              {modules[activeModule - 1].title}
-            </h1>
-            <p className="text-base md:text-lg text-gray-600 leading-relaxed">
-              {modules[activeModule - 1].description}
-            </p>
-          </div>
-
-          {/* Video Section */}
-          <VideoPlayer videoUrl={modules[activeModule - 1].videoUrl} />
-
-          {/* Content Sections */}
-          <div className="prose max-w-none mb-6 md:mb-8">
-            {Object.entries(modules[activeModule - 1].mainContent).map(([key, section]) => (
-              <div key={key} className="mb-6 md:mb-8">
-                <h2 className="text-xl md:text-2xl font-semibold text-gray-800 mb-3 md:mb-4">
-                  {section.title}
-                </h2>
-                <p className="text-base md:text-lg text-gray-600 leading-relaxed">
-                  {section.content}
-                </p>
+                <div className="p-6 flex-1 flex flex-col">
+                  <h3 className="font-semibold text-lg mb-2 group-hover:text-indigo-600 transition-colors">
+                    Chapter {module.id}: {module.title}
+                  </h3>
+                  <p className="text-gray-600 text-sm flex-1 line-clamp-3">
+                    {module.description}
+                  </p>
+                </div>
               </div>
-            ))}
-          </div>
-
-          {/* Key Points */}
-          <div className="bg-white rounded-lg shadow-sm p-4 md:p-8 mb-6 md:mb-8">
-            <h3 className="text-lg md:text-xl font-semibold mb-4">Key Learning Points</h3>
-            <ul className="space-y-3">
-              {modules[activeModule - 1].keyPoints.map((point, index) => (
-                <li key={index} className="flex items-start">
-                  <ChevronRight className="h-5 w-5 text-indigo-500 mr-3 mt-0.5" />
-                  <span className="text-gray-600 text-base md:text-lg">{point}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Additional Resources */}
-          <div className="bg-indigo-50 rounded-lg p-4 md:p-8 mb-6 md:mb-8">
-            <h3 className="text-lg md:text-xl font-semibold text-indigo-900 mb-4">
-              Additional Resources
-            </h3>
-            <div className="space-y-3">
-              {modules[activeModule - 1].additionalResources.map((resource, index) => (
-                <a
-                  key={index}
-                  href={resource.link}
-                  className="flex items-center text-indigo-600 hover:text-indigo-700 text-base md:text-lg"
-                >
-                  <Book className="h-5 w-5 mr-3" />
-                  {resource.title} ({resource.type})
-                </a>
-              ))}
             </div>
-          </div>
-
-          {/* Bottom Navigation */}
-          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 border-t pt-6 md:pt-8 mb-8">
-            <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-              <button 
-                onClick={() => setIsQuizOpen(true)} 
-                className="w-full sm:w-auto flex items-center justify-center px-6 py-3 bg-purple-100 text-purple-600 rounded-lg hover:bg-purple-200 transition-colors duration-200"
-              >
-                <Award className="h-5 w-5 mr-2" />
-                Take Quiz
-              </button>
-              <button
-                onClick={handlePrevModule}
-                disabled={activeModule === 1}
-                className={`w-full sm:w-auto flex items-center justify-center px-6 py-3 rounded-lg transition-colors duration-200
-                  ${activeModule === 1 
-                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                  }`}
-              >
-                Previous
-              </button>
-            </div>
-            <button
-              onClick={handleNextModule}
-              disabled={activeModule === modules.length}
-              className={`w-full sm:w-auto flex items-center justify-center px-8 py-3 rounded-lg transition-colors duration-200
-                ${activeModule === modules.length
-                  ? 'bg-gray-600 cursor-not-allowed'
-                  : 'bg-indigo-600 hover:bg-indigo-700'
-                } text-white`}
-            >
-              Next Module
-              <ArrowRight className="h-5 w-5 ml-2" />
-            </button>
-          </div>
+          ))}
         </div>
       </div>
-
-      <QuizModal
-        isOpen={isQuizOpen}
-        onClose={() => setIsQuizOpen(false)}
-        quiz={modules[activeModule - 1].quiz}
-        moduleId={activeModule}
-      />
     </div>
   );
 };

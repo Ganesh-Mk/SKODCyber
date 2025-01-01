@@ -10,6 +10,7 @@ export const modules = [
       "Common security threats",
       "Overview of security tools"
     ],
+    banner: "/public/Images/module1.avif",
     videoUrl : "https://youtu.be/6fM_I3APtqU?si=RN8Rx3FNLF0sL96I",
     mainContent: {
       section1: {
