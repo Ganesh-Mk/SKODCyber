@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ArrowLeft, Book, ChevronRight, Award } from "lucide-react";
 import { modules } from "../Data/Learndata";
 
@@ -7,6 +7,15 @@ const LearningPage = () => {
   const [isQuizOpen, setIsQuizOpen] = useState(false);
   const [quizAnswers, setQuizAnswers] = useState({});
   const [showResults, setShowResults] = useState(false);
+  const [completedModules, setCompletedModules] = useState([]);
+  const [badges, setBadges] = useState(0);
+
+  useEffect(() => {
+    const storedModules = JSON.parse(localStorage.getItem('completedModules')) || [];
+    const storedBadges = parseInt(localStorage.getItem('badges')) || 0;
+    setCompletedModules(storedModules);
+    setBadges(storedBadges);
+  }, []);
 
   const handleBack = () => {
     setSelectedModule(null);
@@ -30,6 +39,20 @@ const LearningPage = () => {
     return (correct / quiz.length) * 100;
   };
 
+  const updateProgress = (score, moduleId) => {
+    if (score === 100) {
+      const updatedModules = [...new Set([...completedModules, moduleId])];
+      setCompletedModules(updatedModules);
+      localStorage.setItem('completedModules', JSON.stringify(updatedModules));
+
+      if (updatedModules.length === modules.length) {
+        const newBadgeCount = badges + 1;
+        setBadges(newBadgeCount);
+        localStorage.setItem('badges', newBadgeCount.toString());
+      }
+    }
+  };
+
   const getYouTubeEmbedUrl = (url) => {
     try {
       const urlObj = new URL(url);
@@ -51,13 +74,24 @@ const LearningPage = () => {
     return (
       <div className="min-h-screen bg-gray-50 p-4 sm:p-6 md:p-8 lg:p-12">
         <div className="max-w-6xl mx-auto">
-          <button
-            onClick={handleBack}
-            className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 mb-4 sm:mb-6 md:mb-8 group"
-          >
-            <ArrowLeft className="h-5 w-5 transform group-hover:-translate-x-1 transition-transform" />
-            <span>Back to Modules</span>
-          </button>
+          <div className="flex justify-between items-center mb-4 sm:mb-6 md:mb-8">
+            <button
+              onClick={handleBack}
+              className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 group"
+            >
+              <ArrowLeft className="h-5 w-5 transform group-hover:-translate-x-1 transition-transform" />
+              <span>Back to Modules</span>
+            </button>
+            <div className="flex items-center space-x-4">
+              <span className="text-sm text-gray-600">
+                Progress: {completedModules.length}/{modules.length} Modules
+              </span>
+              <div className="flex items-center space-x-1">
+                <Award className="h-5 w-5 text-yellow-500" />
+                <span className="text-sm text-gray-600">{badges}</span>
+              </div>
+            </div>
+          </div>
 
           <div className="space-y-4 sm:space-y-6 md:space-y-8">
             <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 p-4 sm:p-6 md:p-8 lg:p-10">
@@ -113,6 +147,8 @@ const LearningPage = () => {
                   <a
                     key={index}
                     href={resource.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="flex items-center text-indigo-600 hover:text-indigo-700 text-sm sm:text-base"
                   >
                     <Book className="h-5 w-5 mr-3 sm:mr-4" />
@@ -135,7 +171,9 @@ const LearningPage = () => {
                 <h3 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6">Module Quiz</h3>
                 {module.quiz.map((question, qIndex) => (
                   <div key={qIndex} className="mb-4 sm:mb-6">
-                    <p className="font-medium mb-2 sm:mb-3 text-sm sm:text-base">{question.question}</p>
+                    <p className="font-medium mb-2 sm:mb-3 text-sm sm:text-base">
+                      {question.question}
+                    </p>
                     <div className="space-y-2">
                       {question.options.map((option, oIndex) => (
                         <button
@@ -155,7 +193,11 @@ const LearningPage = () => {
                 ))}
                 {!showResults ? (
                   <button
-                    onClick={() => setShowResults(true)}
+                    onClick={() => {
+                      const score = calculateScore(module.quiz);
+                      setShowResults(true);
+                      updateProgress(score, module.id);
+                    }}
                     className="w-full py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 shadow-md hover:shadow-xl transition-all duration-300 text-sm sm:text-base"
                   >
                     Submit Quiz
@@ -165,6 +207,11 @@ const LearningPage = () => {
                     <p className="text-xl sm:text-2xl font-bold mb-2">
                       Your Score: {calculateScore(module.quiz)}%
                     </p>
+                    {calculateScore(module.quiz) === 100 && (
+                      <p className="text-green-600 mb-4">
+                        Congratulations! You've mastered this module!
+                      </p>
+                    )}
                     <button
                       onClick={() => {
                         setQuizAnswers({});
@@ -187,6 +234,18 @@ const LearningPage = () => {
   return (
     <div className="min-h-screen bg-gray-50 p-8 md:p-12 lg:p-16">
       <div className="max-w-7xl mx-auto">
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-2xl font-bold">Learning Modules</h1>
+          <div className="flex items-center space-x-4">
+            <span className="text-sm text-gray-600">
+              Progress: {completedModules.length}/{modules.length} Modules
+            </span>
+            <div className="flex items-center space-x-1">
+              <Award className="h-5 w-5 text-yellow-500" />
+              <span className="text-sm text-gray-600">{badges}</span>
+            </div>
+          </div>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {modules.map((module) => (
             <div
@@ -194,7 +253,12 @@ const LearningPage = () => {
               onClick={() => setSelectedModule(module.id)}
               className="group cursor-pointer h-[320px]"
             >
-              <div className="bg-white rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 ease-in-out transform hover:-translate-y-1 overflow-hidden h-full flex flex-col">
+              <div className="bg-white rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 ease-in-out transform hover:-translate-y-1 overflow-hidden h-full flex flex-col relative">
+                {completedModules.includes(module.id) && (
+                  <div className="absolute top-2 right-2 bg-green-500 text-white p-2 rounded-full">
+                    <Award className="h-4 w-4" />
+                  </div>
+                )}
                 <div className="aspect-video bg-gradient-to-br from-indigo-500 to-purple-600 relative w-full">
                   <img
                     src={`/public/Images/module${module.id}.avif`}
