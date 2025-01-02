@@ -9,12 +9,17 @@ const LearningPage = () => {
   const [showResults, setShowResults] = useState(false);
   const [completedModules, setCompletedModules] = useState([]);
   const [badges, setBadges] = useState(0);
+  const [totalQuizAttempts, setTotalQuizAttempts] = useState(0);
 
   useEffect(() => {
+    // Load all stored data on component mount
     const storedModules = JSON.parse(localStorage.getItem('completedModules')) || [];
     const storedBadges = parseInt(localStorage.getItem('badges')) || 0;
+    const storedQuizAttempts = parseInt(localStorage.getItem('quizAttempts')) || 0;
+    
     setCompletedModules(storedModules);
     setBadges(storedBadges);
+    setTotalQuizAttempts(storedQuizAttempts);
   }, []);
 
   const handleBack = () => {
@@ -40,16 +45,23 @@ const LearningPage = () => {
   };
 
   const updateProgress = (score, moduleId) => {
-    if (score === 100) {
-      const updatedModules = [...new Set([...completedModules, moduleId])];
+    // Increment quiz attempts counter regardless of score
+    const newQuizAttempts = totalQuizAttempts + 1;
+    setTotalQuizAttempts(newQuizAttempts);
+    localStorage.setItem('quizAttempts', newQuizAttempts.toString());
+
+    // Add module to completed list if not already included
+    if (!completedModules.includes(moduleId)) {
+      const updatedModules = [...completedModules, moduleId];
       setCompletedModules(updatedModules);
       localStorage.setItem('completedModules', JSON.stringify(updatedModules));
+    }
 
-      if (updatedModules.length === modules.length) {
-        const newBadgeCount = badges + 1;
-        setBadges(newBadgeCount);
-        localStorage.setItem('badges', newBadgeCount.toString());
-      }
+    // Award badge only if score is 100%
+    if (score === 100) {
+      const newBadgeCount = badges + 1;
+      setBadges(newBadgeCount);
+      localStorage.setItem('badges', newBadgeCount.toString());
     }
   };
 
@@ -74,24 +86,14 @@ const LearningPage = () => {
     return (
       <div className="min-h-screen bg-gray-50 p-4 sm:p-6 md:p-8 lg:p-12">
         <div className="max-w-6xl mx-auto">
-          <div className="flex justify-between items-center mb-4 sm:mb-6 md:mb-8">
-            <button
-              onClick={handleBack}
-              className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 group"
-            >
-              <ArrowLeft className="h-5 w-5 transform group-hover:-translate-x-1 transition-transform" />
-              <span>Back to Modules</span>
-            </button>
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-600">
-                Progress: {completedModules.length}/{modules.length} Modules
-              </span>
-              <div className="flex items-center space-x-1">
-                <Award className="h-5 w-5 text-yellow-500" />
-                <span className="text-sm text-gray-600">{badges}</span>
-              </div>
-            </div>
-          </div>
+        <div className="fixed top-[5rem] left-4 z-50">
+          <button
+            onClick={handleBack}
+            className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 group bg-white px-2 py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-300"
+          >
+            <ArrowLeft className="h-5 w-5  transform group-hover:-translate-x-1 transition-transform" />
+          </button>
+        </div>
 
           <div className="space-y-4 sm:space-y-6 md:space-y-8">
             <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 p-4 sm:p-6 md:p-8 lg:p-10">
@@ -100,7 +102,7 @@ const LearningPage = () => {
               </h1>
               <p className="text-gray-600 mb-6 sm:mb-8">{module.description}</p>
 
-              <div className="aspect-video mb-6 sm:mb-8 md:mb-10 rounded-xl overflow-hidden bg-gray-900">
+              <div className="aspect-[5/2.5] mb-6 sm:mb-8 md:mb-10 rounded-xl overflow-hidden bg-gray-900">
                 <iframe
                   className="w-full h-full"
                   src={getYouTubeEmbedUrl(module.videoUrl)}
@@ -209,7 +211,7 @@ const LearningPage = () => {
                     </p>
                     {calculateScore(module.quiz) === 100 && (
                       <p className="text-green-600 mb-4">
-                        Congratulations! You've mastered this module!
+                        Congratulations! You've earned a badge!
                       </p>
                     )}
                     <button
@@ -238,12 +240,15 @@ const LearningPage = () => {
           <h1 className="text-2xl font-bold">Learning Modules</h1>
           <div className="flex items-center space-x-4">
             <span className="text-sm text-gray-600">
-              Progress: {completedModules.length}/{modules.length} Modules
+              Completed: {completedModules.length}/{modules.length} Modules
             </span>
             <div className="flex items-center space-x-1">
               <Award className="h-5 w-5 text-yellow-500" />
               <span className="text-sm text-gray-600">{badges}</span>
             </div>
+            <span className="text-sm text-gray-600">
+              Quiz Attempts: {totalQuizAttempts}
+            </span>
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">

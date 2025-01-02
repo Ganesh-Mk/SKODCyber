@@ -23,7 +23,7 @@ export const modules = [
       }
     },
     additionalResources: [
-      { title: "Cybersecurity Basics", type: "PDF", link: "/resources/cyber-basics" }
+      { title: "Cybersecurity Basics", type: "PDF", link: "https://www.ftc.gov/system/files/attachments/cybersecurity-small-business/cybersecuirty_sb_factsheets_all.pdf" }
     ],
     quiz: [
       {
@@ -90,7 +90,7 @@ export const modules = [
       }
     },
     additionalResources: [
-      { title: "Guide to Network Security", type: "Video", link: "/resources/network-security" }
+      { title: "Guide to Network Security", type: "Video", link: "https://youtu.be/zd0U1zNBYNk?si=4KLzrMSIEvL5C-dm" }
     ],
     quiz: [
       {
@@ -224,7 +224,7 @@ export const modules = [
       }
     },
     additionalResources: [
-      { title: "Cryptography Basics", type: "PDF", link: "/resources/cryptography" }
+      { title: "Cryptography Basics", type: "PDF", link: "https://www.cs.unibo.it/babaoglu/courses/security/resources/documents/intro-to-crypto.pdf" }
     ],
     quiz: [
       {
@@ -291,7 +291,7 @@ export const modules = [
       }
     },
     additionalResources: [
-      { title: "Beginner's Guide to Ethical Hacking", type: "Video", link: "/resources/ethical-hacking" }
+      { title: "Beginner's Guide to Ethical Hacking", type: "Video", link: "https://youtu.be/RWSqDF_6n4k?si=I6isaAT2G9eL3WYA" }
     ],
     quiz: [
       {
@@ -339,7 +339,7 @@ export const modules = [
   {
     id: 6,
     title: "Incident Response and Forensics",
-    videoUrl : "https://www.youtube.com/live/0NT7Pe-XU9Y?si=3Hy9m9drZDLJjAaL",
+    videoUrl : "https://youtu.be/zuRQzc_Ox6o?si=HD3w3Hb-eUeDtAHq",
     description: "Learn the process of responding to and investigating security incidents, focusing on how to handle and analyze cyberattacks to preserve evidence for legal action.",
     keyPoints: [
       "Incident response process",
@@ -358,7 +358,7 @@ export const modules = [
       }
     },
     additionalResources: [
-      { title: "Incident Response Checklist", type: "PDF", link: "/resources/incident-response" }
+      { title: "Incident Response Checklist", type: "PDF", link: "https://nvlpubs.nist.gov/nistpubs/ir/2022/NIST.IR.8428.pdf" }
     ],
     quiz: [
       {
@@ -406,7 +406,7 @@ export const modules = [
   {
     id: 7,
     title: "Advanced Topics and Career Paths",
-    videoUrl : "https://www.youtube.com/live/lpa8uy4DyMo?si=v3e-dqQXxUavO1zu",
+    videoUrl : "https://youtu.be/b12JrM-6DBY?si=Dn0wUXaLKo3kxGRf",
     description: "Explore advanced cybersecurity topics like cloud security, artificial intelligence, and the zero-trust architecture, while also learning about various career opportunities in the field of cybersecurity.",
     keyPoints: [
       "Cloud security",
@@ -425,7 +425,7 @@ export const modules = [
       }
     },
     additionalResources: [
-      { title: "Cybersecurity Career Guide", type: "PDF", link: "/resources/career-guide" }
+      { title: "Cybersecurity Career Guide", type: "PDF", link: "https://www.wvjc.edu/wp-content/uploads/2020/07/The-Complete-Guide-To-Starting-Your-Career-in-Cybersecurity.pdf" }
     ],
     quiz: [
       {
@@ -473,7 +473,7 @@ export const modules = [
   {
     id: 8,
     title: "Advanced Malware Analysis",
-    videoUrl : "https://www.youtube.com/live/0NT7Pe-XU9Y?si=T_XCnkQtoJPJxKb7",
+    videoUrl : "https://youtu.be/z3lFMfWvwEo?si=ajgrzGQ1b5Xn_s8Z",
     description: "In this module, you will dive deep into advanced techniques for analyzing and dissecting malware, using both static and dynamic analysis methods. Gain hands-on experience in reverse engineering malware, behavior analysis, and using sandboxes to analyze the malicious activities of malware.",
     keyPoints: [
       "Static and dynamic analysis",
@@ -502,7 +502,7 @@ export const modules = [
     },
     additionalResources: [
       { title: "Malware Analysis Tools", type: "Website", link: "/resources/malware-analysis" },
-      { title: "Reverse Engineering Malware - Beginner to Expert", type: "Course", link: "/resources/reverse-engineering" }
+      { title: "Reverse Engineering Malware - Beginner to Expert", type: "Course", link: "https://www.udemy.com/course/advanced-malware-analysis/?srsltid=AfmBOopdadkXO3QzTFBAQUgJFXyb8JiimBzjYnCfZswqKqWDsnMdGFMk&couponCode=NEWYEARCAREER" }
     ],
     quiz: [
       {
@@ -550,7 +550,7 @@ export const modules = [
   {
     id: 9,
     title: "Red Teaming and Blue Teaming",
-    videoUrl : "https://youtu.be/OtcP8c4wZys?si=KTmZ-T4phvtcyeM-",
+    videoUrl : "https://youtu.be/ylz6NhQ5vQM?si=fi44KnZJOtzjD_yA",
     description: "This module introduces the concepts and methodologies used by Red and Blue teams to strengthen an organization’s cybersecurity posture. Understand how Red teams simulate real-world attacks and how Blue teams defend against them, with practical scenarios and strategies for each team.",
     keyPoints: [
       "Red team tactics",
@@ -578,8 +578,8 @@ export const modules = [
       }
     },
     additionalResources: [
-      { title: "Red Team vs Blue Team", type: "Video", link: "/resources/red-blue-teaming" },
-      { title: "Blue Team Best Practices", type: "PDF", link: "/resources/blue-team-practices" }
+      { title: "Red Team vs Blue Team", type: "Video", link: "https://youtu.be/aEKwX95eYG4?si=ma8LbSOTGn3WTQTg" },
+      { title: "Blue Team Best Practices", type: "PDF", link: "https://nukib.gov.cz/download/publikace/navody/cviceni/Tech_manual_FINAL.pdf" }
     ],
     quiz: [
       {
@@ -627,7 +627,7 @@ export const modules = [
   {
     id: 10,
     title: "Zero Trust Architecture",
-    videoUrl : "https://www.youtube.com/live/0NT7Pe-XU9Y?si=a6c3Xgvq-qOMxHlT",
+    videoUrl : "https://youtu.be/yn6CPQ9RioA?si=yI_nTzwwby7hbsas",
     description: "Zero Trust Architecture (ZTA) is a security model that assumes no one, either inside or outside the network, can be trusted by default. This module provides an in-depth understanding of Zero Trust principles and how organizations can implement them to secure their systems.",
     keyPoints: [
       "Zero trust principles",
@@ -655,8 +655,8 @@ export const modules = [
       }
     },
     additionalResources: [
-      { title: "Zero Trust Architecture Framework", type: "PDF", link: "/resources/zero-trust" },
-      { title: "Guide to Implementing Zero Trust", type: "Website", link: "/resources/zero-trust-guide" }
+      { title: "Zero Trust Architecture Framework", type: "PDF", link: "https://nvlpubs.nist.gov/nistpubs/specialpublications/NIST.SP.800-207.pdf" },
+      { title: "Guide to Implementing Zero Trust", type: "Website", link: "https://www.paloaltonetworks.com/cyberpedia/what-is-a-zero-trust-architecture" }
     ],
     quiz: [
       {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { LineChart, CartesianGrid, XAxis, YAxis, Tooltip, Line, ResponsiveContainer } from 'recharts';
-import { Camera, Github, Instagram, Linkedin, Twitter, Edit2, Award, BookOpen, CheckSquare } from 'lucide-react';
+import { Camera, Github, Instagram, Linkedin, Twitter, Edit2, Award, BookOpen, CheckSquare, X } from 'lucide-react';
 
 const Account = () => {
   const [userData, setUserData] = useState(() => {
@@ -17,10 +17,40 @@ const Account = () => {
       }
     };
   });
-
+  const [completedModules, setcompletedModules] = useState({})
+  const [badges, setbadges] = useState("0")
+  const [quizzes, setquizzes] = useState("0")
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editForm, setEditForm] = useState({ ...userData });
   const [imagePreview, setImagePreview] = useState(null);
+  const [isAddCertModalOpen, setIsAddCertModalOpen] = useState(false);
+  const [certifications, setCertifications] = useState([
+    { 
+      name: 'CompTIA Security+',
+      date: 'May 2024',
+      status: 'active',
+      score: '95%'
+    },
+    {
+      name: 'Certified Ethical Hacker (CEH)',
+      date: 'March 2024',
+      status: 'active',
+      score: '92%'
+    },
+    {
+      name: 'CISSP',
+      date: 'January 2024',
+      status: 'active',
+      score: '89%'
+    }
+  ]);
+
+  const [newCertification, setNewCertification] = useState({
+    name: '',
+    date: '',
+    status: 'active',
+    score: ''
+  });
 
   // Sample data for charts
   const quizScores = [
@@ -39,12 +69,6 @@ const Account = () => {
     { month: 'May', modules: 18 }
   ];
 
-  const badges = [
-    { name: 'Network Ninja', count: 3 },
-    { name: 'Code Guardian', count: 2 },
-    { name: 'Security Sentinel', count: 4 }
-  ];
-
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -57,10 +81,30 @@ const Account = () => {
     }
   };
 
+  useEffect(() => {
+    const storedCompletedModules = localStorage.getItem('completedModules')
+    setcompletedModules(JSON.parse(storedCompletedModules))
+    setbadges(localStorage.getItem('badges'))
+    setquizzes(localStorage.getItem('quizAttempts'))
+  },[])
+
   const saveChanges = () => {
     setUserData(editForm);
     localStorage.setItem('userData', JSON.stringify(editForm));
     setIsEditModalOpen(false);
+  };
+
+  const handleAddCertification = () => {
+    if (newCertification.name && newCertification.date && newCertification.score) {
+      setCertifications([...certifications, { ...newCertification }]);
+      setNewCertification({
+        name: '',
+        date: '',
+        status: 'active',
+        score: ''
+      });
+      setIsAddCertModalOpen(false);
+    }
   };
 
   return (
@@ -104,7 +148,7 @@ const Account = () => {
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-gray-800">Modules Completed</h3>
-                <p className="text-3xl font-bold text-blue-600">18</p>
+                <p className="text-3xl font-bold text-blue-600">{completedModules.length}</p>
               </div>
             </div>
           </div>
@@ -115,8 +159,8 @@ const Account = () => {
                 <CheckSquare className="w-6 h-6 text-green-600" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-gray-800">Quizzes Completed</h3>
-                <p className="text-3xl font-bold text-green-600">25</p>
+                <h3 className="text-lg font-semibold text-gray-800">Quizzes Given</h3>
+                <p className="text-3xl font-bold text-green-600">{quizzes}</p>
               </div>
             </div>
           </div>
@@ -127,8 +171,8 @@ const Account = () => {
                 <Award className="w-6 h-6 text-purple-600" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-gray-800">Badges Earned</h3>
-                <p className="text-3xl font-bold text-purple-600">9</p>
+                <h3 className="text-lg font-semibold text-gray-800">Bages</h3>
+                <p className="text-3xl font-bold text-purple-600">{badges}</p>
               </div>
             </div>
           </div>
@@ -167,22 +211,34 @@ const Account = () => {
           </div>
         </div>
 
-        {/* Badges and Social Links */}
+        {/* Certifications and Social Links */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="bg-white p-6 rounded-xl shadow-lg">
-            <h3 className="text-xl font-semibold mb-4">Earned Badges</h3>
+            <h3 className="text-xl font-semibold mb-4">Professional Certifications</h3>
             <div className="space-y-4">
-              {badges.map((badge) => (
-                <div key={badge.name} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <Award className="w-6 h-6 text-yellow-500" />
-                    <span className="font-medium">{badge.name}</span>
+              {certifications.map((cert) => (
+                <div key={cert.name} className="p-4 border border-gray-100 rounded-lg hover:bg-gray-50 transition-all duration-300">
+                  <div className="flex justify-between items-start mb-2">
+                    <h4 className="font-semibold text-gray-800">{cert.name}</h4>
+                    <span className="px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full">
+                      {cert.status}
+                    </span>
                   </div>
-                  <span className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm">
-                    ×{badge.count}
-                  </span>
+                  <div className="flex justify-between text-sm text-gray-600">
+                    <span>Achieved: {cert.date}</span>
+                    <span>Score: {cert.score}</span>
+                  </div>
                 </div>
               ))}
+              <div className="mt-6">
+                <button 
+                  onClick={() => setIsAddCertModalOpen(true)}
+                  className="w-full py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-indigo-500 hover:text-indigo-500 transition-all duration-300 flex items-center justify-center gap-2"
+                >
+                  <Award className="w-5 h-5" />
+                  Add New Certification
+                </button>
+              </div>
             </div>
           </div>
 
@@ -209,9 +265,9 @@ const Account = () => {
           </div>
         </div>
 
-        {/* Edit Modal */}
+        {/* Edit Profile Modal */}
         {isEditModalOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
             <div className="bg-white rounded-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
               <h2 className="text-2xl font-bold mb-6">Edit Profile</h2>
 
@@ -223,7 +279,7 @@ const Account = () => {
                       <img
                         src={imagePreview || editForm.image || '/api/placeholder/96/96'}
                         alt="Profile Preview"
-                        className="w-full h-full object-cover "
+                        className="w-full h-full object-cover"
                       />
                     </div>
                     <label className="px-4 py-2 bg-gray-100 rounded-lg cursor-pointer hover:bg-gray-200 transition-colors duration-300">
@@ -268,7 +324,6 @@ const Account = () => {
                     className="p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
-
                 <div className="flex flex-col gap-4">
                   <label className="font-medium">Social Links</label>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -301,7 +356,8 @@ const Account = () => {
                     <div className="flex items-center gap-2 p-3 border rounded-lg">
                       <Linkedin className="w-5 h-5 text-blue-600" />
                       <input
-                        type="text" value={editForm.social.linkedin}
+                        type="text"
+                        value={editForm.social.linkedin}
                         onChange={(e) => setEditForm({
                           ...editForm,
                           social: { ...editForm.social, linkedin: e.target.value }
@@ -338,6 +394,88 @@ const Account = () => {
                     className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors duration-300"
                   >
                     Save Changes
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Add Certification Modal */}
+        {isAddCertModalOpen && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-2xl p-8 max-w-md w-full">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold">Add New Certification</h2>
+                <button 
+                  onClick={() => setIsAddCertModalOpen(false)}
+                  className="p-2 hover:bg-gray-100 rounded-full"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Certification Name
+                  </label>
+                  <input
+                    type="text"
+                    value={newCertification.name}
+                    onChange={(e) => setNewCertification({
+                      ...newCertification,
+                      name: e.target.value
+                    })}
+                    className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    placeholder="e.g., CompTIA Security+"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Date Achieved
+                  </label>
+                  <input
+                    type="month"
+                    value={newCertification.date}
+                    onChange={(e) => setNewCertification({
+                      ...newCertification,
+                      date: e.target.value
+                    })}
+                    className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Score
+                  </label>
+                  <input
+                    type="text"
+                    value={newCertification.score}
+                    onChange={(e) => setNewCertification({
+                      ...newCertification,
+                      score: e.target.value
+                    })}
+                    className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    placeholder="e.g., 95%"
+                  />
+                </div>
+
+                <div className="flex justify-end gap-4 mt-8">
+                  <button
+                    onClick={() => setIsAddCertModalOpen(false)}
+                    className="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-300"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleAddCertification}
+                    className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors duration-300"
+                    disabled={!newCertification.name || !newCertification.date || !newCertification.score}
+                  >
+                    Add Certification
                   </button>
                 </div>
               </div>
