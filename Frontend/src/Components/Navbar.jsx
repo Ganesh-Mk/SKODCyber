@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Shield, Lock } from 'lucide-react';
+import { Shield, Lock, Menu, X } from 'lucide-react';
 
 const Navbar = () => {
+  const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const currentPath = location.pathname;
 
@@ -13,81 +14,95 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-gradient-to-r from-purple-50 to-blue-50 fixed w-full top-0 z-50 shadow-sm">
+    <nav className="bg-gradient-to-r from-gray-900 to-slate-900 fixed w-full top-0 z-50 shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex-shrink-0">
             <Link to="/" className="flex items-center space-x-3">
               <div className="relative">
-                <Shield className="h-8 w-8 text-indigo-500" />
-                <Lock className="h-4 w-4 text-purple-500 absolute -bottom-1 -right-1" />
+                <Shield className="h-8 w-8 text-purple-400" />
+                <Lock className="h-4 w-4 text-indigo-400 absolute -bottom-1 -right-1" />
               </div>
-              <span className="text-xl font-bold relative">
-                <span className="text-indigo-600">SKOD</span>
-                <span className="text-purple-600">Cyber</span>
+              <span className="text-xl font-bold">
+                <span className="text-purple-400">SKOD</span>
+                <span className="text-indigo-400">Cyber</span>
               </span>
             </Link>
           </div>
 
-          {/* Centered Navigation Links */}
-          <div className="flex-1 flex justify-center">
+          {/* Mobile Menu Button */}
+          <div className="md:hidden">
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className="text-gray-300 hover:text-white p-2"
+            >
+              {isOpen ? (
+                <X className="h-6 w-6" />
+              ) : (
+                <Menu className="h-6 w-6" />
+              )}
+            </button>
+          </div>
+
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex flex-1 justify-center">
             <div className="flex items-center space-x-8">
-              <Link 
-                to="/" 
-                className={`relative group px-3 py-2 ${isActive('/') ? 'text-indigo-600' : ''}`}
-              >
-                <span className={`font-medium relative z-10 transition-colors duration-200 ${
-                  isActive('/') ? 'text-indigo-600' : 'text-gray-700 group-hover:text-gray-900'
-                }`}>
-                  Home
-                </span>
-                <div className={`absolute inset-0 h-full w-full bg-indigo-100 rounded-lg transition-transform duration-200 -z-0 ${
-                  isActive('/') ? 'scale-100' : 'scale-0 group-hover:scale-100'
-                }`}></div>
-              </Link>
-              <Link 
-                to="/learn" 
-                className={`relative group px-3 py-2 ${isActive('/learn') ? 'text-indigo-600' : ''}`}
-              >
-                <span className={`font-medium relative z-10 transition-colors duration-200 ${
-                  isActive('/learn') ? 'text-indigo-600' : 'text-gray-700 group-hover:text-gray-900'
-                }`}>
-                  Learn
-                </span>
-                <div className={`absolute inset-0 h-full w-full bg-indigo-100 rounded-lg transition-transform duration-200 -z-0 ${
-                  isActive('/learn') ? 'scale-100' : 'scale-0 group-hover:scale-100'
-                }`}></div>
-              </Link>
-              <Link 
-                to="/news" 
-                className={`relative group px-3 py-2 ${isActive('/news') ? 'text-indigo-600' : ''}`}
-              >
-                <span className={`font-medium relative z-10 transition-colors duration-200 ${
-                  isActive('/news') ? 'text-indigo-600' : 'text-gray-700 group-hover:text-gray-900'
-                }`}>
-                  News
-                </span>
-                <div className={`absolute inset-0 h-full w-full bg-indigo-100 rounded-lg transition-transform duration-200 -z-0 ${
-                  isActive('/news') ? 'scale-100' : 'scale-0 group-hover:scale-100'
-                }`}></div>
-              </Link>
+              {['/', '/learn', '/news'].map((path) => (
+                <Link
+                  key={path}
+                  to={path}
+                  className="relative group px-3 py-2"
+                >
+                  <span className={`font-medium relative z-10 transition-colors duration-200 ${isActive(path) ? 'text-purple-400' : 'text-gray-300 group-hover:text-white'
+                    }`}>
+                    {path === '/' ? 'Home' : path.slice(1).charAt(0).toUpperCase() + path.slice(2)}
+                  </span>
+                  <div className={`absolute inset-0 h-full w-full bg-purple-900/30 rounded-lg transition-all duration-300 -z-0 ${isActive(path)
+                      ? 'scale-100 opacity-100'
+                      : 'scale-0 opacity-0 group-hover:scale-100 group-hover:opacity-100'
+                    }`}></div>
+                </Link>
+              ))}
             </div>
           </div>
 
-          {/* Account Button */}
-          <div className="flex-shrink-0">
-            <Link 
-              to="/account" 
-              className={`px-6 py-2 rounded-lg font-medium transition-all duration-200 hover:shadow-lg hover:shadow-indigo-200 hover:-translate-y-0.5 ${
-                isActive('/account')
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white'
-              }`}
+          {/* Account Button (Desktop) */}
+          <div className="hidden md:block">
+            <Link
+              to="/account"
+              className={`px-6 py-2 rounded-lg font-medium transition-all duration-300 
+                hover:shadow-lg hover:shadow-purple-500/20 hover:-translate-y-0.5 
+                ${isActive('/account')
+                  ? 'bg-purple-600 text-white'
+                  : 'bg-gradient-to-r from-purple-500 to-indigo-500 text-white'
+                }`}
             >
               Account
             </Link>
           </div>
+        </div>
+      </div>
+
+      {/* Mobile Navigation */}
+      <div className={`md:hidden transition-all duration-300 ease-in-out ${isOpen
+          ? 'max-h-64 opacity-100'
+          : 'max-h-0 opacity-0'
+        } overflow-hidden bg-gray-900`}>
+        <div className="px-4 pt-2 pb-4 space-y-2">
+          {['/', '/learn', '/news', '/account'].map((path) => (
+            <Link
+              key={path}
+              to={path}
+              onClick={() => setIsOpen(false)}
+              className={`block px-3 py-2 rounded-lg transition-colors duration-200 ${isActive(path)
+                  ? 'bg-purple-900/30 text-purple-400'
+                  : 'text-gray-300 hover:bg-purple-900/20 hover:text-white'
+                }`}
+            >
+              {path === '/' ? 'Home' : path.slice(1).charAt(0).toUpperCase() + path.slice(2)}
+            </Link>
+          ))}
         </div>
       </div>
     </nav>
