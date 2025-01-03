@@ -29,7 +29,7 @@ const Navbar = () => {
                 <span className="text-indigo-400">Cyber</span>
               </span>
             </Link>
-          </div>
+          </div>  
 
           {/* Mobile Menu Button */}
           <div className="md:hidden">

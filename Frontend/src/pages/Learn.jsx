@@ -12,7 +12,6 @@ const LearningPage = () => {
   const [totalQuizAttempts, setTotalQuizAttempts] = useState(0);
 
   useEffect(() => {
-    // Load all stored data on component mount
     const storedModules = JSON.parse(localStorage.getItem('completedModules')) || [];
     const storedBadges = parseInt(localStorage.getItem('badges')) || 0;
     const storedQuizAttempts = parseInt(localStorage.getItem('quizAttempts')) || 0;
@@ -36,6 +35,19 @@ const LearningPage = () => {
     }));
   };
 
+  const isAnswerCorrect = (questionIndex, answerIndex, quiz) => {
+    return quiz[questionIndex].answer === answerIndex;
+  };
+
+  const getAnswerStyle = (questionIndex, answerIndex, quiz) => {
+    if (quizAnswers[questionIndex] === answerIndex) {
+      return isAnswerCorrect(questionIndex, answerIndex, quiz)
+        ? "border-green-500 bg-green-50 text-green-700"
+        : "border-red-500 bg-red-50 text-red-700";
+    }
+    return "border-gray-200 hover:bg-gray-50";
+  };
+
   const calculateScore = (quiz) => {
     let correct = 0;
     Object.entries(quizAnswers).forEach(([questionIndex, answer]) => {
@@ -45,19 +57,26 @@ const LearningPage = () => {
   };
 
   const updateProgress = (score, moduleId) => {
-    // Increment quiz attempts counter regardless of score
     const newQuizAttempts = totalQuizAttempts + 1;
     setTotalQuizAttempts(newQuizAttempts);
     localStorage.setItem('quizAttempts', newQuizAttempts.toString());
 
-    // Add module to completed list if not already included
+    // Store quiz score with module info
+    const quizScores = JSON.parse(localStorage.getItem('quizScores')) || [];
+    quizScores.push({
+      moduleId,
+      score,
+      name: `Module ${moduleId}`,
+      date: new Date().toISOString()
+    });
+    localStorage.setItem('quizScores', JSON.stringify(quizScores));
+
     if (!completedModules.includes(moduleId)) {
       const updatedModules = [...completedModules, moduleId];
       setCompletedModules(updatedModules);
       localStorage.setItem('completedModules', JSON.stringify(updatedModules));
     }
 
-    // Award badge only if score is 100%
     if (score === 100) {
       const newBadgeCount = badges + 1;
       setBadges(newBadgeCount);
@@ -86,14 +105,14 @@ const LearningPage = () => {
     return (
       <div className="min-h-screen bg-gray-50 p-4 sm:p-6 md:p-8 lg:p-12">
         <div className="max-w-6xl mx-auto">
-        <div className="fixed top-[5rem] left-4 z-50">
-          <button
-            onClick={handleBack}
-            className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 group bg-white px-2 py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-300"
-          >
-            <ArrowLeft className="h-5 w-5  transform group-hover:-translate-x-1 transition-transform" />
-          </button>
-        </div>
+          <div className="fixed top-[5rem] left-4 z-50">
+            <button
+              onClick={handleBack}
+              className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 group bg-white px-2 py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-300"
+            >
+              <ArrowLeft className="h-5 w-5 transform group-hover:-translate-x-1 transition-transform" />
+            </button>
+          </div>
 
           <div className="space-y-4 sm:space-y-6 md:space-y-8">
             <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 p-4 sm:p-6 md:p-8 lg:p-10">
@@ -181,11 +200,9 @@ const LearningPage = () => {
                         <button
                           key={oIndex}
                           onClick={() => handleAnswer(qIndex, oIndex)}
-                          className={`w-full text-left p-3 rounded-lg border text-sm sm:text-base ${
-                            quizAnswers[qIndex] === oIndex
-                              ? "border-indigo-500 bg-indigo-50"
-                              : "border-gray-200 hover:bg-gray-50"
-                          } shadow-sm hover:shadow-md transition-shadow duration-300`}
+                          className={`w-full text-left p-3 rounded-lg border text-sm sm:text-base 
+                            ${getAnswerStyle(qIndex, oIndex, module.quiz)}
+                            shadow-sm hover:shadow-md transition-shadow duration-300`}
                         >
                           {option}
                         </button>
