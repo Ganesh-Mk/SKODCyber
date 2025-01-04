@@ -75,12 +75,15 @@ const Account = () => {
     }));
   };
 
-  const generateQuizData = (attempts) => {
-    if (!attempts) return [];
-    const baseScores = [85, 88, 92];
-    return baseScores.slice(0, attempts).map((score, index) => ({
-      name: `Quiz ${index + 1}`,
-      score,
+  const processQuizData = () => {
+    const storedQuizScores = localStorage.getItem("quizScores");
+    if (!storedQuizScores) return [];
+
+    const scores = JSON.parse(storedQuizScores);
+    return scores.map((quiz) => ({
+      name: quiz.name,
+      score: quiz.score,
+      date: new Date(quiz.date).toLocaleDateString(),
     }));
   };
 
@@ -114,15 +117,15 @@ const Account = () => {
 
   useEffect(() => {
     const storedCompletedModules = localStorage.getItem("completedModules");
-    const storedQuizAttempts = localStorage.getItem("quizAttempts");
+    const storedQuizScores = localStorage.getItem("quizScores");
     const modules = JSON.parse(storedCompletedModules) || [];
-    const attempts = parseInt(storedQuizAttempts) || 0;
+    const quizScores = JSON.parse(storedQuizScores) || [];
 
     setProgressData(generateProgressData(modules));
-    setQuizData(generateQuizData(attempts));
+    setQuizData(processQuizData());
     setcompletedModules(modules);
     setbadges(localStorage.getItem("badges") || "0");
-    setquizzes(storedQuizAttempts || "0");
+    setquizzes(quizScores.length.toString() || "0");
   }, []);
 
   const handleImageChange = (e) => {
@@ -244,19 +247,37 @@ const Account = () => {
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={quizData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                  <XAxis dataKey="name" stroke="#9CA3AF" />
-                  <YAxis stroke="#9CA3AF" domain={[0, 100]} />
+                  <XAxis
+                    dataKey="name"
+                    stroke="#9CA3AF"
+                    angle={-45}
+                    textAnchor="end"
+                    height={60}
+                  />
+                  <YAxis
+                    stroke="#9CA3AF"
+                    domain={[0, 100]}
+                    label={{
+                      value: "Score (%)",
+                      angle: -90,
+                      position: "insideLeft",
+                      style: { fill: "#9CA3AF" },
+                    }}
+                  />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: "#1F2937",
                       border: "none",
                     }}
+                    formatter={(value, name) => [`${value}%`, "Score"]}
+                    labelFormatter={(label) => `${label}`}
                   />
                   <Line
                     type="monotone"
                     dataKey="score"
                     stroke="#4F46E5"
                     strokeWidth={2}
+                    dot={{ fill: "#4F46E5", strokeWidth: 2 }}
                   />
                 </LineChart>
               </ResponsiveContainer>
