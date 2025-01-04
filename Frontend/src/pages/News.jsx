@@ -6,7 +6,7 @@ const News = () => {
   const [articles, setArticles] = useState([]);
   const [error, setError] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(true); // Dark mode default
   const [loading, setLoading] = useState(true);
   const [selectedSource, setSelectedSource] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
@@ -128,15 +128,13 @@ const News = () => {
   }
 
   return (
-    <div className={`min-h-screen pt-16 ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'}`}>
-      {/* Header */}
-      <header className={` z-50 ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-md`}>
-        <div className="container mx-auto px-4 py-4 pl-14">
-          {/* Header layout changes */}
+    <div className={`min-h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'}`}>
+      {/* Fixed Header */}
+      <header className={`fixed top-[4rem] left-0 right-0 z-50 ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-md`}>
+        <div className="container mx-auto px-4 py-2">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <h1 className="text-2xl font-bold">Cybersecurity News</h1>
 
-            {/* Search and Filters */}
             <div className="flex flex-col gap-4 md:flex-row md:items-center">
               <div className="relative w-full md:w-64">
                 <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
@@ -184,7 +182,7 @@ const News = () => {
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8 pt-32">
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(6)].map((_, i) => (
