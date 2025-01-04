@@ -1,21 +1,28 @@
 import React, { useState, useEffect } from "react";
 import { ArrowLeft, Book, ChevronRight, Award } from "lucide-react";
 import { modules } from "../Data/Learndata";
+import { useNavigate } from "react-router-dom";
+import QuizModal from "../Components/QuizModal";
 
 const LearningPage = () => {
   const [selectedModule, setSelectedModule] = useState(null);
   const [isQuizOpen, setIsQuizOpen] = useState(false);
-  const [quizAnswers, setQuizAnswers] = useState({});
-  const [showResults, setShowResults] = useState(false);
   const [completedModules, setCompletedModules] = useState([]);
   const [badges, setBadges] = useState(0);
   const [totalQuizAttempts, setTotalQuizAttempts] = useState(0);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (JSON.parse(localStorage.getItem('userData')) === null) {
+      navigate('/login');
+    }
+  })
 
   useEffect(() => {
     const storedModules = JSON.parse(localStorage.getItem('completedModules')) || [];
     const storedBadges = parseInt(localStorage.getItem('badges')) || 0;
     const storedQuizAttempts = parseInt(localStorage.getItem('quizAttempts')) || 0;
-    
+
     setCompletedModules(storedModules);
     setBadges(storedBadges);
     setTotalQuizAttempts(storedQuizAttempts);
@@ -24,63 +31,6 @@ const LearningPage = () => {
   const handleBack = () => {
     setSelectedModule(null);
     setIsQuizOpen(false);
-    setQuizAnswers({});
-    setShowResults(false);
-  };
-
-  const handleAnswer = (questionIndex, answerIndex) => {
-    setQuizAnswers((prev) => ({
-      ...prev,
-      [questionIndex]: answerIndex,
-    }));
-  };
-
-  const isAnswerCorrect = (questionIndex, answerIndex, quiz) => {
-    return quiz[questionIndex].answer === answerIndex;
-  };
-
-  const getAnswerStyle = (questionIndex, answerIndex, quiz) => {
-    if (quizAnswers[questionIndex] === answerIndex) {
-      return isAnswerCorrect(questionIndex, answerIndex, quiz)
-        ? "border-green-500 bg-green-900/50 text-green-400"
-        : "border-red-500 bg-red-900/50 text-red-400";
-    }
-    return "border-gray-700 hover:bg-gray-800";
-  };
-
-  const calculateScore = (quiz) => {
-    let correct = 0;
-    Object.entries(quizAnswers).forEach(([questionIndex, answer]) => {
-      if (answer === quiz[questionIndex].answer) correct++;
-    });
-    return (correct / quiz.length) * 100;
-  };
-
-  const updateProgress = (score, moduleId) => {
-    const newQuizAttempts = totalQuizAttempts + 1;
-    setTotalQuizAttempts(newQuizAttempts);
-    localStorage.setItem('quizAttempts', newQuizAttempts.toString());
-
-    const quizScores = JSON.parse(localStorage.getItem('quizScores')) || [];
-    quizScores.push({
-      moduleId,
-      score,
-      name: `Module ${moduleId}`,
-      date: new Date().toISOString()
-    });
-    localStorage.setItem('quizScores', JSON.stringify(quizScores));
-
-    if (!completedModules.includes(moduleId)) {
-      const updatedModules = [...completedModules, moduleId];
-      setCompletedModules(updatedModules);
-      localStorage.setItem('completedModules', JSON.stringify(updatedModules));
-    }
-
-    if (score === 100) {
-      const newBadgeCount = badges + 1;
-      setBadges(newBadgeCount);
-      localStorage.setItem('badges', newBadgeCount.toString());
-    }
   };
 
   const getYouTubeEmbedUrl = (url) => {
@@ -178,71 +128,20 @@ const LearningPage = () => {
               </div>
             </div>
 
-            {!isQuizOpen ? (
-              <button
-                onClick={() => setIsQuizOpen(true)}
-                className="w-full py-4 sm:py-6 bg-purple-900/50 text-purple-300 rounded-xl hover:bg-purple-800/50 shadow-md hover:shadow-xl transition-all duration-300 flex items-center justify-center text-sm sm:text-base"
-              >
-                <Award className="h-5 w-5 mr-2 sm:mr-3" />
-                Take Module Quiz
-              </button>
-            ) : (
-              <div className="bg-gray-800 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 p-4 sm:p-6 md:p-8">
-                <h3 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6 text-white">Module Quiz</h3>
-                {module.quiz.map((question, qIndex) => (
-                  <div key={qIndex} className="mb-4 sm:mb-6">
-                    <p className="font-medium mb-2 sm:mb-3 text-sm sm:text-base text-gray-200">
-                      {question.question}
-                    </p>
-                    <div className="space-y-2">
-                      {question.options.map((option, oIndex) => (
-                        <button
-                          key={oIndex}
-                          onClick={() => handleAnswer(qIndex, oIndex)}
-                          className={`w-full text-left p-3 rounded-lg border text-white text-sm sm:text-base 
-                            ${getAnswerStyle(qIndex, oIndex, module.quiz)}
-                            shadow-sm hover:shadow-md transition-shadow duration-300`}
-                        >
-                          {option}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-                {!showResults ? (
-                  <button
-                    onClick={() => {
-                      const score = calculateScore(module.quiz);
-                      setShowResults(true);
-                      updateProgress(score, module.id);
-                    }}
-                    className="w-full py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 shadow-md hover:shadow-xl transition-all duration-300 text-sm sm:text-base"
-                  >
-                    Submit Quiz
-                  </button>
-                ) : (
-                  <div className="text-center">
-                    <p className="text-xl sm:text-2xl font-bold mb-2 text-white">
-                      Your Score: {calculateScore(module.quiz)}%
-                    </p>
-                    {calculateScore(module.quiz) === 100 && (
-                      <p className="text-green-400 mb-4">
-                        Congratulations! You've earned a badge!
-                      </p>
-                    )}
-                    <button
-                      onClick={() => {
-                        setQuizAnswers({});
-                        setShowResults(false);
-                      }}
-                      className="text-purple-400 hover:text-purple-300 text-sm sm:text-base"
-                    >
-                      Retake Quiz
-                    </button>
-                  </div>
-                )}
-              </div>
-            )}
+            <button
+              onClick={() => setIsQuizOpen(true)}
+              className="w-full py-4 sm:py-6 bg-purple-900/50 text-purple-300 rounded-xl hover:bg-purple-800/50 shadow-md hover:shadow-xl transition-all duration-300 flex items-center justify-center text-sm sm:text-base"
+            >
+              <Award className="h-5 w-5 mr-2 sm:mr-3" />
+              Take Module Quiz
+            </button>
+
+            <QuizModal
+              isOpen={isQuizOpen}
+              onClose={() => setIsQuizOpen(false)}
+              quiz={module.quiz}
+              moduleId={module.id}
+            />
           </div>
         </div>
       </div>
@@ -251,18 +150,18 @@ const LearningPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-900 p-8 md:p-12 lg:p-16">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-2xl font-bold text-white">Learning Modules</h1>
-          <div className="flex items-center space-x-4">
-            <span className="text-sm text-gray-300">
+      <div className="max-w-7xl mx-auto mt-10">
+        <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-8 space-y-4 md:space-y-0">
+          <h1 className="text-3xl font-bold text-white">Learning Modules</h1>
+          <div className="flex flex-wrap items-center gap-4 md:gap-0 md:space-x-10">
+            <span className="text-1xl text-gray-300">
               Completed: {completedModules.length}/{modules.length} Modules
             </span>
             <div className="flex items-center space-x-1">
-              <Award className="h-5 w-5 text-yellow-500" />
-              <span className="text-sm text-gray-300">{badges}</span>
+              <Award className="h-6 w-6 text-yellow-500" />
+              <span className="text-1xl text-gray-300">{badges}</span>
             </div>
-            <span className="text-sm text-gray-300">
+            <span className="text-1xl text-gray-300">
               Quiz Attempts: {totalQuizAttempts}
             </span>
           </div>
@@ -282,7 +181,7 @@ const LearningPage = () => {
                 )}
                 <div className="aspect-video bg-gradient-to-br from-purple-600 to-indigo-800 relative w-full">
                   <img
-                    src={`/public/Images/module${module.id}.avif`}
+                    src={`/Images/module${module.id}.avif`}
                     alt={`Banner for ${module.title}`}
                     className="absolute inset-0 w-full h-full object-cover opacity-80"
                   />

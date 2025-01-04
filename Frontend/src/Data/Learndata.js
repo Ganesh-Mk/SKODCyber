@@ -10,8 +10,8 @@ export const modules = [
       "Common security threats",
       "Overview of security tools"
     ],
-    banner: "/public/Images/module1.avif",
-    videoUrl : "https://youtu.be/6fM_I3APtqU?si=RN8Rx3FNLF0sL96I",
+    banner: "/Images/module1.avif",
+    videoUrl: "https://youtu.be/6fM_I3APtqU?si=RN8Rx3FNLF0sL96I",
     mainContent: {
       section1: {
         title: "What is Cybersecurity?",
@@ -78,7 +78,7 @@ export const modules = [
       "Secure network architecture",
       "Virtual Private Networks (VPNs)"
     ],
-    videoUrl : "https://youtu.be/3oTLTijODA4?si=NSEXQ8JxwDv2VzZg",
+    videoUrl: "https://youtu.be/3oTLTijODA4?si=NSEXQ8JxwDv2VzZg",
     mainContent: {
       section1: {
         title: "Network Threats",
@@ -145,7 +145,7 @@ export const modules = [
       "SQL injection",
       "Authentication and authorization best practices"
     ],
-    videoUrl : "https://youtu.be/OtcP8c4wZys?si=GfiVrmIONmnh51ke",
+    videoUrl: "https://youtu.be/OtcP8c4wZys?si=GfiVrmIONmnh51ke",
     mainContent: {
       section1: {
         title: "Web Application Vulnerabilities",
@@ -205,7 +205,7 @@ export const modules = [
   {
     id: 4,
     title: "Cryptography",
-    videoUrl : "https://youtu.be/6fM_I3APtqU?si=ApO1E_HDupOjtH79",
+    videoUrl: "https://youtu.be/6fM_I3APtqU?si=ApO1E_HDupOjtH79",
     description: "Discover the essential concepts of cryptography and how encryption secures data both in transit and at rest, ensuring the confidentiality and integrity of sensitive information.",
     keyPoints: [
       "Basics of cryptography",
@@ -272,7 +272,7 @@ export const modules = [
   {
     id: 5,
     title: "Ethical Hacking and Penetration Testing",
-    videoUrl : "https://youtu.be/OtcP8c4wZys?si=CRVVSjqO9AV95KZE",
+    videoUrl: "https://youtu.be/OtcP8c4wZys?si=CRVVSjqO9AV95KZE",
     description: "Learn how ethical hackers identify and mitigate vulnerabilities to improve security by conducting authorized and controlled attacks on systems and applications.",
     keyPoints: [
       "Phases of penetration testing",
@@ -339,7 +339,7 @@ export const modules = [
   {
     id: 6,
     title: "Incident Response and Forensics",
-    videoUrl : "https://youtu.be/zuRQzc_Ox6o?si=HD3w3Hb-eUeDtAHq",
+    videoUrl: "https://youtu.be/zuRQzc_Ox6o?si=HD3w3Hb-eUeDtAHq",
     description: "Learn the process of responding to and investigating security incidents, focusing on how to handle and analyze cyberattacks to preserve evidence for legal action.",
     keyPoints: [
       "Incident response process",
@@ -406,7 +406,7 @@ export const modules = [
   {
     id: 7,
     title: "Advanced Topics and Career Paths",
-    videoUrl : "https://youtu.be/b12JrM-6DBY?si=Dn0wUXaLKo3kxGRf",
+    videoUrl: "https://youtu.be/b12JrM-6DBY?si=Dn0wUXaLKo3kxGRf",
     description: "Explore advanced cybersecurity topics like cloud security, artificial intelligence, and the zero-trust architecture, while also learning about various career opportunities in the field of cybersecurity.",
     keyPoints: [
       "Cloud security",
@@ -473,7 +473,7 @@ export const modules = [
   {
     id: 8,
     title: "Advanced Malware Analysis",
-    videoUrl : "https://youtu.be/z3lFMfWvwEo?si=ajgrzGQ1b5Xn_s8Z",
+    videoUrl: "https://youtu.be/z3lFMfWvwEo?si=ajgrzGQ1b5Xn_s8Z",
     description: "In this module, you will dive deep into advanced techniques for analyzing and dissecting malware, using both static and dynamic analysis methods. Gain hands-on experience in reverse engineering malware, behavior analysis, and using sandboxes to analyze the malicious activities of malware.",
     keyPoints: [
       "Static and dynamic analysis",
@@ -550,7 +550,7 @@ export const modules = [
   {
     id: 9,
     title: "Red Teaming and Blue Teaming",
-    videoUrl : "https://youtu.be/ylz6NhQ5vQM?si=fi44KnZJOtzjD_yA",
+    videoUrl: "https://youtu.be/ylz6NhQ5vQM?si=fi44KnZJOtzjD_yA",
     description: "This module introduces the concepts and methodologies used by Red and Blue teams to strengthen an organization’s cybersecurity posture. Understand how Red teams simulate real-world attacks and how Blue teams defend against them, with practical scenarios and strategies for each team.",
     keyPoints: [
       "Red team tactics",
@@ -627,7 +627,7 @@ export const modules = [
   {
     id: 10,
     title: "Zero Trust Architecture",
-    videoUrl : "https://youtu.be/yn6CPQ9RioA?si=yI_nTzwwby7hbsas",
+    videoUrl: "https://youtu.be/yn6CPQ9RioA?si=yI_nTzwwby7hbsas",
     description: "Zero Trust Architecture (ZTA) is a security model that assumes no one, either inside or outside the network, can be trusted by default. This module provides an in-depth understanding of Zero Trust principles and how organizations can implement them to secure their systems.",
     keyPoints: [
       "Zero trust principles",
@@ -702,4 +702,3 @@ export const modules = [
     ]
   }
 ];
-	

@@ -1,0 +1,20 @@
+/* For Webkit browsers (Chrome, Safari, etc.) */
+::-webkit-scrollbar {
+  width: 8px;  /* small width */
+  background: #111827;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #111827;  /* dark bluish color */
+  border-radius: 4px;  /* rounded corners */
+}
+
+::-webkit-scrollbar-track {
+  background: #111827;
+}
+
+/* For Firefox */
+* {
+  scrollbar-width: thin;  /* "thin" or "auto" */
+  scrollbar-color: #111827;  /* thumb and track colors */
+}
