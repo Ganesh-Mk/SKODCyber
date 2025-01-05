@@ -16,14 +16,15 @@ const UserModal = ({ user, isOpen, onClose }) => {
           {/* Close Button */}
           <button
             onClick={onClose}
+            style={{ cursor: 'pointer' }}
             className="absolute top-4 right-4 p-2  rounded-full bg-gray-800/50 hover:bg-gray-700 
                      transition-colors duration-300 text-gray-400 hover:text-white"
           >
-            <X className="w-7 h-7" />
+            <X style={{ cursor: 'pointer' }} className="w-7 h-7" />
           </button>
 
           {/* Profile Header */}
-          <div className="relative h-48 rounded-t-2xl overflow-hidden">
+          <div className="relative h-24 rounded-t-2xl overflow-hidden">
             {/* Background Pattern */}
             <div onClick={onClose} className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 opacity-20">
               <div className="w-full h-full" style={{
