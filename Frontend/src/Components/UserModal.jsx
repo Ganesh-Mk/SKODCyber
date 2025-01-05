@@ -5,7 +5,7 @@ const UserModal = ({ user, isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm"
+    <div className="fixed inset-0 z-50 mt-24 overflow-y-auto bg-black/60 backdrop-blur-sm"
       onClick={onClose}>
       <div className="min-h-screen px-4 flex items-center justify-center">
         {/* Modal Content */}
@@ -16,16 +16,16 @@ const UserModal = ({ user, isOpen, onClose }) => {
           {/* Close Button */}
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 p-2 rounded-full bg-gray-800/50 hover:bg-gray-700 
+            className="absolute top-4 right-4 p-2  rounded-full bg-gray-800/50 hover:bg-gray-700 
                      transition-colors duration-300 text-gray-400 hover:text-white"
           >
-            <X className="w-5 h-5" />
+            <X className="w-7 h-7" />
           </button>
 
           {/* Profile Header */}
           <div className="relative h-48 rounded-t-2xl overflow-hidden">
             {/* Background Pattern */}
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 opacity-20">
+            <div onClick={onClose} className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 opacity-20">
               <div className="w-full h-full" style={{
                 backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
               }} />
