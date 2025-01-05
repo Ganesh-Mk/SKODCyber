@@ -10,6 +10,7 @@ import News from './pages/News';
 import Signup from './pages/Signup';
 import Login from './pages/Login';
 import Community from './pages/Community';
+import UserProfilePage from './pages/Userprofile';
 
 
 const App = () => {
@@ -24,6 +25,7 @@ const App = () => {
           <Route path="/news" element={<News />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/user/:userId" element={<UserProfilePage />} />
           <Route path="/community" element={<Community />} />
         </Routes>
       </Router>

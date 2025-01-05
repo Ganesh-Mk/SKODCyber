@@ -1,23 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Search } from 'lucide-react';
 import { AllUsers } from '../Data/AllUsers';
-import UserModal from '../Components/UserModal';
+import { useNavigate } from 'react-router-dom';
 
 const CommunityPage = () => {
   const [users, setUsers] = useState(AllUsers);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const blogsPerPage = 9;
-
-  // Filter users based on search term
+  const navigate = useNavigate();
 
   const handleUserClick = (user) => {
-    setSelectedUser(user);
-    setIsModalOpen(true);
+    navigate(`/user/${user.id}`);
   };
-
 
   useEffect(() => {
     const filtered = AllUsers.filter(user =>
@@ -33,6 +28,7 @@ const CommunityPage = () => {
     user.allBlogs.map(blog => ({
       ...blog,
       user: {
+        id: user.id,
         name: user.name,
         profileImage: user.profileImage,
         skills: user.skills,
@@ -57,7 +53,6 @@ const CommunityPage = () => {
   // Handle search submit
   const handleSearchSubmit = (e) => {
     e.preventDefault();
-    // You can add additional search logic here if needed
   };
 
   return (
@@ -84,8 +79,8 @@ const CommunityPage = () => {
               type="text"
               placeholder="Search by name or skill..."
               className="w-full pl-12 pr-24 py-3 bg-gray-800/50 border border-gray-700 rounded-xl 
-                       text-white placeholder-gray-400 focus:outline-none focus:border-blue-500/50 
-                       focus:ring-2 focus:ring-blue-500/20 transition-all duration-300"
+                      text-white placeholder-gray-400 focus:outline-none focus:border-blue-500/50 
+                      focus:ring-2 focus:ring-blue-500/20 transition-all duration-300"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -93,14 +88,12 @@ const CommunityPage = () => {
             <button
               type="submit"
               className="absolute right-3 top-1/2 transform -translate-y-1/2 px-4 py-1.5 
-                       bg-blue-500 text-white rounded-lg hover:bg-blue-600 
-                       transition-colors duration-300"
+                      bg-blue-500 text-white rounded-lg hover:bg-blue-600 
+                      transition-colors duration-300"
             >
               Search
             </button>
           </form>
-
-
         </div>
       </div>
 
@@ -111,8 +104,8 @@ const CommunityPage = () => {
             <article
               key={index}
               className="group bg-gray-800/30 rounded-xl overflow-hidden border border-gray-700/50 
-                       hover:border-blue-500/50 transition-all duration-500 
-                       hover:shadow-[0_0_25px_-5px_rgba(59,130,246,0.3)]"
+                      hover:border-blue-500/50 transition-all duration-500 
+                      hover:shadow-[0_0_25px_-5px_rgba(59,130,246,0.3)]"
             >
               {blog.imageUrl && (
                 <div className="w-full h-48 overflow-hidden">
@@ -130,14 +123,14 @@ const CommunityPage = () => {
                       src={blog.user.profileImage}
                       alt={blog.user.name}
                       className="w-10 h-10 rounded-full object-cover border-2 border-transparent 
-           group-hover:border-blue-500 transition-all duration-300 cursor-pointer"
+                               group-hover:border-blue-500 transition-all duration-300 cursor-pointer"
                       onClick={(e) => {
                         e.stopPropagation();
                         handleUserClick(users.find(u => u.name === blog.user.name));
                       }}
                     />
                     <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full 
-                                  border-2 border-gray-800"></div>
+                                border-2 border-gray-800"></div>
                   </div>
                   <div>
                     <h3
@@ -160,7 +153,7 @@ const CommunityPage = () => {
                   </div>
                 </div>
                 <h2 className="text-xl font-semibold text-white mb-3 group-hover:text-blue-400 
-                             transition-colors duration-300">
+                            transition-colors duration-300">
                   {blog.title}
                 </h2>
                 <p className="text-gray-400 line-clamp-2">{blog.description}</p>
@@ -188,7 +181,7 @@ const CommunityPage = () => {
               onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
               className={`px-4 py-2 rounded-lg transition-all duration-300 
-                       ${currentPage === 1
+                      ${currentPage === 1
                   ? 'bg-gray-800/50 text-gray-500 cursor-not-allowed'
                   : 'bg-gray-800 text-white hover:bg-gray-700'}`}
             >
@@ -200,7 +193,7 @@ const CommunityPage = () => {
                 key={number}
                 onClick={() => setCurrentPage(number)}
                 className={`w-10 h-10 rounded-lg transition-all duration-300 
-                         ${currentPage === number
+                        ${currentPage === number
                     ? 'bg-blue-500 text-white'
                     : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}`}
               >
@@ -212,7 +205,7 @@ const CommunityPage = () => {
               onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
               disabled={currentPage === totalPages}
               className={`px-4 py-2 rounded-lg transition-all duration-300 
-                       ${currentPage === totalPages
+                      ${currentPage === totalPages
                   ? 'bg-gray-800/50 text-gray-500 cursor-not-allowed'
                   : 'bg-gray-800 text-white hover:bg-gray-700'}`}
             >
@@ -229,15 +222,7 @@ const CommunityPage = () => {
           </div>
         )}
       </div>
-      {selectedUser && (
-        <UserModal
-          user={selectedUser}
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-        />
-      )}
     </div>
-
   );
 };
 
