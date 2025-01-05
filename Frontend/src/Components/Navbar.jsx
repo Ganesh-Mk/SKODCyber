@@ -28,7 +28,7 @@ const Navbar = () => {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem('userData');
+    localStorage.removeItem('userData');  
     setIsLoggedIn(false);
     setUserData(null);
     navigate('/');
@@ -43,7 +43,7 @@ const Navbar = () => {
   // Auth buttons for desktop
   const DesktopAuthButtons = () => (
     <div className="hidden md:flex items-center space-x-4">
-      {isLoggedIn ? (
+      {localStorage.getItem('userData') ? (
         <div className="flex items-center space-x-4">
           <div className="text-gray-300 px-3">
             <span className="text-purple-400">Hello, </span>

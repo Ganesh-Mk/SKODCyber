@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
 import {
-  LineChart,
+  BarChart,
   CartesianGrid,
   XAxis,
   YAxis,
   Tooltip,
-  Line,
+  Bar,
   ResponsiveContainer,
+  LineChart,
+  Line,
 } from "recharts";
 import {
   Camera,
@@ -40,22 +42,31 @@ const Account = () => {
     );
   });
 
-  const [completedModules, setcompletedModules] = useState([]);
-  const [badges, setbadges] = useState("0");
-  const [quizzes, setquizzes] = useState("0");
+  const [quizzesGiven, setQuizzesGiven] = useState(0);
+  const [completedModules, setCompletedModules] = useState([]);
+  const [badges, setBadges] = useState("0");
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editForm, setEditForm] = useState({ ...userData });
   const [imagePreview, setImagePreview] = useState(null);
   const [progressData, setProgressData] = useState([]);
-  const [quizData, setQuizData] = useState([]);
 
   const generateProgressData = (modules) => {
     if (!modules || modules.length === 0) return [];
 
     const currentDate = new Date();
     const monthNames = [
-      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
     ];
 
     return modules.map((moduleId, index) => ({
@@ -64,29 +75,38 @@ const Account = () => {
     }));
   };
 
-  const processQuizData = () => {
-    const storedQuizScores = localStorage.getItem("quizScores");
-    if (!storedQuizScores) return [];
+  const prepareAchievementData = () => {
+    const totalModules = 10; // Adjust based on your total modules
+    const totalQuizzes = 10; // Adjust based on your total quizzes
+    const totalBadges = 10; // Adjust based on your total badges
 
-    const scores = JSON.parse(storedQuizScores);
-    return scores.map((quiz) => ({
-      name: quiz.name,
-      score: quiz.score,
-      date: new Date(quiz.date).toLocaleDateString(),
-    }));
+    return [
+      {
+        name: "Modules",
+        completed: completedModules.length,
+        total: totalModules,
+      },
+      {
+        name: "Quizzes",
+        completed: parseInt(quizzesGiven),
+        total: totalQuizzes,
+      },
+      {
+        name: "Badges",
+        completed: parseInt(badges),
+        total: totalBadges,
+      },
+    ];
   };
 
   useEffect(() => {
     const storedCompletedModules = localStorage.getItem("completedModules");
-    const storedQuizScores = localStorage.getItem("quizScores");
     const modules = JSON.parse(storedCompletedModules) || [];
-    const quizScores = JSON.parse(storedQuizScores) || [];
 
     setProgressData(generateProgressData(modules));
-    setQuizData(processQuizData());
-    setcompletedModules(modules);
-    setbadges(localStorage.getItem("badges") || "0");
-    setquizzes(quizScores.length.toString() || "0");
+    setCompletedModules(modules);
+    setBadges(localStorage.getItem("badges") || "0");
+    setQuizzesGiven(localStorage.getItem("totalQuizzesGiven") || 0);
   }, []);
 
   const handleImageChange = (e) => {
@@ -129,6 +149,7 @@ const Account = () => {
   return (
     <div className="min-h-screen mt-2 sm:mt-10 pt-20 bg-gray-900 p-4 sm:p-8">
       <div className="max-w-7xl mx-auto">
+        {/* Profile Section */}
         <div className="bg-gray-800 rounded-2xl shadow-lg p-6 sm:p-8 mb-8">
           <div className="flex flex-col md:flex-row items-center gap-8">
             <div className="relative group">
@@ -143,7 +164,9 @@ const Account = () => {
 
             <div className="flex-1 text-center md:text-left">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <h1 className="text-2xl sm:text-3xl font-bold text-white">{userData.name}</h1>
+                <h1 className="text-2xl sm:text-3xl font-bold text-white">
+                  {userData.name}
+                </h1>
                 <button
                   onClick={() => setIsEditModalOpen(true)}
                   className="px-4 sm:px-6 py-2 sm:py-3 bg-indigo-600 text-white rounded-lg flex items-center justify-center gap-2 hover:bg-indigo-700 transition-colors duration-300"
@@ -159,6 +182,7 @@ const Account = () => {
           </div>
         </div>
 
+        {/* Stats Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8 mb-8">
           <div className="bg-gray-800 p-6 rounded-xl shadow-lg">
             <div className="flex items-center gap-4">
@@ -166,8 +190,12 @@ const Account = () => {
                 <BookOpen className="w-6 h-6 text-blue-400" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-white">Modules Completed</h3>
-                <p className="text-3xl font-bold text-blue-400">{completedModules.length}</p>
+                <h3 className="text-lg font-semibold text-white">
+                  Modules Completed
+                </h3>
+                <p className="text-3xl font-bold text-blue-400">
+                  {completedModules.length}
+                </p>
               </div>
             </div>
           </div>
@@ -178,8 +206,12 @@ const Account = () => {
                 <CheckSquare className="w-6 h-6 text-green-400" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-white">Quizzes Given</h3>
-                <p className="text-3xl font-bold text-green-400">{quizzes}</p>
+                <h3 className="text-lg font-semibold text-white">
+                  Quizzes Given
+                </h3>
+                <p className="text-3xl font-bold text-green-400">
+                  {quizzesGiven}
+                </p>
               </div>
             </div>
           </div>
@@ -197,52 +229,39 @@ const Account = () => {
           </div>
         </div>
 
+        {/* Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div className="bg-gray-800 p-6 rounded-xl shadow-lg">
-            <h3 className="text-xl font-semibold mb-4 text-white">Quiz Performance</h3>
+            <h3 className="text-xl font-semibold mb-4 text-white">
+              Achievement Progress
+            </h3>
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={quizData}>
+                <BarChart data={prepareAchievementData()}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                  <XAxis
-                    dataKey="name"
-                    stroke="#9CA3AF"
-                    angle={-45}
-                    textAnchor="end"
-                    height={60}
-                  />
-                  <YAxis
-                    stroke="#9CA3AF"
-                    domain={[0, 100]}
-                    label={{
-                      value: "Score (%)",
-                      angle: -90,
-                      position: "insideLeft",
-                      style: { fill: "#9CA3AF" },
-                    }}
-                  />
+                  <XAxis dataKey="name" stroke="#9CA3AF" />
+                  <YAxis stroke="#9CA3AF" allowDecimals={false} />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: "#1F2937",
                       border: "none",
                     }}
-                    formatter={(value, name) => [`${value}%`, "Score"]}
-                    labelFormatter={(label) => `${label}`}
+                    formatter={(value, name) => [
+                      value,
+                      name === "total" ? "Target" : "Completed",
+                    ]}
                   />
-                  <Line
-                    type="monotone"
-                    dataKey="score"
-                    stroke="#4F46E5"
-                    strokeWidth={2}
-                    dot={{ fill: "#4F46E5", strokeWidth: 2 }}
-                  />
-                </LineChart>
+                  <Bar dataKey="completed" fill="#4F46E5" name="Completed" />
+                  <Bar dataKey="total" fill="#6B7280" name="Target" />
+                </BarChart>
               </ResponsiveContainer>
             </div>
           </div>
 
           <div className="bg-gray-800 p-6 rounded-xl shadow-lg">
-            <h3 className="text-xl font-semibold mb-4 text-white">Learning Progress</h3>
+            <h3 className="text-xl font-semibold mb-4 text-white">
+              Learning Progress
+            </h3>
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={progressData}>
@@ -252,7 +271,9 @@ const Account = () => {
                     stroke="#9CA3AF"
                     domain={[
                       0,
-                      Math.max(...(completedModules.length ? completedModules : [1])) + 1,
+                      Math.max(
+                        ...(completedModules.length ? completedModules : [1])
+                      ) + 1,
                     ]}
                   />
                   <Tooltip
@@ -273,6 +294,7 @@ const Account = () => {
           </div>
         </div>
 
+        {/* Edit Modal */}
         {isEditModalOpen && (
           <div className="fixed inset-0 mt-10 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50">
             <div className="bg-gray-800 rounded-2xl p-6 sm:p-8 max-w-2xl w-full max-h-[80vh] overflow-y-auto">
@@ -288,11 +310,17 @@ const Account = () => {
 
               <div className="space-y-6">
                 <div className="flex flex-col gap-2">
-                  <label className="font-medium text-gray-300">Profile Picture</label>
+                  <label className="font-medium text-gray-300">
+                    Profile Picture
+                  </label>
                   <div className="flex items-center gap-4">
                     <div className="w-24 h-24 rounded-full overflow-hidden bg-gray-700">
                       <img
-                        src={imagePreview || editForm.image || "/api/placeholder/96/96"}
+                        src={
+                          imagePreview ||
+                          editForm.image ||
+                          "/api/placeholder/96/96"
+                        }
                         alt="Profile Preview"
                         className="w-full h-full object-cover"
                       />
@@ -347,11 +375,14 @@ const Account = () => {
                 </div>
 
                 <div className="flex flex-col gap-4">
-                  <label className="font-medium text-gray-300">Social Links</label>
+                  <label className="font-medium text-gray-300">
+                    Social Links
+                  </label>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="flex items-center gap-2 p-3 bg-gray-700 border border-gray-600 rounded-lg">
                       <Twitter className="w-5 h-5 text-blue-400" />
                       <input
+                        type="text"
                         type="text"
                         value={editForm.social.twitter}
                         onChange={(e) =>
@@ -442,7 +473,6 @@ const Account = () => {
             </div>
           </div>
         )}
-
       </div>
     </div>
   );

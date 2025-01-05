@@ -30,6 +30,24 @@ const QuizModal = ({ isOpen, onClose, quiz, moduleId }) => {
     setAllQuestionsAnswered(Object.keys(selectedAnswers).length === quiz.length);
   }, [selectedAnswers, quiz.length]);
 
+  const updateCompletedModules = () => {
+    const completedModules = JSON.parse(localStorage.getItem('completedModules') || '[]');
+    if (!completedModules.includes(moduleId)) {
+      completedModules.push(moduleId);
+      localStorage.setItem('completedModules', JSON.stringify(completedModules));
+    }
+  };
+
+  const updateBadges = () => {
+    const currentBadges = parseInt(localStorage.getItem('badges') || '0');
+    localStorage.setItem('badges', (currentBadges + 1).toString());
+  };
+
+  const updateTotalQuizzes = () => {
+    const totalQuizzes = parseInt(localStorage.getItem('totalQuizzesGiven') || '0');
+    localStorage.setItem('totalQuizzesGiven', (totalQuizzes + 1).toString());
+  };
+
   const resetQuiz = () => {
     setSelectedAnswers({});
     setCurrentScore(0);
@@ -55,6 +73,10 @@ const QuizModal = ({ isOpen, onClose, quiz, moduleId }) => {
   };
 
   const handleSubmitQuiz = () => {
+    // Update total quizzes taken
+    updateTotalQuizzes();
+
+    // Store quiz progress
     const progress = getStoredQuizState();
     progress[moduleId] = {
       answers: selectedAnswers,
@@ -62,9 +84,17 @@ const QuizModal = ({ isOpen, onClose, quiz, moduleId }) => {
       completedAt: new Date().toISOString()
     };
     localStorage.setItem('quizProgress', JSON.stringify(progress));
+
+    // If all answers are correct
+    if (currentScore === quiz.length) {
+      updateCompletedModules();
+      updateBadges();
+    }
+
     setShowCongrats(true);
   };
 
+  // Rest of the component remains the same...
   const getOptionClassName = (questionIndex, optionIndex) => {
     if (selectedAnswers[questionIndex] === undefined) {
       return 'border-2 border-gray-700 hover:border-purple-500 bg-gray-800 hover:bg-gray-700';
