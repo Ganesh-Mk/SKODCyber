@@ -1,4 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Provider } from 'react-redux';
+import { store } from './store/store';
 import './App.css'
 import Home from './pages/Home';
 import Learn from './pages/Learn';
@@ -11,18 +13,19 @@ import Login from './pages/Login';
 
 const App = () => {
   return (
-    <Router>
-      <Navbar />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/learn" element={<Learn />} />
-        <Route path="/account" element={<Account />} />
-        <Route path="/news" element={<News />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/login" element={<Login />} />
-      </Routes>
-    </Router>
-
+    <Provider store={store}>
+      <Router>
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/learn" element={<Learn />} />
+          <Route path="/account" element={<Account />} />
+          <Route path="/news" element={<News />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/login" element={<Login />} />
+        </Routes>
+      </Router>
+    </Provider>
   );
 };
 

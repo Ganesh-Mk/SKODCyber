@@ -1,8 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { login } from '../store/userSlice.js';
+import { useDispatch } from 'react-redux';
 
 const Signup = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -54,6 +57,7 @@ const Signup = () => {
           github: `${formData.name}@github`,
         },
       };
+      dispatch(login(dataToStore));
       localStorage.setItem('userData', JSON.stringify(dataToStore));
       navigate('/');
     }
@@ -74,7 +78,7 @@ const Signup = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 flex items-center justify-center p-6 relative overflow-hidden">
+    <div className="min-h-screen bg-gray-900 flex items-center mt-10 justify-center p-6 relative overflow-hidden">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         {/* Binary Rain Animation */}
@@ -127,8 +131,12 @@ const Signup = () => {
       <div className="max-w-md w-full space-y-8 bg-gray-800/90 p-8 rounded-xl shadow-2xl backdrop-blur-sm relative z-10">
         <div className="text-center">
           <div className="text-6xl mb-4 animate-bounce">🛡️</div>
-          <h2 className="text-3xl font-bold text-white mb-2">
-            Join CyberEdu
+          <h2 className="text-3xl font-bold text-white mb-2 flex gap-2 align-center justify-center">
+            Join
+            <span className="text-3xl font-bold">
+              <span className="text-purple-400">SKOD</span>
+              <span className="text-indigo-400">Cyber</span>
+            </span>
           </h2>
           <p className="text-cyan-400">
             Begin your cybersecurity learning journey

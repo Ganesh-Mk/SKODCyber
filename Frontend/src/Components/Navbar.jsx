@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Shield, Lock, Menu, X, LogOut, UserCircle } from 'lucide-react';
+import { useDispatch, useSelector } from 'react-redux';
+import { logout } from '../store/userSlice';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -8,7 +10,9 @@ const Navbar = () => {
   const [userData, setUserData] = useState(null);
   const location = useLocation();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const currentPath = location.pathname;
+  const { isLoggedIn: isLoggedInStore } = useSelector((state) => state.user);
 
   useEffect(() => {
     const checkAuth = () => {
@@ -25,10 +29,11 @@ const Navbar = () => {
     checkAuth();
     window.addEventListener('storage', checkAuth);
     return () => window.removeEventListener('storage', checkAuth);
-  }, []);
+  }, [isLoggedInStore]);
 
   const handleLogout = () => {
-    localStorage.removeItem('userData');  
+    localStorage.removeItem('userData');
+    dispatch(logout());
     setIsLoggedIn(false);
     setUserData(null);
     navigate('/');

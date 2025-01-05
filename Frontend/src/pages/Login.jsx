@@ -1,8 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { login } from '../store/userSlice.js';
+import { useDispatch } from 'react-redux';
 
 const Login = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -37,6 +40,7 @@ const Login = () => {
     if (validateForm()) {
       const storedData = localStorage.getItem('userData');
       if (storedData) {
+        dispatch(login(storedData));
         const userData = JSON.parse(storedData);
         if (userData.email === formData.email && userData.password === formData.password) {
           navigate('/');
@@ -115,7 +119,7 @@ const Login = () => {
       </div>
 
       {/* Main Form Container */}
-      <div className="max-w-md w-full space-y-8 bg-gray-800/90 p-8 rounded-xl shadow-2xl backdrop-blur-sm relative z-10">
+      <div className="max-w-md w-full space-y-4 bg-gray-800/90 p-8 mt-10 rounded-xl shadow-2xl backdrop-blur-sm relative z-10">
         <div className="text-center">
           <div className="text-6xl mb-4 animate-bounce">🔐</div>
           <h2 className="text-3xl font-bold text-white mb-2">

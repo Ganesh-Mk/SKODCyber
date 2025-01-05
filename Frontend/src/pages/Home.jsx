@@ -57,12 +57,12 @@ const Home = () => {
             <div className="lg:w-1/2 relative">
               <div className="w-full aspect-square relative">
                 <img
-                  src="https://cdni.iconscout.com/illustration/premium/thumb/cyber-security-developer-illustration-download-in-svg-png-gif-file-formats--development-developing-cloud-data-dev-working-on-pack-crime-illustrations-5175408.png"
+                  src="/Images/developer.webp"
                   alt="Cybersecurity Shield"
                   className="absolute inset-0 w-full h-full object-contain opacity-35 filter blur-sm"
                 />
                 <img
-                  src="https://cdni.iconscout.com/illustration/premium/thumb/cyber-security-developer-illustration-download-in-svg-png-gif-file-formats--development-developing-cloud-data-dev-working-on-pack-crime-illustrations-5175408.png"
+                  src="/Images/developer.webp"
                   alt="Cybersecurity Shield"
                   className="absolute inset-0 w-full h-full object-contain animate-float"
                 />
