@@ -383,7 +383,6 @@ const Account = () => {
                       <Twitter className="w-5 h-5 text-blue-400" />
                       <input
                         type="text"
-                        type="text"
                         value={editForm.social.twitter}
                         onChange={(e) =>
                           setEditForm({

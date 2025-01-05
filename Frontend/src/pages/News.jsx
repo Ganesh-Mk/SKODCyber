@@ -120,8 +120,8 @@ const News = () => {
     return (
       <div className="flex items-center justify-center min-h-screen p-4 bg-gray-900">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-red-500 mb-2">Error Loading News</h2>
-          <p className="text-gray-300">{error}</p>
+          <h2 className="text-2xl font-bold text-red-500 mb-2">News API works only in localhost</h2>
+          <p className="text-gray-300">due to subscription limitations</p>
         </div>
       </div>
     );
