@@ -21,6 +21,8 @@ import {
   BookOpen,
   CheckSquare,
   X,
+  Plus,
+  Trash2,
 } from "lucide-react";
 
 const Account = () => {
@@ -38,6 +40,7 @@ const Account = () => {
           linkedin: "",
           github: "",
         },
+        certifications: [],
       }
     );
   });
@@ -49,6 +52,14 @@ const Account = () => {
   const [editForm, setEditForm] = useState({ ...userData });
   const [imagePreview, setImagePreview] = useState(null);
   const [progressData, setProgressData] = useState([]);
+  const [isAddCertModalOpen, setIsAddCertModalOpen] = useState(false);
+  const [newCertification, setNewCertification] = useState({
+    name: "",
+    issuer: "",
+    date: "",
+    expiry: "",
+    credentialId: "",
+  });
 
   const generateProgressData = (modules) => {
     if (!modules || modules.length === 0) return [];
@@ -76,9 +87,9 @@ const Account = () => {
   };
 
   const prepareAchievementData = () => {
-    const totalModules = 10; // Adjust based on your total modules
-    const totalQuizzes = 10; // Adjust based on your total quizzes
-    const totalBadges = 10; // Adjust based on your total badges
+    const totalModules = 10;
+    const totalQuizzes = 10;
+    const totalBadges = 10;
 
     return [
       {
@@ -125,6 +136,44 @@ const Account = () => {
     setUserData(editForm);
     localStorage.setItem("userData", JSON.stringify(editForm));
     setIsEditModalOpen(false);
+  };
+
+  const handleAddCertification = () => {
+    const updatedCertifications = [
+      ...(userData.certifications || []),
+      { ...newCertification, id: Date.now() },
+    ];
+
+    const updatedUserData = {
+      ...userData,
+      certifications: updatedCertifications,
+    };
+
+    setUserData(updatedUserData);
+    localStorage.setItem("userData", JSON.stringify(updatedUserData));
+
+    setNewCertification({
+      name: "",
+      issuer: "",
+      date: "",
+      expiry: "",
+      credentialId: "",
+    });
+    setIsAddCertModalOpen(false);
+  };
+
+  const handleRemoveCertification = (id) => {
+    const updatedCertifications = (userData.certifications || []).filter(
+      (cert) => cert.id !== id
+    );
+
+    const updatedUserData = {
+      ...userData,
+      certifications: updatedCertifications,
+    };
+
+    setUserData(updatedUserData);
+    localStorage.setItem("userData", JSON.stringify(updatedUserData));
   };
 
   const SocialIcons = () => {
@@ -294,7 +343,169 @@ const Account = () => {
           </div>
         </div>
 
-        {/* Edit Modal */}
+        {/* Certifications Section */}
+        <div className="mt-8 bg-gray-800 p-6 rounded-xl shadow-lg">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-xl font-semibold text-white">Certifications</h3>
+            <button
+              onClick={() => setIsAddCertModalOpen(true)}
+              className="px-4 py-2 bg-indigo-600 text-white rounded-lg flex items-center gap-2 hover:bg-indigo-700 transition-colors duration-300"
+            >
+              <Plus className="w-4 h-4" />
+              Add Certification
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {(userData.certifications || []).map((cert) => (
+              <div
+                key={cert.id}
+                className="bg-gray-700 p-4 rounded-lg space-y-2"
+              >
+                <div className="flex justify-between items-start">
+                  <h4 className="text-lg font-semibold text-white">
+                    {cert.name}
+                  </h4>
+                  <button
+                    onClick={() => handleRemoveCertification(cert.id)}
+                    className="text-gray-400 hover:text-red-400"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+                <p className="text-gray-300">Issuer: {cert.issuer}</p>
+                <p className="text-gray-300">Issued: {cert.date}</p>
+                {cert.expiry && (
+                  <p className="text-gray-300">Expires: {cert.expiry}</p>
+                )}
+                {cert.credentialId && (
+                  <p className="text-gray-300">
+                    Credential ID: {cert.credentialId}
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Add Certification Modal */}
+        {isAddCertModalOpen && (
+          <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50">
+            <div className="bg-gray-800 rounded-2xl p-6 max-w-md w-full">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold text-white">
+                  Add Certification
+                </h2>
+                <button
+                  onClick={() => setIsAddCertModalOpen(false)}
+                  className="p-2 hover:bg-gray-700 rounded-full text-gray-400"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-gray-300 mb-2">
+                    Certification Name
+                  </label>
+                  <input
+                    type="text"
+                    value={newCertification.name}
+                    onChange={(e) =>
+                      setNewCertification({
+                        ...newCertification,
+                        name: e.target.value,
+                      })
+                    }
+                    className="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-gray-300 mb-2">Issuer</label>
+                  <input
+                    type="text"
+                    value={newCertification.issuer}
+                    onChange={(e) =>
+                      setNewCertification({
+                        ...newCertification,
+                        issuer: e.target.value,
+                      })
+                    }
+                    className="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-gray-300 mb-2">Issue Date</label>
+                  <input
+                    type="date"
+                    value={newCertification.date}
+                    onChange={(e) =>
+                      setNewCertification({
+                        ...newCertification,
+                        date: e.target.value,
+                      })
+                    }
+                    className="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-gray-300 mb-2">
+                    Expiry Date (Optional)
+                  </label>
+                  <input
+                    type="date"
+                    value={newCertification.expiry}
+                    onChange={(e) =>
+                      setNewCertification({
+                        ...newCertification,
+                        expiry: e.target.value,
+                      })
+                    }
+                    className="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-gray-300 mb-2">
+                    Credential ID (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    value={newCertification.credentialId}
+                    onChange={(e) =>
+                      setNewCertification({
+                        ...newCertification,
+                        credentialId: e.target.value,
+                      })
+                    }
+                    className="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                  />
+                </div>
+
+                <div className="flex justify-end gap-4 mt-6">
+                  <button
+                    onClick={() => setIsAddCertModalOpen(false)}
+                    className="px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleAddCertification}
+                    className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                  >
+                    Add Certification
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Edit Profile Modal */}
         {isEditModalOpen && (
           <div className="fixed inset-0 mt-10 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50">
             <div className="bg-gray-800 rounded-2xl p-6 sm:p-8 max-w-2xl w-full max-h-[80vh] overflow-y-auto">

@@ -18,7 +18,6 @@ const UserProfilePage = () => {
   const { userId } = useParams();
   const navigate = useNavigate();
   const user = AllUsers.find(u => u.id === parseInt(userId, 10));
-  const [message, setMessage] = useState('');
   const [isConnected, setIsConnected] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -26,15 +25,21 @@ const UserProfilePage = () => {
     setIsConnected(!isConnected);
   };
 
-  const handleSendMessage = () => {
+  const handleSendMessage = (message) => {
     console.log('Sending message:', message);
-    setMessage('');
     setIsDialogOpen(false);
   };
 
   // Custom Dialog Component
   const MessageDialog = ({ isOpen, onClose, onSend }) => {
+    const [messageText, setMessageText] = useState('');
+
     if (!isOpen) return null;
+
+    const handleSubmit = () => {
+      onSend(messageText);
+      setMessageText('');
+    };
 
     return (
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
@@ -44,8 +49,8 @@ const UserProfilePage = () => {
             <p className="text-gray-400">Send a message to {user.name}</p>
           </div>
           <textarea
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
+            value={messageText}
+            onChange={(e) => setMessageText(e.target.value)}
             placeholder="Type your message here..."
             className="w-full h-32 p-3 bg-gray-700 rounded-lg text-white placeholder-gray-400 
                      resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -59,8 +64,8 @@ const UserProfilePage = () => {
               Cancel
             </button>
             <button
-              onClick={onSend}
-              disabled={!message.trim()}
+              onClick={handleSubmit}
+              disabled={!messageText.trim()}
               className="px-4 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 
                        transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed
                        flex items-center gap-2"
