@@ -2,10 +2,13 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { login } from '../store/userSlice.js';
 import { useDispatch } from 'react-redux';
+import { Eye, EyeOff } from 'lucide-react';
+import axios from 'axios';
 
 const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -14,11 +17,12 @@ const Login = () => {
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const validateForm = () => {
     const newErrors = {};
-
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    
     if (!formData.email) {
       newErrors.email = 'Email is required';
     } else if (!emailRegex.test(formData.email)) {
@@ -33,22 +37,40 @@ const Login = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoginError('');
 
     if (validateForm()) {
-      const storedData = localStorage.getItem('userData');
-      if (storedData) {
-        dispatch(login(storedData));
-        const userData = JSON.parse(storedData);
-        if (userData.email === formData.email && userData.password === formData.password) {
+      setIsLoading(true);
+      try {
+        const response = await axios.post(
+          'http://localhost:3000/login',
+          formData,
+          {
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          }
+        );
+
+        if (response.data.success) {
+          // Store user data
+          const userData = response.data.user;
+          dispatch(login(userData));
+          localStorage.setItem('userData', JSON.stringify(userData));
+          
+          // Redirect to home
           navigate('/');
-        } else {
-          setLoginError('Invalid email or password. Please try again.');
         }
-      } else {
-        setLoginError('User not found. Please sign up first.');
+      } catch (error) {
+        console.error('Login error:', error);
+        setLoginError(
+          error.response?.data?.message || 
+          'Failed to login. Please try again.'
+        );
+      } finally {
+        setIsLoading(false);
       }
     }
   };
@@ -167,15 +189,15 @@ const Login = () => {
                   type={showPassword ? 'text' : 'password'}
                   value={formData.password}
                   onChange={handleChange}
-                  className="mt-1 block w-full px-4 py-3 rounded-lg bg-gray-700/50 border-transparent focus:border-cyan-500 focus:bg-gray-900 focus:ring-0 text-white backdrop-blur-sm transition-all"
+                  className="mt-1 block w-full px-4 py-3 rounded-lg bg-gray-700/50 border-transparent focus:border-cyan-500 focus:bg-gray-900 focus:ring-0 text-white backdrop-blur-sm transition-all pr-12"
                   placeholder="••••••••"
                 />
                 <button
                   type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-white"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
                   onClick={() => setShowPassword(!showPassword)}
                 >
-                  {showPassword ? 'Hide' : 'Show'}
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
               {errors.password && (
@@ -187,9 +209,10 @@ const Login = () => {
           <div>
             <button
               type="submit"
-              className="w-full flex justify-center py-3 px-4 rounded-lg shadow-sm text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 transition-all duration-300 transform hover:scale-105"
+              disabled={isLoading}
+              className="w-full flex justify-center py-3 px-4 rounded-lg shadow-sm text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Sign In
+              {isLoading ? 'Signing In...' : 'Sign In'}
             </button>
           </div>
 
