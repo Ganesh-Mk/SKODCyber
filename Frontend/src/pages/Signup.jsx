@@ -49,7 +49,7 @@ const Signup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setServerError("");
-
+  
     if (validateForm()) {
       setIsLoading(true);
       try {
@@ -62,11 +62,18 @@ const Signup = () => {
             }
           }
         );
-
+  
         if (response.data.success) {
           const userData = response.data.user;
+          const token = response.data.token;
+          
           dispatch(login(userData));
           localStorage.setItem('userData', JSON.stringify(userData));
+          localStorage.setItem('token', token); // Store JWT token
+          
+          // Set default axios authorization header
+          axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+          
           navigate('/');
         }
       } catch (error) {
