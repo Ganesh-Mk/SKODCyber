@@ -30,13 +30,17 @@ const userSchema = new mongoose.Schema({
     instagram: String,
     linkedin: String,
     github: String
-  }
+  },
+  blogs: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Blog'
+  }]
 }, {
   timestamps: true
 });
 
 // Remove password when converting to JSON
-userSchema.methods.toJSON = function() {
+userSchema.methods.toJSON = function () {
   const user = this.toObject();
   delete user.password;
   return user;

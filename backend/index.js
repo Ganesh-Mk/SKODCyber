@@ -8,9 +8,9 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(express.json());
-app.use(cors({ 
-  origin: "http://localhost:5173", 
-  credentials: true 
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials: true
 }));
 
 // MongoDB Connection
@@ -23,9 +23,37 @@ mongoose
 const signupRoute = require("./routes/singup");
 const loginRoute = require("./routes/login");
 
+const createBlog = require("./routes/createBlog");
+const deleteBlog = require("./routes/deleteBlog");
+const getAllBlog = require("./routes/getAllBlog");
+const updateBlog = require("./routes/updateBlog");
+
+const createCourse = require("./routes/createCourse");
+const deleteCourse = require("./routes/deleteCourse");
+const getAllCourse = require("./routes/getAllCourse");
+const updateCourse = require("./routes/updateCourse");
+
+const createModule = require('./routes/createModule');
+const updateModule = require('./routes/updateModule');
+const deleteModule = require('./routes/deleteModule');
+
 // Use routes
-app.use("/signup", signupRoute);
-app.use("/login", loginRoute);
+app.use("/", signupRoute);
+app.use("/", loginRoute);
+
+app.use("/", createBlog);
+app.use("/", deleteBlog);
+app.use("/", getAllBlog);
+app.use("/", updateBlog);
+
+app.use("/", createCourse);
+app.use("/", deleteCourse);
+app.use("/", getAllCourse);
+app.use("/", updateCourse);
+
+app.use('/', createModule);
+app.use('/', updateModule);
+app.use('/', deleteModule);
 
 // Test Route
 app.get("/", (req, res) => {
@@ -35,9 +63,9 @@ app.get("/", (req, res) => {
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).json({ 
-    success: false, 
-    message: "Internal server error" 
+  res.status(500).json({
+    success: false,
+    message: "Internal server error"
   });
 });
 
