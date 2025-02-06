@@ -39,6 +39,7 @@ const updateCourse = require("./routes/updateCourse");
 const createModule = require('./routes/createModule');
 const updateModule = require('./routes/updateModule');
 const deleteModule = require('./routes/deleteModule');
+const getModules = require('./routes/getModules');
 
 // Use routes
 app.use("/", getAll);
@@ -60,6 +61,7 @@ app.use("/", updateCourse);
 app.use('/', createModule);
 app.use('/', updateModule);
 app.use('/', deleteModule);
+app.use('/', getModules);
 
 // Test Route
 app.get("/", (req, res) => {

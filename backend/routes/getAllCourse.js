@@ -5,11 +5,6 @@ const Course = require('../models/courseModel');
 router.get('/allCourse', async (req, res) => {
   try {
     const courses = await Course.find()
-      .populate({
-        path: 'modules',
-        select: 'title description videoUrl role'
-      })
-      .sort({ createdAt: -1 });
 
     res.json(courses);
   } catch (error) {
