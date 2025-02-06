@@ -12,7 +12,8 @@ const Signup = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    password: ""
+    password: "",
+    role: "user"
   });
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
@@ -27,6 +28,7 @@ const Signup = () => {
     else if (!emailRegex.test(formData.email)) newErrors.email = 'Please enter a valid email';
     if (!formData.password) newErrors.password = 'Password is required';
     else if (formData.password.length < 6) newErrors.password = 'Password must be at least 6 characters';
+    if (!formData.role) newErrors.role = 'Role is required';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -37,7 +39,6 @@ const Signup = () => {
       ...prev,
       [name]: value
     }));
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
@@ -153,6 +154,22 @@ const Signup = () => {
                 </button>
               </div>
               {errors.password && <p className="mt-1 text-red-500 text-sm">{errors.password}</p>}
+            </div>
+
+            <div>
+              <label htmlFor="role" className="text-white block mb-1">Role</label>
+              <select
+                id="role"
+                name="role"
+                value={formData.role}
+                onChange={handleChange}
+                className="mt-1 block w-full px-4 py-3 rounded-lg bg-gray-700/50 border-transparent focus:border-cyan-500 focus:bg-gray-900 focus:ring-0 text-white"
+              >
+                <option value="user">User</option>
+                <option value="admin">Admin</option>
+                <option value="developer">Developer</option>
+              </select>
+              {errors.role && <p className="mt-1 text-red-500 text-sm">{errors.role}</p>}
             </div>
           </div>
 
