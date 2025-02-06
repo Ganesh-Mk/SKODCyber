@@ -4,11 +4,11 @@ const Module = require('../models/moduleModel');
 
 router.put('/updateModule/:id', async (req, res) => {
   try {
-    const { title, description, videoUrl } = req.body;
+    const { title, description, videoUrl, role } = req.body;
 
     const updatedModule = await Module.findByIdAndUpdate(
       req.params.id,
-      { title, description, videoUrl },
+      { title, description, videoUrl, role },
       { new: true, runValidators: true }
     );
 

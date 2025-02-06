@@ -2,12 +2,12 @@ const express = require('express');
 const router = express.Router();
 const Blog = require('../models/blogModel');
 
-router.put('/updateBlog/:id', async (req, res) => {
+router.put('/updateBlog', async (req, res) => {
   try {
-    const { title, image, description } = req.body;
+    const { title, image, description, blogId, userId } = req.body;
 
     const updatedBlog = await Blog.findByIdAndUpdate(
-      req.params.id,
+      blogId,
       { title, image, description },
       { new: true }
     );

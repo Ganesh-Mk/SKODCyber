@@ -4,12 +4,14 @@ const Course = require('../models/courseModel');
 
 router.post('/createCourse', async (req, res) => {
   try {
-    const { title, description, thumbnail } = req.body;
+    const { title, description, thumbnail, role, userId } = req.body;
 
     const newCourse = new Course({
       title,
       description,
-      thumbnail
+      thumbnail,
+      role,
+      userId
     });
 
     const savedCourse = await newCourse.save();

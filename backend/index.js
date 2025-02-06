@@ -22,6 +22,8 @@ mongoose
 // Import routes
 const signupRoute = require("./routes/singup");
 const loginRoute = require("./routes/login");
+const deleteUser = require("./routes/deleteUser");
+const getAllUser = require("./routes/getAllUser");
 
 const createBlog = require("./routes/createBlog");
 const deleteBlog = require("./routes/deleteBlog");
@@ -40,6 +42,8 @@ const deleteModule = require('./routes/deleteModule');
 // Use routes
 app.use("/", signupRoute);
 app.use("/", loginRoute);
+app.use("/", deleteUser);
+app.use("/", getAllUser);
 
 app.use("/", createBlog);
 app.use("/", deleteBlog);

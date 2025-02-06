@@ -4,11 +4,11 @@ const Course = require('../models/courseModel');
 
 router.put('/updateCourse/:id', async (req, res) => {
   try {
-    const { title, description, thumbnail } = req.body;
+    const { title, description, thumbnail, role } = req.body;
 
     const updatedCourse = await Course.findByIdAndUpdate(
       req.params.id,
-      { title, description, thumbnail },
+      { title, description, thumbnail, role },
       { new: true }
     );
 

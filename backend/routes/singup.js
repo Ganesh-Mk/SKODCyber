@@ -1,15 +1,15 @@
 const express = require("express");
 const bcrypt = require("bcryptjs");
-const User = require("../models/user");
+const User = require("../models/userModel");
 const router = express.Router();
 
-router.post("/", async (req, res) => {
+router.post("/signup", async (req, res) => {
   try {
     console.log("Received signup request:");
-    const { name, email, password } = req.body;
+    const { name, email, password, role } = req.body;
 
     // Validate input
-    if (!name || !email || !password) {
+    if (!name || !email || !password || !role) {
       return res.status(400).json({
         success: false,
         message: "All fields are required"
@@ -34,12 +34,7 @@ router.post("/", async (req, res) => {
       name,
       email: email.toLowerCase(),
       password: hashedPassword,
-      social: {
-        twitter: `${name.replace(/\s+/g, '')}`,
-        instagram: `${name.replace(/\s+/g, '')}`,
-        linkedin: `${name.replace(/\s+/g, '')}`,
-        github: `${name.replace(/\s+/g, '')}`
-      }
+      role
     });
 
     await newUser.save();

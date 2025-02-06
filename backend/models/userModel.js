@@ -17,6 +17,11 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Password is required']
   },
+  role: {
+    type: String,
+    enum: ['admin', 'developer', 'user'],
+    required: [true, 'Role is required']
+  },
   about: {
     type: String,
     default: "Edit your description"
@@ -34,6 +39,10 @@ const userSchema = new mongoose.Schema({
   blogs: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Blog'
+  }],
+  courses: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Course'
   }]
 }, {
   timestamps: true

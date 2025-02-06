@@ -7,7 +7,7 @@ router.get('/allCourse', async (req, res) => {
     const courses = await Course.find()
       .populate({
         path: 'modules',
-        select: 'title description videoUrl'
+        select: 'title description videoUrl role'
       })
       .sort({ createdAt: -1 });
 

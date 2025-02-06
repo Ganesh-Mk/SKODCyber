@@ -4,16 +4,22 @@ require('./moduleModel');
 const courseSchema = new mongoose.Schema({
   title: {
     type: String,
-    required: [true, 'Title is required'],
-    trim: true
   },
   description: {
     type: String,
-    required: [true, 'Description is required']
   },
   thumbnail: {
     type: String,
-    required: [true, 'Thumbnail is required']
+  },
+  role: {
+    type: String,
+    enum: ['admin', 'developer', 'user'],
+    required: [true, 'role is required']
+  },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: [true, 'userId is required']
   },
   modules: [{
     type: mongoose.Schema.Types.ObjectId,

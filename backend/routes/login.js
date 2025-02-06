@@ -2,11 +2,11 @@
 
 const express = require("express");
 const bcrypt = require("bcryptjs");
-const User = require("../models/user");
+const User = require("../models/userModel");
 const router = express.Router();
 
 // Login Route (POST /login)
-router.post("/", async (req, res) => {
+router.post("/login", async (req, res) => {
   try {
     // 1. Extract credentials from request body
     const { email, password } = req.body;
@@ -21,7 +21,7 @@ router.post("/", async (req, res) => {
     }
 
     // 3. Find user by email (case insensitive)
-    const user = await User.findOne({ 
+    const user = await User.findOne({
       email: { $regex: new RegExp(`^${email}$`, 'i') }
     });
 
@@ -36,7 +36,7 @@ router.post("/", async (req, res) => {
 
     // 5. Compare passwords
     const isPasswordValid = await bcrypt.compare(password, user.password);
-    
+
     if (!isPasswordValid) {
       console.log("❌ Invalid password for:", email);
       return res.status(401).json({

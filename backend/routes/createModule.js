@@ -5,7 +5,7 @@ const Course = require('../models/courseModel');
 
 router.post('/createModule', async (req, res) => {
   try {
-    const { title, description, videoUrl, courseId } = req.body;
+    const { title, description, videoUrl, courseId, role, userId } = req.body;
 
     // Check if the course exists
     const course = await Course.findById(courseId);
@@ -18,7 +18,9 @@ router.post('/createModule', async (req, res) => {
       title,
       description,
       videoUrl,
-      course: courseId
+      course: courseId,
+      role,
+      userId
     });
 
     const savedModule = await newModule.save();

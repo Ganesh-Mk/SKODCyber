@@ -9,7 +9,7 @@ const Dashboard = () => {
 
   const menuItems = [
     { id: 'courses', icon: Book, text: 'My Courses', path: '/courses' },
-    { id: 'posts', icon: FileText, text: 'Manage All Posts', path: '/posts' },
+    { id: 'blogs', icon: FileText, text: 'Manage All Blogs', path: '/blogs' },
     { id: 'manage-courses', icon: Settings, text: 'Manage All Courses', path: '/manage-courses' }
   ];
 
@@ -38,8 +38,8 @@ const Dashboard = () => {
                 key={item.id}
                 onClick={() => navigate(item.path)}
                 className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-300 ${location.pathname === item.path
-                    ? 'bg-cyan-500/10 text-cyan-400'
-                    : 'text-gray-400 hover:bg-slate-700 hover:text-white'
+                  ? 'bg-cyan-500/10 text-cyan-400'
+                  : 'text-gray-400 hover:bg-slate-700 hover:text-white'
                   }`}
               >
                 <item.icon className="w-5 h-5" />

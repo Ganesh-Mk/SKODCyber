@@ -1,6 +1,11 @@
 const mongoose = require('mongoose');
 
 const blogSchema = new mongoose.Schema({
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: [true, 'userId is required']
+  },
   title: {
     type: String,
     required: [true, 'Title is required'],
@@ -13,6 +18,11 @@ const blogSchema = new mongoose.Schema({
   description: {
     type: String,
     required: [true, 'Description is required']
+  },
+  role: {
+    type: String,
+    enum: ['admin', 'developer', 'user'],
+    required: [true, 'role is required']
   }
 }, {
   timestamps: true
