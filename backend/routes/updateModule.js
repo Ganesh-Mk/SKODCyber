@@ -2,13 +2,13 @@ const express = require('express');
 const router = express.Router();
 const Module = require('../models/moduleModel');
 
-router.put('/updateModule/:id', async (req, res) => {
+router.put('/updateModule', async (req, res) => {
   try {
-    const { title, description, videoUrl, role } = req.body;
+    const { moduleId, title, description, videoUrl } = req.body;
 
     const updatedModule = await Module.findByIdAndUpdate(
-      req.params.id,
-      { title, description, videoUrl, role },
+      moduleId,
+      { title, description, videoUrl },
       { new: true, runValidators: true }
     );
 

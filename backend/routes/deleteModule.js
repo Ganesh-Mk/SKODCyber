@@ -3,19 +3,19 @@ const router = express.Router();
 const Module = require('../models/moduleModel');
 const Course = require('../models/courseModel');
 
-router.delete('/deleteModule/:id', async (req, res) => {
+router.delete('/deleteModule', async (req, res) => {
   try {
-    const module = await Module.findById(req.params.id);
+    const { moduleId, courseId } = req.body;
+
+    const module = await Module.findById(moduleId);
     if (!module) {
       return res.status(404).json({ message: 'Module not found' });
     }
 
-    // Remove module from the course
-    await Course.findByIdAndUpdate(module.course, {
+    await Course.findByIdAndUpdate(courseId, {
       $pull: { modules: module._id }
     });
 
-    // Delete module
     await module.deleteOne();
 
     res.json({ message: 'Module deleted successfully' });

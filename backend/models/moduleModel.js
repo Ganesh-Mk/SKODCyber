@@ -2,11 +2,6 @@ const mongoose = require('mongoose');
 require('./courseModel');
 
 const moduleSchema = new mongoose.Schema({
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: [true, 'userId is required']
-  },
   title: {
     type: String,
     required: [true, 'Title is required'],
@@ -20,15 +15,10 @@ const moduleSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Video URL is required']
   },
-  course: {
+  courseId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Course',
     required: true
-  },
-  role: {
-    type: String,
-    enum: ['admin', 'developer', 'user'],
-    required: [true, 'role is required']
   },
 }, {
   timestamps: true

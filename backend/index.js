@@ -20,6 +20,7 @@ mongoose
   .catch((err) => console.error("❌ MongoDB Connection Error:", err));
 
 // Import routes
+const getAll = require("./routes/getAll");
 const signupRoute = require("./routes/singup");
 const loginRoute = require("./routes/login");
 const deleteUser = require("./routes/deleteUser");
@@ -40,6 +41,7 @@ const updateModule = require('./routes/updateModule');
 const deleteModule = require('./routes/deleteModule');
 
 // Use routes
+app.use("/", getAll);
 app.use("/", signupRoute);
 app.use("/", loginRoute);
 app.use("/", deleteUser);
