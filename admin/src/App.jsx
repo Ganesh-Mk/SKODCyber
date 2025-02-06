@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import './App.css';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Dashboard from './pages/Dashboard';
@@ -9,8 +9,6 @@ import ManageModules from './pages/ManageModules';
 import ManageMyModules from './pages/ManageMyModules';
 
 const App = () => {
-  localStorage.setItem('role', 'admin');
-  localStorage.setItem('userId', '67a46dbd9e1c926f5f5210e5');
 
   return (
     <Router>

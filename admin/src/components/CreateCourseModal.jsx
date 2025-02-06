@@ -16,8 +16,18 @@ const CreateCourseModal = ({ isOpen, onClose, onCreate, loading = false }) => {
     return () => document.removeEventListener('keydown', handleEscape);
   }, [onClose]);
 
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    setFormData({ ...formData, thumbnail: file });
+  };
+
   const handleSubmit = () => {
-    onCreate(formData);
+    const data = new FormData();
+    data.append("title", formData.title);
+    data.append("description", formData.description);
+    data.append("thumbnail", formData.thumbnail);
+
+    onCreate(data);
   };
 
   if (!isOpen) return null;
@@ -78,14 +88,12 @@ const CreateCourseModal = ({ isOpen, onClose, onCreate, loading = false }) => {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-300">Thumbnail URL</label>
-                    <motion.input
-                      whileFocus={{ scale: 1.01 }}
-                      type="text"
-                      placeholder="Enter thumbnail URL"
-                      className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 transition-all duration-200"
-                      value={formData.thumbnail}
-                      onChange={(e) => setFormData({ ...formData, thumbnail: e.target.value })}
+                    <label className="text-sm font-medium text-gray-300">Thumbnail</label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-gray-200"
+                      onChange={handleFileChange}
                     />
                   </div>
 

@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 const CreateModuleModal = ({ isOpen, onClose, onCreate, loading = false }) => {
   const [formData, setFormData] = useState({
     title: '',
-    videoUrl: '',
+    videoUrl: null,
     description: ''
   });
 
@@ -16,8 +16,26 @@ const CreateModuleModal = ({ isOpen, onClose, onCreate, loading = false }) => {
     return () => document.removeEventListener('keydown', handleEscape);
   }, [onClose]);
 
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    setFormData({ ...formData, video: file });
+  };
+
   const handleSubmit = () => {
-    onCreate(formData);
+    const data = new FormData();
+    data.append("title", formData.title);
+    data.append("description", formData.description);
+    data.append("video", formData.video);
+
+    // Convert FormData to plain object
+    const plainData = {};
+    data.forEach((value, key) => {
+      plainData[key] = value;
+    });
+
+    console.log("PlainData:", plainData); // You can log this now
+
+    onCreate(plainData);  // Send plainData to parent
   };
 
   if (!isOpen) return null;
@@ -78,14 +96,13 @@ const CreateModuleModal = ({ isOpen, onClose, onCreate, loading = false }) => {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-300">Video URL</label>
+                    <label className="text-sm font-medium text-gray-300">Upload Video</label>
                     <motion.input
                       whileFocus={{ scale: 1.01 }}
-                      type="text"
-                      placeholder="Enter video URL"
+                      type="file"
+                      accept="video/*"
                       className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 transition-all duration-200"
-                      value={formData.videoUrl}
-                      onChange={(e) => setFormData({ ...formData, videoUrl: e.target.value })}
+                      onChange={handleFileChange}
                     />
                   </div>
 

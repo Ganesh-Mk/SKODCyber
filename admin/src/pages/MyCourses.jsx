@@ -8,7 +8,7 @@ import CreateCourseModal from '../components/CreateCourseModal';
 
 const MyCourses = () => {
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
-  const userId = localStorage.getItem('userId');
+  const userId = "67a46dbd9e1c926f5f5210e5";
   const navigate = useNavigate();
   const [courses, setCourses] = useState([]);
   const [filteredCourses, setFilteredCourses] = useState([]);
@@ -47,19 +47,24 @@ const MyCourses = () => {
 
   const filterCourses = () => {
     const filtered = courses.filter(course =>
-      course.title.toLowerCase().includes(searchQuery.toLowerCase())
+      course.title?.toLowerCase().includes(searchQuery.toLowerCase())
     );
     setFilteredCourses(filtered);
   };
 
   const handleCreateCourse = async (formData) => {
+    formData.append("userId", userId);
+    const plainData = {};
+    formData.forEach((value, key) => {
+      plainData[key] = value;
+    });
+
     try {
       setLoading(true);
-      await axios.post(`${BACKEND_URL}/createCourse`, {
-        title: formData.title,
-        description: formData.description,
-        thumbnail: formData.thumbnail,
-        userId
+      await axios.post(`${BACKEND_URL}/createCourse`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        }
       });
       fetchCourses();
       setIsCreateModalOpen(false);

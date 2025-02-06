@@ -4,18 +4,18 @@ const cors = require("cors");
 require("dotenv").config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(express.json());
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin: "*",
   credentials: true
 }));
 
 // MongoDB Connection
 mongoose
-  .connect(process.env.MONGO_URI)
+  .connect(process.env.MONGODB_URI)
   .then(() => console.log("✅ MongoDB Connected"))
   .catch((err) => console.error("❌ MongoDB Connection Error:", err));
 
@@ -41,27 +41,30 @@ const updateModule = require('./routes/updateModule');
 const deleteModule = require('./routes/deleteModule');
 const getModules = require('./routes/getModules');
 
-// Use routes
-app.use("/", getAll);
-app.use("/", signupRoute);
-app.use("/", loginRoute);
-app.use("/", deleteUser);
-app.use("/", getAllUser);
+// User
+app.use(getAll);
+app.use(signupRoute);
+app.use(loginRoute);
+app.use(deleteUser);
+app.use(getAllUser);
 
-app.use("/", createBlog);
-app.use("/", deleteBlog);
-app.use("/", getAllBlog);
-app.use("/", updateBlog);
+// Blog
+app.use(createBlog);
+app.use(deleteBlog);
+app.use(getAllBlog);
+app.use(updateBlog);
 
-app.use("/", createCourse);
-app.use("/", deleteCourse);
-app.use("/", getAllCourse);
-app.use("/", updateCourse);
+// Course
+app.use(createCourse);
+app.use(deleteCourse);
+app.use(getAllCourse);
+app.use(updateCourse);
 
-app.use('/', createModule);
-app.use('/', updateModule);
-app.use('/', deleteModule);
-app.use('/', getModules);
+// Module
+app.use(createModule);
+app.use(updateModule);
+app.use(deleteModule);
+app.use(getModules);
 
 // Test Route
 app.get("/", (req, res) => {

@@ -1,11 +1,23 @@
 const express = require('express');
 const router = express.Router();
+const multer = require("multer");
 const Module = require('../models/moduleModel');
 const Course = require('../models/courseModel');
+const uploadVideo = require('../utils/uploadVideo');
 
-router.post('/createModule', async (req, res) => {
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
+
+router.post('/createModule', upload.single('video'), async (req, res) => {
   try {
-    const { title, description, videoUrl, courseId } = req.body;
+    const { title, description, courseId } = req.body;
+    const file = req.file;
+
+    if (!file) {
+      return res.status(400).json({ message: 'Video file is required' });
+    }
+
+    const videoUrl = await uploadVideo(file.buffer, 'modules');
 
     const course = await Course.findById(courseId);
     if (!course) {
@@ -26,6 +38,7 @@ router.post('/createModule', async (req, res) => {
 
     res.status(201).json(savedModule);
   } catch (error) {
+    console.error('Error:', error.message);
     res.status(400).json({ message: error.message });
   }
 });

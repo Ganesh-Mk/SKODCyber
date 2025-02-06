@@ -1,24 +1,34 @@
-const express = require('express');
-const router = express.Router();
-const Blog = require('../models/blogModel');
-const User = require('../models/userModel');
+const express = require("express");
+const multer = require("multer");
+const uploadImage = require("../utils/uploadImage");
+const Blog = require("../models/blogModel");
+const User = require("../models/userModel");
 
-router.post('/createBlog', async (req, res) => {
+const router = express.Router();
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
+
+router.post("/createBlog", upload.single("image"), async (req, res) => {
   try {
-    const { title, image, description, userId } = req.body;
+    const { title, description, userId } = req.body;
+    const imageFile = req.file;
 
     const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-    const role = user.role;
+    if (!user) return res.status(404).json({ message: "User not found" });
 
+    // Upload image to Cloudinary
+    let imageUrl = "";
+    if (imageFile) {
+      imageUrl = await uploadImage(imageFile.buffer, "blogs");
+    }
+
+    // Create Blog
     const newBlog = new Blog({
       title,
-      image,
+      image: imageUrl,
       description,
-      role,
-      userId
+      role: user.role,
+      userId,
     });
 
     const savedBlog = await newBlog.save();
@@ -29,6 +39,5 @@ router.post('/createBlog', async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 });
-
 
 module.exports = router;

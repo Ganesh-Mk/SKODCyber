@@ -8,6 +8,7 @@ import CreateModuleModal from '../components/CreateModuleModal';
 
 const ManageMyModules = () => {
   const { courseId } = useParams();
+  const userId = "67a46dbd9e1c926f5f5210e5";
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
   const [modules, setModules] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -37,13 +38,22 @@ const ManageMyModules = () => {
     }
   };
 
-  const handleCreateModule = async (formData) => {
+  const handleCreateModule = async (plainData) => {
+    const formData = new FormData();
+    for (let key in plainData) {
+      formData.append(key, plainData[key]);
+    }
+    formData.append("userId", userId);
+    formData.append("courseId", courseId);
+
     try {
       setLoading(true);
-      await axios.post(`${BACKEND_URL}/createModule`, {
-        ...formData,
-        courseId
+      await axios.post(`${BACKEND_URL}/createModule`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        }
       });
+
       fetchModules();
       setIsCreateModalOpen(false);
     } catch (error) {
@@ -52,6 +62,8 @@ const ManageMyModules = () => {
       setLoading(false);
     }
   };
+
+
 
   const handleUpdateModule = async () => {
     try {
