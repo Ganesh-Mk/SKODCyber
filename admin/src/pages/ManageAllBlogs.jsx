@@ -53,13 +53,18 @@ const ManageAllBlogs = () => {
     setFilteredBlogs(filtered);
   };
 
-  const handleUpdateBlog = async () => {
+  const handleUpdateBlog = async (plainData) => {
+    plainData.blogId = selectedBlog._id;
+
+    const formData = new FormData();
+    for (const key in plainData) {
+      formData.append(key, plainData[key]);
+    }
+
     try {
       setLoading(true);
-      await axios.put(`${BACKEND_URL}/updateBlog`, {
-        ...updateFormData,
-        blogId: selectedBlog._id,
-        userId: selectedBlog.userId
+      await axios.put(`${BACKEND_URL}/updateBlog`, formData, {
+        headers: { "Content-Type": "multipart/form-data" }
       });
       fetchBlogs();
       setIsUpdateModalOpen(false);
@@ -69,6 +74,7 @@ const ManageAllBlogs = () => {
       setLoading(false);
     }
   };
+
 
   const handleDeleteBlog = async () => {
     try {

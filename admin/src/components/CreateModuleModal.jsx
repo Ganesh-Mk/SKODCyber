@@ -27,15 +27,12 @@ const CreateModuleModal = ({ isOpen, onClose, onCreate, loading = false }) => {
     data.append("description", formData.description);
     data.append("video", formData.video);
 
-    // Convert FormData to plain object
     const plainData = {};
     data.forEach((value, key) => {
       plainData[key] = value;
     });
 
-    console.log("PlainData:", plainData); // You can log this now
-
-    onCreate(plainData);  // Send plainData to parent
+    onCreate(plainData);
   };
 
   if (!isOpen) return null;

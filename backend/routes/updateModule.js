@@ -1,20 +1,32 @@
 const express = require('express');
 const router = express.Router();
+const multer = require("multer");
 const Module = require('../models/moduleModel');
+const uploadVideo = require('../utils/uploadVideo');
 
-router.put('/updateModule', async (req, res) => {
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
+
+router.put('/updateModule', upload.single('video'), async (req, res) => {
   try {
-    const { moduleId, title, description, videoUrl } = req.body;
+    const { moduleId, title, description } = req.body;
+    const file = req.file;
 
-    const updatedModule = await Module.findByIdAndUpdate(
-      moduleId,
-      { title, description, videoUrl },
-      { new: true, runValidators: true }
-    );
-
-    if (!updatedModule) {
+    const existingModule = await Module.findById(moduleId);
+    if (!existingModule) {
       return res.status(404).json({ message: 'Module not found' });
     }
+
+    let videoUrl = existingModule.videoUrl;
+    if (file) {
+      videoUrl = await uploadVideo(file.buffer, 'modules');
+    }
+
+    existingModule.title = title || existingModule.title;
+    existingModule.description = description || existingModule.description;
+    existingModule.videoUrl = videoUrl;
+
+    const updatedModule = await existingModule.save();
 
     res.json(updatedModule);
   } catch (error) {

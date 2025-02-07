@@ -8,7 +8,7 @@ import CreateCourseModal from '../components/CreateCourseModal';
 
 const MyCourses = () => {
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
-  const userId = "67a46dbd9e1c926f5f5210e5";
+  const userId = import.meta.env.VITE_ADMIN_ID;
   const navigate = useNavigate();
   const [courses, setCourses] = useState([]);
   const [filteredCourses, setFilteredCourses] = useState([]);
@@ -78,23 +78,20 @@ const MyCourses = () => {
     }
   };
 
-  const handleUpdateCourse = async () => {
+  const handleUpdateCourse = async (formData) => {
+    formData.append("userId", userId);
+    formData.append("courseId", selectedCourse._id);
+
     try {
       setLoading(true);
-      await axios.put(`${BACKEND_URL}/updateCourse`, {
-        courseId: selectedCourse._id,
-        userId,
-        title: updateFormData.title,
-        description: updateFormData.description,
-        thumbnail: updateFormData.thumbnail
+      await axios.put(`${BACKEND_URL}/updateCourse`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
       });
       fetchCourses();
       setIsUpdateModalOpen(false);
     } catch (error) {
       console.error('Error updating course:', error);
-      if (error.response) {
-        alert(error.response.data.message);
-      }
+      if (error.response) alert(error.response.data.message);
     } finally {
       setLoading(false);
     }

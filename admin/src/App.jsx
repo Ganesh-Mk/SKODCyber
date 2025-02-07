@@ -6,7 +6,7 @@ import MyCourses from './pages/MyCourses';
 import ManageAllBlogs from './pages/ManageAllBlogs';
 import ManageAllCourses from './pages/ManageAllCourses';
 import ManageModules from './pages/ManageModules';
-import ManageMyModules from './pages/ManageMyModules';
+import MyModules from './pages/MyModules';
 
 const App = () => {
 
@@ -19,7 +19,7 @@ const App = () => {
           <Route path="blogs" element={<ManageAllBlogs />} />
           <Route path="manage-courses" element={<ManageAllCourses />} />
           <Route path="manage-modules/:courseId" element={<ManageModules />} />
-          <Route path="my-course-module/:courseId" element={<ManageMyModules />} />
+          <Route path="my-course-module/:courseId" element={<MyModules />} />
         </Route>
       </Routes>
     </Router>

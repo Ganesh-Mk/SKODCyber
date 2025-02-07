@@ -36,14 +36,22 @@ const ManageModules = () => {
     }
   };
 
-  const handleUpdateModule = async () => {
+  const handleUpdateModule = async (plainData) => {
+    const formData = new FormData();
+    for (let key in plainData) {
+      formData.append(key, plainData[key]);
+    }
+    formData.append("moduleId", selectedModule._id);
+    formData.append("courseId", courseId);
+
     try {
       setLoading(true);
-      await axios.put(`${BACKEND_URL}/updateModule`, {
-        ...updateFormData,
-        moduleId: selectedModule._id,
-        courseId
+      await axios.put(`${BACKEND_URL}/updateModule`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        }
       });
+
       fetchModules();
       setIsUpdateModalOpen(false);
     } catch (error) {

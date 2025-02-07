@@ -6,7 +6,7 @@ import ConfirmationModal from '../components/confirmationModal';
 import UpdateModuleModal from '../components/UpdateModuleModal';
 import CreateModuleModal from '../components/CreateModuleModal';
 
-const ManageMyModules = () => {
+const MyModules = () => {
   const { courseId } = useParams();
   const userId = "67a46dbd9e1c926f5f5210e5";
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
@@ -65,14 +65,22 @@ const ManageMyModules = () => {
 
 
 
-  const handleUpdateModule = async () => {
+  const handleUpdateModule = async (plainData) => {
+    const formData = new FormData();
+    for (let key in plainData) {
+      formData.append(key, plainData[key]);
+    }
+    formData.append("moduleId", selectedModule._id);
+    formData.append("courseId", courseId);
+
     try {
       setLoading(true);
-      await axios.put(`${BACKEND_URL}/updateModule`, {
-        ...updateFormData,
-        moduleId: selectedModule._id,
-        courseId
+      await axios.put(`${BACKEND_URL}/updateModule`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        }
       });
+
       fetchModules();
       setIsUpdateModalOpen(false);
     } catch (error) {
@@ -81,6 +89,7 @@ const ManageMyModules = () => {
       setLoading(false);
     }
   };
+
 
   const handleDeleteModule = async () => {
     try {
@@ -218,4 +227,4 @@ const ManageMyModules = () => {
   );
 };
 
-export default ManageMyModules;
+export default MyModules;
