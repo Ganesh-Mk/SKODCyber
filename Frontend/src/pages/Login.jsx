@@ -40,7 +40,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoginError('');
-
+  
     if (validateForm()) {
       setIsLoading(true);
       try {
@@ -53,12 +53,18 @@ const Login = () => {
             }
           }
         );
-
+  
         if (response.data.success) {
-          // Store user data
+          // Store user data and token
           const userData = response.data.user;
+          const token = response.data.token;
+          
           dispatch(login(userData));
           localStorage.setItem('userData', JSON.stringify(userData));
+          localStorage.setItem('token', token); // Store JWT token
+          
+          // Set default axios authorization header
+          axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
           
           // Redirect to home
           navigate('/');

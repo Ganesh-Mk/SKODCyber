@@ -13,12 +13,18 @@ const Signup = () => {
     name: "",
     email: "",
     password: "",
-    role: "user"
+    role: "user" // Default role
   });
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [serverError, setServerError] = useState("");
+
+  const roles = [
+    { value: "user", label: "User" },
+    { value: "developer", label: "Developer" },
+    { value: "admin", label: "Admin" }
+  ];
 
   const validateForm = () => {
     const newErrors = {};
@@ -39,6 +45,7 @@ const Signup = () => {
       ...prev,
       [name]: value
     }));
+    // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
@@ -50,7 +57,7 @@ const Signup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setServerError("");
-
+  
     if (validateForm()) {
       setIsLoading(true);
       try {
@@ -63,11 +70,17 @@ const Signup = () => {
             }
           }
         );
-
+  
         if (response.data.success) {
           const userData = response.data.user;
+          const token = response.data.token;
+          
           dispatch(login(userData));
           localStorage.setItem('userData', JSON.stringify(userData));
+          localStorage.setItem('token', token);
+          
+          axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+          
           navigate('/');
         }
       } catch (error) {
@@ -133,6 +146,24 @@ const Signup = () => {
               {errors.email && <p className="mt-1 text-red-500 text-sm">{errors.email}</p>}
             </div>
 
+            <div>
+              <label htmlFor="role" className="text-white block mb-1">Role</label>
+              <select
+                id="role"
+                name="role"
+                value={formData.role}
+                onChange={handleChange}
+                className="mt-1 block w-full px-4 py-3 rounded-lg bg-gray-700/50 border-transparent focus:border-cyan-500 focus:bg-gray-900 focus:ring-0 text-white"
+              >
+                {roles.map(role => (
+                  <option key={role.value} value={role.value}>
+                    {role.label}
+                  </option>
+                ))}
+              </select>
+              {errors.role && <p className="mt-1 text-red-500 text-sm">{errors.role}</p>}
+            </div>
+
             <div className="relative">
               <label htmlFor="password" className="text-white block mb-1">Password</label>
               <div className="relative">
@@ -154,22 +185,6 @@ const Signup = () => {
                 </button>
               </div>
               {errors.password && <p className="mt-1 text-red-500 text-sm">{errors.password}</p>}
-            </div>
-
-            <div>
-              <label htmlFor="role" className="text-white block mb-1">Role</label>
-              <select
-                id="role"
-                name="role"
-                value={formData.role}
-                onChange={handleChange}
-                className="mt-1 block w-full px-4 py-3 rounded-lg bg-gray-700/50 border-transparent focus:border-cyan-500 focus:bg-gray-900 focus:ring-0 text-white"
-              >
-                <option value="user">User</option>
-                <option value="admin">Admin</option>
-                <option value="developer">Developer</option>
-              </select>
-              {errors.role && <p className="mt-1 text-red-500 text-sm">{errors.role}</p>}
             </div>
           </div>
 

@@ -1,14 +1,13 @@
 const express = require("express");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken"); // Add this
 const User = require("../models/userModel");
 const router = express.Router();
 
 router.post("/signup", async (req, res) => {
   try {
-    console.log("Received signup request:");
     const { name, email, password, role } = req.body;
 
-    // Validate input
     if (!name || !email || !password || !role) {
       return res.status(400).json({
         success: false,
@@ -16,7 +15,6 @@ router.post("/signup", async (req, res) => {
       });
     }
 
-    // Check if user exists
     const existingUser = await User.findOne({ email: email.toLowerCase() });
     if (existingUser) {
       return res.status(400).json({
@@ -25,30 +23,47 @@ router.post("/signup", async (req, res) => {
       });
     }
 
-    // Hash password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Create user
     const newUser = new User({
       name,
       email: email.toLowerCase(),
       password: hashedPassword,
-      role
+      role,
+      social: {
+        twitter: `${name.replace(/\s+/g, '')}`,
+        instagram: `${name.replace(/\s+/g, '')}`,
+        linkedin: `${name.replace(/\s+/g, '')}`,
+        github: `${name.replace(/\s+/g, '')}`
+      }
     });
 
     await newUser.save();
-    console.log("User saved successfully:", newUser);
 
-    // Send response
+    // Generate JWT Token
+    const token = jwt.sign(
+      { userId: newUser._id }, 
+      process.env.JWT_SECRET, 
+      { expiresIn: '1h' }
+    );
+
+    const userResponse = {
+      _id: newUser._id,
+      name: newUser.name,
+      email: newUser.email,
+      role: newUser.role,
+      social: newUser.social
+    };
+
     res.status(201).json({
       success: true,
       message: "User registered successfully",
-      user: newUser
+      user: userResponse,
+      token // Send token back to client
     });
 
   } catch (error) {
-    console.error("❌ Signup Error:", error);
     res.status(500).json({
       success: false,
       message: "Server error",
