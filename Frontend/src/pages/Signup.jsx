@@ -12,12 +12,19 @@ const Signup = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    password: ""
+    password: "",
+    role: "user" // Default role
   });
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [serverError, setServerError] = useState("");
+
+  const roles = [
+    { value: "user", label: "User" },
+    { value: "developer", label: "Developer" },
+    { value: "admin", label: "Admin" }
+  ];
 
   const validateForm = () => {
     const newErrors = {};
@@ -27,6 +34,7 @@ const Signup = () => {
     else if (!emailRegex.test(formData.email)) newErrors.email = 'Please enter a valid email';
     if (!formData.password) newErrors.password = 'Password is required';
     else if (formData.password.length < 6) newErrors.password = 'Password must be at least 6 characters';
+    if (!formData.role) newErrors.role = 'Role is required';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -49,7 +57,7 @@ const Signup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setServerError("");
-
+  
     if (validateForm()) {
       setIsLoading(true);
       try {
@@ -62,11 +70,17 @@ const Signup = () => {
             }
           }
         );
-
+  
         if (response.data.success) {
           const userData = response.data.user;
+          const token = response.data.token;
+          
           dispatch(login(userData));
           localStorage.setItem('userData', JSON.stringify(userData));
+          localStorage.setItem('token', token);
+          
+          axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+          
           navigate('/');
         }
       } catch (error) {
@@ -130,6 +144,24 @@ const Signup = () => {
                 placeholder="you@example.com"
               />
               {errors.email && <p className="mt-1 text-red-500 text-sm">{errors.email}</p>}
+            </div>
+
+            <div>
+              <label htmlFor="role" className="text-white block mb-1">Role</label>
+              <select
+                id="role"
+                name="role"
+                value={formData.role}
+                onChange={handleChange}
+                className="mt-1 block w-full px-4 py-3 rounded-lg bg-gray-700/50 border-transparent focus:border-cyan-500 focus:bg-gray-900 focus:ring-0 text-white"
+              >
+                {roles.map(role => (
+                  <option key={role.value} value={role.value}>
+                    {role.label}
+                  </option>
+                ))}
+              </select>
+              {errors.role && <p className="mt-1 text-red-500 text-sm">{errors.role}</p>}
             </div>
 
             <div className="relative">
