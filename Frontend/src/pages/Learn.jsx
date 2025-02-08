@@ -1,203 +1,265 @@
-import React, { useState, useEffect } from "react";
-import { ArrowLeft, Book, ChevronRight, Award } from "lucide-react";
-import { modules } from "../Data/Learndata";
-import { useNavigate } from "react-router-dom";
-import QuizModal from "../Components/QuizModal";
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
+import ConfirmationModal from '../components/ConfirmatonModal';
+import UpdateCourseModal from '../components//UpdateCourseModal';
 
 const LearningPage = () => {
-  const [selectedModule, setSelectedModule] = useState(null);
-  const [isQuizOpen, setIsQuizOpen] = useState(false);
-  const [completedModules, setCompletedModules] = useState([]);
-  const [badges, setBadges] = useState(0);
-  const [totalQuizAttempts, setTotalQuizAttempts] = useState(0);
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
   const navigate = useNavigate();
+  const userId = import.meta.env.VITE_ADMIN_ID;
+  const [courses, setCourses] = useState([]);
+  const [filteredCourses, setFilteredCourses] = useState([]);
+  const [selectedRole, setSelectedRole] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedCourse, setSelectedCourse] = useState(null);
+  const [updateFormData, setUpdateFormData] = useState({
+    title: '',
+    thumbnail: '',
+    description: ''
+  });
 
   useEffect(() => {
-    if (JSON.parse(localStorage.getItem('userData')) === null) {
-      navigate('/login');
-    }
-  })
-
-  useEffect(() => {
-    const storedModules = JSON.parse(localStorage.getItem('completedModules')) || [];
-    const storedBadges = parseInt(localStorage.getItem('badges')) || 0;
-    const storedQuizAttempts = parseInt(localStorage.getItem('quizAttempts')) || 0;
-
-    setCompletedModules(storedModules);
-    setBadges(storedBadges);
-    setTotalQuizAttempts(storedQuizAttempts);
+    fetchCourses();
   }, []);
 
-  const handleBack = () => {
-    setSelectedModule(null);
-    setIsQuizOpen(false);
-  };
+  useEffect(() => {
+    filterCourses();
+  }, [selectedRole, searchQuery, courses]);
 
-  const getYouTubeEmbedUrl = (url) => {
+  const fetchCourses = async () => {
     try {
-      const urlObj = new URL(url);
-      const videoId =
-        urlObj.hostname === "youtu.be"
-          ? urlObj.pathname.substring(1)
-          : new URLSearchParams(urlObj.search).get("v");
-      return videoId
-        ? `https://www.youtube.com/embed/${videoId}?enablejsapi=1`
-        : "";
-    } catch {
-      return "";
+      setLoading(true);
+      const response = await axios.get(`${BACKEND_URL}/allCourse`);
+      setCourses(response.data);
+    } catch (error) {
+      console.error('Error fetching courses:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  if (selectedModule) {
-    const module = modules[selectedModule - 1];
+  const filterCourses = () => {
+    let filtered = [...courses];
+    if (selectedRole !== 'all') {
+      filtered = filtered.filter(course => course.role === selectedRole);
+    }
+    if (searchQuery) {
+      filtered = filtered.filter(course =>
+        course.title.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+    setFilteredCourses(filtered);
+  };
 
-    return (
-      <div className="min-h-screen bg-gray-900 p-4 sm:p-6 md:p-8 lg:p-12">
-        <div className="max-w-6xl mx-auto">
-          <div className="fixed top-[5rem] left-4 z-50">
-            <button
-              onClick={handleBack}
-              className="flex items-center space-x-2 text-gray-400 hover:text-gray-200 group bg-gray-800 px-2 py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-300"
-            >
-              <ArrowLeft className="h-5 w-5 transform group-hover:-translate-x-1 transition-transform" />
-            </button>
-          </div>
 
-          <div className="space-y-4 sm:space-y-6 md:space-y-8">
-            <div className="bg-gray-800 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 p-4 sm:p-6 md:p-8 lg:p-10">
-              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 sm:mb-6 text-white">
-                {module.title}
-              </h1>
-              <p className="text-gray-300 mb-6 sm:mb-8">{module.description}</p>
+  const handleUpdateCourse = async (formData) => {
+    formData.append("userId", userId);
+    formData.append("courseId", selectedCourse._id);
 
-              <div className="aspect-[5/2.5] mb-6 sm:mb-8 md:mb-10 rounded-xl overflow-hidden bg-black">
-                <iframe
-                  className="w-full h-full"
-                  src={getYouTubeEmbedUrl(module.videoUrl)}
-                  title="Video Player"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
-              </div>
+    try {
+      setLoading(true);
+      await axios.put(`${BACKEND_URL}/updateCourse`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      fetchCourses();
+      setIsUpdateModalOpen(false);
+    } catch (error) {
+      console.error('Error updating course:', error);
+      if (error.response) alert(error.response.data.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-              <div className="prose prose-invert max-w-none space-y-6 sm:space-y-8 md:space-y-10">
-                {Object.entries(module.mainContent).map(([key, section]) => (
-                  <div key={key}>
-                    <h2 className="text-lg sm:text-xl md:text-2xl font-semibold mb-3 sm:mb-4 text-white">
-                      {section.title}
-                    </h2>
-                    <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
-                      {section.content}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
+  const handleDeleteCourse = async () => {
+    try {
+      setLoading(true);
+      await axios.delete(`${BACKEND_URL}/deleteCourse`, {
+        data: {
+          courseId: selectedCourse._id,
+          userId: selectedCourse.userId
+        }
+      });
+      fetchCourses();
+      setIsDeleteModalOpen(false);
+    } catch (error) {
+      console.error('Error deleting course:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-            <div className="bg-gray-800 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 p-4 sm:p-6 md:p-8">
-              <h3 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6 text-white">
-                Key Learning Points
-              </h3>
-              <ul className="space-y-3 sm:space-y-4">
-                {module.keyPoints.map((point, index) => (
-                  <li key={index} className="flex items-start">
-                    <ChevronRight className="h-5 w-5 text-purple-400 mr-3 sm:mr-4 mt-0.5" />
-                    <span className="text-gray-300 text-sm sm:text-base">{point}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="bg-gray-800/50 rounded-xl p-4 sm:p-6 md:p-8 shadow-md hover:shadow-xl transition-shadow duration-300">
-              <h3 className="text-lg sm:text-xl font-semibold text-purple-300 mb-4 sm:mb-6">
-                Additional Resources
-              </h3>
-              <div className="space-y-3 sm:space-y-4">
-                {module.additionalResources.map((resource, index) => (
-                  <a
-                    key={index}
-                    href={resource.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center text-purple-400 hover:text-purple-300 text-sm sm:text-base"
-                  >
-                    <Book className="h-5 w-5 mr-3 sm:mr-4" />
-                    {resource.title} ({resource.type})
-                  </a>
-                ))}
-              </div>
-            </div>
-
-            <button
-              onClick={() => setIsQuizOpen(true)}
-              className="w-full py-4 sm:py-6 bg-purple-900/50 text-purple-300 rounded-xl hover:bg-purple-800/50 shadow-md hover:shadow-xl transition-all duration-300 flex items-center justify-center text-sm sm:text-base"
-            >
-              <Award className="h-5 w-5 mr-2 sm:mr-3" />
-              Take Module Quiz
-            </button>
-
-            <QuizModal
-              isOpen={isQuizOpen}
-              onClose={() => setIsQuizOpen(false)}
-              quiz={module.quiz}
-              moduleId={module.id}
-            />
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const navigateToModules = (courseId) => {
+    navigate(`/manage-modules/${courseId}`);
+  };
 
   return (
-    <div className="min-h-screen bg-gray-900 p-8 md:p-12 lg:p-16">
-      <div className="max-w-7xl mx-auto mt-10">
-        <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-8 space-y-4 md:space-y-0">
-          <h1 className="text-3xl font-bold text-white">Learning Modules</h1>
-          <div className="flex flex-wrap items-center gap-4 md:gap-0 md:space-x-10">
-            <span className="text-1xl text-gray-300">
-              Completed: {completedModules.length}/{modules.length} Modules
-            </span>
-            <div className="flex items-center space-x-1">
-              <Award className="h-6 w-6 text-yellow-500" />
-              <span className="text-1xl text-gray-300">{badges}</span>
-            </div>
-            <span className="text-1xl text-gray-300">
-              Quiz Attempts: {totalQuizAttempts}
-            </span>
+    <div className="min-h-screen bg-gray-900 pt-16 md:pt-0">
+      <div className="max-w-7xl mx-auto space-y-8">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <motion.h1
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent"
+          >
+            Manage All Courses
+          </motion.h1>
+
+          <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
+            <motion.input
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              type="text"
+              placeholder="Search courses..."
+              className="px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-cyan-400 focus:border-transparent outline-none text-gray-200 w-full md:w-64 transition-all duration-300"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+
+            <motion.select
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-cyan-400 focus:border-transparent outline-none text-gray-200 w-full md:w-auto transition-all duration-300"
+              value={selectedRole}
+              onChange={(e) => setSelectedRole(e.target.value)}
+            >
+              <option value="all">All Roles</option>
+              <option value="admin">Admin</option>
+              <option value="developer">Developer</option>
+              <option value="user">User</option>
+            </motion.select>
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {modules.map((module) => (
-            <div
-              key={module.id}
-              onClick={() => setSelectedModule(module.id)}
-              className="group cursor-pointer h-[320px]"
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredCourses.map((course, index) => (
+            <motion.div
+              key={course._id}
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{
+                duration: 0.5,
+                delay: index * 0.1,
+                ease: [0.43, 0.13, 0.23, 0.96]
+              }}
+              whileHover={{ y: -5, transition: { duration: 0.2 } }}
+              className="group bg-gray-800/90 backdrop-blur-sm rounded-xl overflow-hidden border border-gray-700/50 hover:border-cyan-400/50 transition-all duration-300 shadow-lg hover:shadow-cyan-400/20"
             >
-              <div className="bg-gray-800 rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 ease-in-out transform hover:-translate-y-1 overflow-hidden h-full flex flex-col relative">
-                {completedModules.includes(module.id) && (
-                  <div className="absolute top-2 right-2 bg-green-500 text-white p-2 rounded-full">
-                    <Award className="h-4 w-4" />
-                  </div>
-                )}
-                <div className="aspect-video bg-gradient-to-br from-purple-600 to-indigo-800 relative w-full">
-                  <img
-                    src={`/Images/module${module.id}.avif`}
-                    alt={`Banner for ${module.title}`}
-                    className="absolute inset-0 w-full h-full object-cover opacity-80"
-                  />
-                </div>
-                <div className="p-6 flex-1 flex flex-col">
-                  <h3 className="font-semibold text-lg mb-2 text-white group-hover:text-purple-400 transition-colors">
-                    Chapter {module.id}: {module.title}
-                  </h3>
-                  <p className="text-gray-300 text-sm flex-1 line-clamp-3">
-                    {module.description}
-                  </p>
+              <div className="relative overflow-hidden cursor-pointer" onClick={() => navigateToModules(course._id)}>
+                <motion.img
+                  src={course.thumbnail}
+                  alt={course.title}
+                  className="w-full h-52 object-cover transform transition-transform duration-500 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 to-transparent" />
+                <div className="absolute bottom-4 right-4 bg-cyan-500/20 backdrop-blur-sm border border-cyan-400/30 rounded-lg px-3 py-1">
+                  <span className="text-cyan-300 text-sm font-medium">View Modules</span>
                 </div>
               </div>
-            </div>
+
+              <div className="p-6 space-y-4">
+                <div className="flex justify-between items-start gap-4">
+                  <motion.h3
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: index * 0.1 + 0.2 }}
+                    className="text-xl font-semibold text-gray-100 line-clamp-2 group-hover:text-cyan-400 transition-colors duration-300"
+                  >
+                    {course.title}
+                  </motion.h3>
+                  <motion.span
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: index * 0.1 + 0.3 }}
+                    className="px-3 py-1 bg-gray-700/50 backdrop-blur-sm rounded-full text-sm font-medium text-cyan-400 border border-gray-600/50 whitespace-nowrap"
+                  >
+                    {course.role}
+                  </motion.span>
+                </div>
+
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: index * 0.1 + 0.4 }}
+                  className="text-gray-400 line-clamp-3 text-sm leading-relaxed"
+                >
+                  {course.description}
+                </motion.p>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 + 0.5 }}
+                  className="flex justify-between gap-4 pt-2"
+                >
+                  <button
+                    onClick={() => {
+                      setSelectedCourse(course);
+                      setUpdateFormData({
+                        title: course.title,
+                        thumbnail: course.thumbnail,
+                        description: course.description
+                      });
+                      setIsUpdateModalOpen(true);
+                    }}
+                    className="flex-1 px-4 py-2.5 bg-gray-700/50 border border-blue-500/30 hover:border-blue-400 hover:bg-blue-500/10 rounded-lg text-blue-400 font-medium transition-all duration-300 backdrop-blur-sm hover:shadow-lg hover:shadow-blue-500/20 active:scale-95"
+                  >
+                    <span className="flex items-center justify-center gap-2">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                      </svg>
+                      Update
+                    </span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      setSelectedCourse(course);
+                      setIsDeleteModalOpen(true);
+                    }}
+                    className="flex-1 px-4 py-2.5 bg-gray-700/50 border border-red-500/30 hover:border-red-400 hover:bg-red-500/10 rounded-lg text-red-400 font-medium transition-all duration-300 backdrop-blur-sm hover:shadow-lg hover:shadow-red-500/20 active:scale-95"
+                  >
+                    <span className="flex items-center justify-center gap-2">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                      Delete
+                    </span>
+                  </button>
+                </motion.div>
+              </div>
+            </motion.div>
           ))}
         </div>
+
+        {isUpdateModalOpen && (
+          <UpdateCourseModal
+            isOpen={isUpdateModalOpen}
+            onClose={() => setIsUpdateModalOpen(false)}
+            onUpdate={handleUpdateCourse}
+            formData={updateFormData}
+            setFormData={setUpdateFormData}
+            loading={loading}
+          />
+        )}
+
+        {isDeleteModalOpen && (
+          <ConfirmationModal
+            isOpen={isDeleteModalOpen}
+            onClose={() => setIsDeleteModalOpen(false)}
+            onConfirm={handleDeleteCourse}
+            loading={loading}
+            title="Delete Course"
+            description="Are you sure you want to delete this course?"
+            confirmButtonText="Delete"
+            cancelButtonText="Cancel"
+            type="danger"
+          />
+        )}
       </div>
     </div>
   );

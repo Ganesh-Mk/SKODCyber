@@ -52,58 +52,97 @@ const BlogManage = () => {
     }
   };
 
-  const handleSubmit = async () => {
-    if (!editingBlog && (!newBlog.title || !newBlog.description || !newBlog.image)) {
+  const handleSubmit = () => {
+    if (editingBlog) {
+      updateBlog();
+    } else {
+      createBlog();
+    }
+  };
+  
+
+  const createBlog = async () => {
+    if (!newBlog.title || !newBlog.description || !newBlog.image) {
       alert("Please fill all fields");
       return;
     }
-  
+
     setIsLoading(true);
-  
+
     const userData = JSON.parse(localStorage.getItem("userData"));
     const userID = userData ? userData._id : null;
-  
+
     const formData = new FormData();
-    formData.append("title", editingBlog ? editingBlog.title : newBlog.title);
-    formData.append("description", editingBlog ? editingBlog.description : newBlog.description);
+    formData.append("title", newBlog.title);
+    formData.append("description", newBlog.description);
     formData.append("userId", userID);
-  
-    if (editingBlog) {
-      formData.append("blogId", editingBlog._id);
+
+    if (newBlog.image) {
+      formData.append("image", dataURItoBlob(newBlog.image));
     }
-  
-    if ((editingBlog && editingBlog.image.startsWith("data:image")) || (!editingBlog && newBlog.image)) {
-      formData.append("image", dataURItoBlob(editingBlog ? editingBlog.image : newBlog.image));
-    }
-  
+
     try {
-      const url = editingBlog
-        ? "http://localhost:3000/updateBlog"
-        : "http://localhost:3000/createBlog";
-      
-      const method = editingBlog ? "PUT" : "POST";
-  
-      const response = await fetch(url, {
-        method: method,
-        body: formData, // ✅ No need to set headers, FormData automatically handles it
+      const response = await fetch("http://localhost:3000/createBlog", {
+        method: "POST",
+        body: formData,
       });
-  
+
       if (response.ok) {
         setTrigger((prev) => !prev);
-        console.log(editingBlog ? "Blog updated successfully" : "Blog created successfully");
+        console.log("Blog created successfully");
         setNewBlog({ title: "", description: "", image: "" });
-        setEditingBlog(null);
         setIsModalOpen(false);
       } else {
-        throw new Error("Failed to submit blog");
+        throw new Error("Failed to create blog");
       }
     } catch (error) {
-      console.error("Error submitting blog:", error);
+      console.error("Error creating blog:", error);
     } finally {
       setIsLoading(false);
     }
   };
+
+
+  const updateBlog = async () => {
+    if (!editingBlog) return;
   
+    setIsLoading(true);
+  
+    const formData = new FormData();
+    formData.append("blogId", editingBlog._id);
+    formData.append("title", editingBlog.title);
+    formData.append("description", editingBlog.description);
+  
+    // Handle image update - only append if it's a new image (starts with data:image)
+    if (editingBlog.image && editingBlog.image.startsWith('data:image')) {
+      // Convert base64 to blob and append
+      const imageBlob = dataURItoBlob(editingBlog.image);
+      formData.append("image", imageBlob, "image.jpg"); // Add filename
+    }
+  
+    try {
+      const response = await fetch("http://localhost:3000/updateBlog", {
+        method: "PUT",
+        body: formData,
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to update blog');
+      }
+  
+      const updatedBlog = await response.json();
+      setTrigger((prev) => !prev);
+      console.log("Blog updated successfully", updatedBlog);
+      setEditingBlog(null);
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error("Error updating blog:", error);
+      alert(error.message || "Failed to update blog");
+    } finally {
+      setIsLoading(false);
+    }
+  };
   
 
   const dataURItoBlob = (dataURI) => {
