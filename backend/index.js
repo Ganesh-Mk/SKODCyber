@@ -40,6 +40,7 @@ const createModule = require('./routes/createModule');
 const updateModule = require('./routes/updateModule');
 const deleteModule = require('./routes/deleteModule');
 const getModules = require('./routes/getModules');
+const getSingleUserBlog = require('./routes/getSingleUserBlog');
 
 // User
 app.use(getAll);
@@ -53,6 +54,7 @@ app.use(createBlog);
 app.use(deleteBlog);
 app.use(getAllBlog);
 app.use(updateBlog);
+app.use(getSingleUserBlog);
 
 // Course
 app.use(createCourse);

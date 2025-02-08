@@ -1,23 +1,41 @@
-import React, { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2, X } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { Plus, Edit2, Trash2, X } from "lucide-react";
 
 const BlogManage = () => {
-  const [blogs, setBlogs] = useState(() => {
-    return JSON.parse(localStorage.getItem('userBlogs')) || [];
-  });
-  
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [editingBlog, setEditingBlog] = useState(null);
   const [deletingBlog, setDeletingBlog] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [newBlog, setNewBlog] = useState({
-    title: '',
-    description: '',
-    image: ''
+    title: "",
+    description: "",
+    image: "",
   });
+  const [error, setError] = useState(null);
+  const [blogs, setBlogs] = useState([]);
+  const [trigger, setTrigger] = useState(false);
 
   const blogsPerPage = 4;
   const totalPages = Math.ceil(blogs.length / blogsPerPage);
+
+  const fetchBlogs = async () => {
+    const userData = JSON.parse(localStorage.getItem("userData"));
+    const userId = userData ? userData._id : null;
+    try {
+      const response = await axios.get(`http://localhost:3000/authorBlogs/${userId}`);
+      setBlogs(response.data);
+      setError(null);
+    } catch (err) {
+      setError("Failed to fetch blogs. Please try again later.");
+      console.error("Error fetching blogs:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchBlogs();
+  }, [trigger]);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -34,49 +52,143 @@ const BlogManage = () => {
     }
   };
 
-  const handleSubmit = () => {
-    if (editingBlog) {
-      const updatedBlogs = blogs.map(blog => 
-        blog.id === editingBlog.id ? editingBlog : blog
-      );
-      setBlogs(updatedBlogs);
-    } else {
-      const newBlogWithId = {
-        ...newBlog,
-        id: Date.now(),
-        createdAt: new Date().toISOString()
-      };
-      setBlogs([...blogs, newBlogWithId]);
+  const handleSubmit = async () => {
+    if (!editingBlog && (!newBlog.title || !newBlog.description || !newBlog.image)) {
+      alert("Please fill all fields");
+      return;
     }
-    
-    setNewBlog({ title: '', description: '', image: '' });
-    setEditingBlog(null);
-    setIsModalOpen(false);
+  
+    setIsLoading(true);
+  
+    const userData = JSON.parse(localStorage.getItem("userData"));
+    const userID = userData ? userData._id : null;
+  
+    const formData = new FormData();
+    formData.append("title", editingBlog ? editingBlog.title : newBlog.title);
+    formData.append("description", editingBlog ? editingBlog.description : newBlog.description);
+    formData.append("userId", userID);
+  
+    if (editingBlog) {
+      formData.append("blogId", editingBlog._id);
+    }
+  
+    if ((editingBlog && editingBlog.image.startsWith("data:image")) || (!editingBlog && newBlog.image)) {
+      formData.append("image", dataURItoBlob(editingBlog ? editingBlog.image : newBlog.image));
+    }
+  
+    try {
+      const url = editingBlog
+        ? "http://localhost:3000/updateBlog"
+        : "http://localhost:3000/createBlog";
+      
+      const method = editingBlog ? "PUT" : "POST";
+  
+      const response = await fetch(url, {
+        method: method,
+        body: formData, // ✅ No need to set headers, FormData automatically handles it
+      });
+  
+      if (response.ok) {
+        setTrigger((prev) => !prev);
+        console.log(editingBlog ? "Blog updated successfully" : "Blog created successfully");
+        setNewBlog({ title: "", description: "", image: "" });
+        setEditingBlog(null);
+        setIsModalOpen(false);
+      } else {
+        throw new Error("Failed to submit blog");
+      }
+    } catch (error) {
+      console.error("Error submitting blog:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  
+
+  const dataURItoBlob = (dataURI) => {
+    let byteString = atob(dataURI.split(",")[1]);
+    let mimeString = dataURI.split(",")[0].split(":")[1].split(";")[0];
+    let ab = new ArrayBuffer(byteString.length);
+    let ia = new Uint8Array(ab);
+    for (let i = 0; i < byteString.length; i++) {
+      ia[i] = byteString.charCodeAt(i);
+    }
+    return new Blob([ab], { type: mimeString });
   };
 
   const handleEdit = (blog) => {
     setEditingBlog(blog);
     setIsModalOpen(true);
   };
+  
 
   const handleDelete = (blog) => {
     setDeletingBlog(blog);
   };
 
-  const confirmDelete = () => {
-    const updatedBlogs = blogs.filter(blog => blog.id !== deletingBlog.id);
-    setBlogs(updatedBlogs);
-    setDeletingBlog(null);
+
+  // const updateBlog = async (blog) => {
+
+  //   try {
+  //     const userData = JSON.parse(localStorage.getItem("userData"));
+  //     const userID = userData ? userData._id : null;
+
+  //     const updateData = {
+  //       title: blog.title,
+  //       description: blog.description,
+  //       image: dataURItoBlob(blog.image),
+  //       blogId: blog._id,
+  //       userId : userID
+  //     }
+  //     const response = await fetch(`http://localhost:3000/blog/updateBlog`, {
+  //       method: "PUT",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify(updateData)
+  //     });
+
+  //     if (response.ok) {
+  //       console.log("Blog updated successfully");
+  //       setIsModalOpen(false)
+  //     } else {
+  //       throw new Error("Failed to update blog");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error updating blog:", error);
+  //   }
+  // };
+
+  const confirmDelete = async () => {
+    const userData = JSON.parse(localStorage.getItem("userData"));
+    const userID = userData ? userData._id : null;
+
+    try {
+      const response = await fetch("http://localhost:3000/deleteBlog", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ userId: userID, blogId: deletingBlog._id }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        console.log("Blog deleted successfully:", data);
+        setTrigger(prev => !prev);
+        setDeletingBlog(null);
+      } else {
+        console.error("Failed to delete blog:", data.message);
+      }
+    } catch (error) {
+      console.error("Error deleting blog:", error);
+    }
   };
 
   useEffect(() => {
-    localStorage.setItem('userBlogs', JSON.stringify(blogs));
+    localStorage.setItem("userBlogs", JSON.stringify(blogs));
   }, [blogs]);
-
-  const paginatedBlogs = blogs.slice(
-    (currentPage - 1) * blogsPerPage,
-    currentPage * blogsPerPage
-  );
 
   return (
     <div className="mt-8 bg-gray-800 mb-8 p-6 rounded-xl shadow-lg">
@@ -96,8 +208,11 @@ const BlogManage = () => {
 
       <div className="max-w-6xl mx-auto">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {paginatedBlogs.map((blog) => (
-            <div key={blog.id} className="bg-gray-700 rounded-lg overflow-hidden h-64 transform hover:scale-105 transition-transform duration-300 hover:shadow-xl">
+          {blogs.map((blog) => (
+            <div
+              key={blog._id}
+              className="bg-gray-700 rounded-lg overflow-hidden h-64 transform hover:scale-105 transition-transform duration-300 hover:shadow-xl"
+            >
               <div className="h-32 overflow-hidden">
                 <img
                   src={blog.image || "/api/placeholder/400/300"}
@@ -106,7 +221,9 @@ const BlogManage = () => {
                 />
               </div>
               <div className="p-4">
-                <h4 className="text-lg font-semibold text-white mb-2 truncate">{blog.title}</h4>
+                <h4 className="text-lg font-semibold text-white mb-2 truncate">
+                  {blog.title}
+                </h4>
                 <p className="text-gray-300 text-sm line-clamp-2">
                   {blog.description}
                 </p>
@@ -138,8 +255,8 @@ const BlogManage = () => {
               onClick={() => setCurrentPage(index + 1)}
               className={`px-4 py-2 rounded-lg transition-colors duration-200 ${
                 currentPage === index + 1
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                  ? "bg-indigo-600 text-white"
+                  : "bg-gray-700 text-gray-300 hover:bg-gray-600"
               }`}
             >
               {index + 1}
@@ -148,13 +265,16 @@ const BlogManage = () => {
         </div>
       )}
 
-      {/* Custom Delete Confirmation Dialog */}
+      {/* Delete Confirmation Dialog */}
       {deletingBlog && (
         <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50">
           <div className="bg-gray-800 rounded-xl p-6 max-w-md w-full border border-gray-700 shadow-xl">
-            <h2 className="text-xl font-semibold text-white mb-4">Delete Blog</h2>
+            <h2 className="text-xl font-semibold text-white mb-4">
+              Delete Blog
+            </h2>
             <p className="text-gray-300 mb-6">
-              Are you sure you want to delete "{deletingBlog.title}"? This action cannot be undone.
+              Are you sure you want to delete "{deletingBlog.title}"? This
+              action cannot be undone.
             </p>
             <div className="flex justify-end gap-4">
               <button
@@ -180,7 +300,7 @@ const BlogManage = () => {
           <div className="bg-gray-800 rounded-2xl p-6 max-w-2xl w-full">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold text-white">
-                {editingBlog ? 'Edit Blog' : 'Create Blog'}
+                {editingBlog ? "Edit Blog" : "Create Blog"}
               </h2>
               <button
                 onClick={() => {
@@ -213,10 +333,15 @@ const BlogManage = () => {
               <div>
                 <label className="block text-gray-300 mb-2">Description</label>
                 <textarea
-                  value={editingBlog ? editingBlog.description : newBlog.description}
+                  value={
+                    editingBlog ? editingBlog.description : newBlog.description
+                  }
                   onChange={(e) => {
                     if (editingBlog) {
-                      setEditingBlog({ ...editingBlog, description: e.target.value });
+                      setEditingBlog({
+                        ...editingBlog,
+                        description: e.target.value,
+                      });
                     } else {
                       setNewBlog({ ...newBlog, description: e.target.value });
                     }
@@ -243,14 +368,40 @@ const BlogManage = () => {
                     setEditingBlog(null);
                   }}
                   className="px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 transition-colors duration-200"
+                  disabled={isLoading}
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleSubmit}
-                  className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors duration-200"
+                  disabled={isLoading}
+                  className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors duration-200 flex items-center gap-2"
                 >
-                  {editingBlog ? 'Save Changes' : 'Create Blog'}
+                  {isLoading ? (
+                    <>
+                      <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                          fill="none"
+                        />
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        />
+                      </svg>
+                      Creating...
+                    </>
+                  ) : editingBlog ? (
+                    "Save Changes"
+                  ) : (
+                    "Create Blog"
+                  )}
                 </button>
               </div>
             </div>

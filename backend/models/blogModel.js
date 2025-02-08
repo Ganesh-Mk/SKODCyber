@@ -6,6 +6,10 @@ const blogSchema = new mongoose.Schema({
     ref: 'User',
     required: [true, 'userId is required']
   },
+  userName: {
+    type: String,
+    required: [true, 'userName is required']
+  },
   title: {
     type: String,
     required: [true, 'Title is required'],

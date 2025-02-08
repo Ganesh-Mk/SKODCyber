@@ -1,59 +1,86 @@
 import React, { useState, useEffect } from 'react';
 import { Search } from 'lucide-react';
-import { AllUsers } from '../Data/AllUsers';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const CommunityPage = () => {
-  const [users, setUsers] = useState(AllUsers);
+  const [blogs, setBlogs] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const blogsPerPage = 9;
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const blogsPerPage = 9; // Changed from 12 to 9 to match 3 blogs per row
   const navigate = useNavigate();
 
-  const handleUserClick = (user) => {
-    navigate(`/user/${user.id}`);
-  };
-
+  // Fetch blogs from backend
   useEffect(() => {
-    const filtered = AllUsers.filter(user =>
-      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.skills.some(skill => skill.toLowerCase().includes(searchTerm.toLowerCase()))
-    );
-    setUsers(filtered);
-    setCurrentPage(1); // Reset to first page when search changes
-  }, [searchTerm]);
-
-  // Get all blogs as flat array
-  const allBlogs = users.flatMap(user =>
-    user.allBlogs.map(blog => ({
-      ...blog,
-      user: {
-        id: user.id,
-        name: user.name,
-        profileImage: user.profileImage,
-        skills: user.skills,
-        badges: user.badges,
-        modulesCompleted: user.modulesCompleted
+    const fetchBlogs = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get('http://localhost:3000/allBlog');
+        setBlogs(response.data);
+        setError(null);
+      } catch (err) {
+        setError('Failed to fetch blogs. Please try again later.');
+        console.error('Error fetching blogs:', err);
+      } finally {
+        setLoading(false);
       }
-    }))
+    };
+
+    fetchBlogs();
+  }, []);
+
+  // Filter blogs based on search term
+  const filteredBlogs = blogs.filter(blog =>
+    blog.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    blog.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Pagination logic
-  const totalPages = Math.ceil(allBlogs.length / blogsPerPage);
+  const totalPages = Math.ceil(filteredBlogs.length / blogsPerPage);
   const indexOfLastBlog = currentPage * blogsPerPage;
   const indexOfFirstBlog = indexOfLastBlog - blogsPerPage;
-  const currentBlogs = allBlogs.slice(indexOfFirstBlog, indexOfLastBlog);
+  const currentBlogs = filteredBlogs.slice(indexOfFirstBlog, indexOfLastBlog);
 
-  // Generate page numbers
-  const pageNumbers = [];
-  for (let i = 1; i <= totalPages; i++) {
-    pageNumbers.push(i);
-  }
+  // Generate page numbers with a maximum of 5 visible page numbers
+  const getPageNumbers = () => {
+    const pageNumbers = [];
+    let startPage = Math.max(1, currentPage - 2);
+    let endPage = Math.min(totalPages, startPage + 4);
+
+    // Adjust startPage if we're near the end
+    if (endPage - startPage < 4) {
+      startPage = Math.max(1, endPage - 4);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pageNumbers.push(i);
+    }
+    return pageNumbers;
+  };
 
   // Handle search submit
   const handleSearchSubmit = (e) => {
     e.preventDefault();
+    setCurrentPage(1);
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen mt-16 bg-[#0a0a0a] text-white flex items-center justify-center">
+        <div className="text-xl">Loading...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen mt-16 bg-[#0a0a0a] text-white flex items-center justify-center">
+        <div className="text-xl text-red-400">{error}</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen mt-16 bg-[#0a0a0a] text-white">
@@ -77,7 +104,7 @@ const CommunityPage = () => {
           >
             <input
               type="text"
-              placeholder="Search by name or skill..."
+              placeholder="Search blogs..."
               className="w-full pl-12 pr-24 py-3 bg-gray-800/50 border border-gray-700 rounded-xl 
                       text-white placeholder-gray-400 focus:outline-none focus:border-blue-500/50 
                       focus:ring-2 focus:ring-blue-500/20 transition-all duration-300"
@@ -100,17 +127,17 @@ const CommunityPage = () => {
       {/* Blog Grid */}
       <div className="max-w-7xl mx-auto px-4 py-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {currentBlogs.map((blog, index) => (
+          {currentBlogs.map((blog) => (
             <article
-              key={index}
+              key={blog._id}
               className="group bg-gray-800/30 rounded-xl overflow-hidden border border-gray-700/50 
                       hover:border-blue-500/50 transition-all duration-500 
                       hover:shadow-[0_0_25px_-5px_rgba(59,130,246,0.3)]"
             >
-              {blog.imageUrl && (
+              {blog.image && (
                 <div className="w-full h-48 overflow-hidden">
                   <img
-                    src={blog.imageUrl}
+                    src={blog.image}
                     alt={blog.title}
                     className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
                   />
@@ -120,35 +147,20 @@ const CommunityPage = () => {
                 <div className="flex items-center space-x-4 mb-4">
                   <div className="relative">
                     <img
-                      src={blog.user.profileImage}
-                      alt={blog.user.name}
+                      src={blog.author?.profileImage || '/default-avatar.png'}
+                      alt={blog.author?.name || 'Author'}
                       className="w-10 h-10 rounded-full object-cover border-2 border-transparent 
                                group-hover:border-blue-500 transition-all duration-300 cursor-pointer"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleUserClick(users.find(u => u.name === blog.user.name));
-                      }}
                     />
                     <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full 
                                 border-2 border-gray-800"></div>
                   </div>
                   <div>
-                    <h3
-                      className="font-medium text-white cursor-pointer hover:text-blue-400 transition-colors duration-300"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleUserClick(users.find(u => u.name === blog.user.name));
-                      }}
-                    >
-                      {blog.user.name}
+                    <h3 className="font-medium text-white cursor-pointer hover:text-blue-400 transition-colors duration-300">
+                      {blog.userName || 'Anonymous'}
                     </h3>
-                    <div className="flex gap-2">
-                      {blog.user.skills.slice(0, 2).map((skill, index) => (
-                        <span key={index} className="text-xs text-blue-400">
-                          {skill}
-                          {index < 1 && " • "}
-                        </span>
-                      ))}
+                    <div className="text-xs text-blue-400">
+                      {new Date(blog.createdAt).toLocaleDateString()}
                     </div>
                   </div>
                 </div>
@@ -160,11 +172,12 @@ const CommunityPage = () => {
                 <div className="mt-4 pt-4 border-t border-gray-700/50">
                   <div className="flex items-center justify-between text-sm text-gray-400">
                     <div className="flex items-center gap-2">
-                      <span>{blog.user.badges} badges</span>
-                      <span>•</span>
-                      <span>{blog.user.modulesCompleted} modules</span>
+                      <span>{blog.readTime || '5 min'} read</span>
                     </div>
-                    <button className="text-blue-400 hover:text-blue-300 transition-colors duration-300">
+                    <button 
+                      onClick={() => navigate(`/blog/${blog._id}`)}
+                      className="text-blue-400 hover:text-blue-300 transition-colors duration-300"
+                    >
                       Read more
                     </button>
                   </div>
@@ -188,7 +201,7 @@ const CommunityPage = () => {
               Previous
             </button>
 
-            {pageNumbers.map(number => (
+            {getPageNumbers().map(number => (
               <button
                 key={number}
                 onClick={() => setCurrentPage(number)}

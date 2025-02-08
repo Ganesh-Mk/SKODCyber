@@ -1,25 +1,28 @@
 const express = require("express");
 const multer = require("multer");
-const uploadImage = require("../utils/uploadImage");
+const router = express.Router();
 const Blog = require("../models/blogModel");
 
-const router = express.Router();
-const storage = multer.memoryStorage();
+// Set up Multer for file uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/"); // Ensure this folder exists
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + "-" + file.originalname);
+  },
+});
 const upload = multer({ storage });
 
+// ✅ Update Blog Route
 router.put("/updateBlog", upload.single("image"), async (req, res) => {
   try {
-    const { blogId, title, description } = req.body;
-    const imageFile = req.file;
-
-    let imageUrl = undefined;
-    if (imageFile) {
-      imageUrl = await uploadImage(imageFile.buffer, "blog");
-    }
+    const { title, description, blogId, userId } = req.body;
+    const image = req.file ? `/uploads/${req.file.filename}` : null; // Only update image if provided
 
     const updatedBlog = await Blog.findByIdAndUpdate(
       blogId,
-      { title, description, ...(imageUrl && { image: imageUrl }) },
+      { title, description, ...(image && { image }) }, // Only update image if it's uploaded
       { new: true }
     );
 
@@ -27,7 +30,7 @@ router.put("/updateBlog", upload.single("image"), async (req, res) => {
       return res.status(404).json({ message: "Blog not found" });
     }
 
-    res.json(updatedBlog);
+    res.json({ message: "Blog updated successfully", updatedBlog });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
