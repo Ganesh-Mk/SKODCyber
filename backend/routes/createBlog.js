@@ -29,6 +29,7 @@ router.post("/createBlog", upload.single("image"), async (req, res) => {
       description,
       role: user.role,
       userId,
+      userName : user.name
     });
 
     const savedBlog = await newBlog.save();
