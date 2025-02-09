@@ -167,38 +167,6 @@ const BlogManage = () => {
   };
 
 
-  // const updateBlog = async (blog) => {
-
-  //   try {
-  //     const userData = JSON.parse(localStorage.getItem("userData"));
-  //     const userID = userData ? userData._id : null;
-
-  //     const updateData = {
-  //       title: blog.title,
-  //       description: blog.description,
-  //       image: dataURItoBlob(blog.image),
-  //       blogId: blog._id,
-  //       userId : userID
-  //     }
-  //     const response = await fetch(`http://localhost:3000/blog/updateBlog`, {
-  //       method: "PUT",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify(updateData)
-  //     });
-
-  //     if (response.ok) {
-  //       console.log("Blog updated successfully");
-  //       setIsModalOpen(false)
-  //     } else {
-  //       throw new Error("Failed to update blog");
-  //     }
-  //   } catch (error) {
-  //     console.error("Error updating blog:", error);
-  //   }
-  // };
-
   const confirmDelete = async () => {
     const userData = JSON.parse(localStorage.getItem("userData"));
     const userID = userData ? userData._id : null;
