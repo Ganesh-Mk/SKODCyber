@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 require('./courseModel');
+require('./quizModel');
 
 const moduleSchema = new mongoose.Schema({
   title: {
@@ -20,6 +21,10 @@ const moduleSchema = new mongoose.Schema({
     ref: 'Course',
     required: true
   },
+  quizzes: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Quiz'
+  }]
 }, {
   timestamps: true
 });

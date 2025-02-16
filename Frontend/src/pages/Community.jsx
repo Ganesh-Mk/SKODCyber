@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Search } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const CommunityPage = () => {
@@ -174,7 +174,7 @@ const CommunityPage = () => {
                     <div className="flex items-center gap-2">
                       <span>{blog.readTime || '5 min'} read</span>
                     </div>
-                    <button 
+                    <button
                       onClick={() => navigate(`/blog/${blog._id}`)}
                       className="text-blue-400 hover:text-blue-300 transition-colors duration-300"
                     >

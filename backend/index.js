@@ -40,7 +40,9 @@ const createModule = require('./routes/createModule');
 const updateModule = require('./routes/updateModule');
 const deleteModule = require('./routes/deleteModule');
 const getModules = require('./routes/getModules');
+const getAllModules = require('./routes/getAllModules');
 const getSingleUserBlog = require('./routes/getSingleUserBlog');
+const getAllQuiz = require('./routes/getAllQuiz');
 
 // User
 app.use(getAll);
@@ -67,6 +69,8 @@ app.use(createModule);
 app.use(updateModule);
 app.use(deleteModule);
 app.use(getModules);
+app.use(getAllModules);
+app.use(getAllQuiz);
 
 // Test Route
 app.get("/", (req, res) => {
