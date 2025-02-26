@@ -39,16 +39,9 @@ const MyModules = () => {
   };
 
   const handleCreateModule = async (plainData) => {
-    const formData = new FormData();
-    for (let key in plainData) {
-      formData.append(key, plainData[key]);
-    }
-    formData.append("userId", userId);
-    formData.append("courseId", courseId);
-
     try {
       setLoading(true);
-      await axios.post(`${BACKEND_URL}/createModule`, formData, {
+      await axios.post(`${BACKEND_URL}/createModule`, plainData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         }
@@ -195,6 +188,7 @@ const MyModules = () => {
             onClose={() => setIsCreateModalOpen(false)}
             onCreate={handleCreateModule}
             loading={loading}
+            courseId={courseId}
           />
         )}
 
