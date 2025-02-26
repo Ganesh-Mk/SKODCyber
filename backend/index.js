@@ -30,6 +30,7 @@ const signupRoute = require("./routes/singup");
 const loginRoute = require("./routes/login");
 const deleteUser = require("./routes/deleteUser");
 const getAllUser = require("./routes/getAllUser");
+const updateUser = require("./routes/updateUser");
 
 const createBlog = require("./routes/createBlog");
 const deleteBlog = require("./routes/deleteBlog");
@@ -55,6 +56,7 @@ app.use(signupRoute);
 app.use(loginRoute);
 app.use(deleteUser);
 app.use(getAllUser);
+app.use(updateUser);
 
 // Blog
 app.use(createBlog);

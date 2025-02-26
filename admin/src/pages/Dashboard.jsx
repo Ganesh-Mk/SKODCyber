@@ -1,17 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { Book, FileText, Settings, Shield, LogOut, Menu, X } from 'lucide-react';
+import { Book, FileText, Settings, Shield, LogOut, Menu, X, Users } from 'lucide-react';
 
 const Dashboard = () => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
   const menuItems = [
     { id: 'courses', icon: Book, text: 'My Courses', path: '/courses' },
     { id: 'blogs', icon: FileText, text: 'Manage All Blogs', path: '/blogs' },
-    { id: 'manage-courses', icon: Settings, text: 'Manage All Courses', path: '/manage-courses' }
+    { id: 'manage-courses', icon: Settings, text: 'Manage All Courses', path: '/manage-courses' },
+    { id: 'manage-users', icon: Users, text: 'Manage All Users', path: '/manage-users' }
   ];
+
+  useEffect(() => {
+    const isOnValidPath = menuItems.some(item => item.path === location.pathname);
+    if (!isOnValidPath) {
+      navigate('/courses');
+    }
+  }, [location.pathname, navigate]);
+
+  const handleMenuItemClick = (path) => {
+    navigate(path);
+    if (window.innerWidth < 1024) {
+      setIsSidebarOpen(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-slate-900">
@@ -36,7 +51,7 @@ const Dashboard = () => {
             {menuItems.map((item) => (
               <button
                 key={item.id}
-                onClick={() => navigate(item.path)}
+                onClick={() => handleMenuItemClick(item.path)}
                 className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-300 ${location.pathname === item.path
                   ? 'bg-cyan-500/10 text-cyan-400'
                   : 'text-gray-400 hover:bg-slate-700 hover:text-white'
@@ -57,7 +72,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      <div className={`transition-all duration-300 ${isSidebarOpen ? 'lg:ml-64' : ''}`}>
+      <div className="lg:ml-64 transition-all duration-300">
         <div className="p-8">
           <Outlet />
         </div>

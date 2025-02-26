@@ -2,14 +2,12 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/userModel');
 
-router.delete('/deleteUser', async (req, res) => {
-  const { userId } = req.body;
+router.post('/updateUser', async (req, res) => {
   try {
-    await User.findByIdAndDelete(userId);
-    res.json({ message: 'User deleted successfully' });
-  } catch (error) {
+  }
+  catch (error) {
     res.status(400).json({ message: error.message });
   }
-});
+})
 
 module.exports = router;

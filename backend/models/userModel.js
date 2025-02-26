@@ -36,6 +36,18 @@ const userSchema = new mongoose.Schema({
     linkedin: String,
     github: String
   },
+  modulesCompleted: {
+    type: Number,
+    default: 0
+  },
+  quizzesCompleted: {
+    type: Number,
+    default: 0
+  },
+  badges: {
+    type: Number,
+    default: 0
+  },
   blogs: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Blog'
