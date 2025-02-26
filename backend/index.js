@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const path = require("path");
 require("dotenv").config();
 
 const app = express();
@@ -8,7 +9,7 @@ const PORT = process.env.PORT || 3000;
 
 // Set EJS as the view engine
 app.set("view engine", "ejs");
-app.set("views", "./views");
+app.set("views", path.join(__dirname, "views"));
 
 // Middleware
 app.use(express.json());
