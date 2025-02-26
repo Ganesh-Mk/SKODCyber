@@ -8,7 +8,7 @@ import axios from 'axios';
 const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  
+
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -18,11 +18,12 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   const validateForm = () => {
     const newErrors = {};
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    
+
     if (!formData.email) {
       newErrors.email = 'Email is required';
     } else if (!emailRegex.test(formData.email)) {
@@ -40,12 +41,12 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoginError('');
-  
+
     if (validateForm()) {
       setIsLoading(true);
       try {
         const response = await axios.post(
-          'http://localhost:3000/login',
+          `${BACKEND_URL}/login`,
           formData,
           {
             headers: {
@@ -53,26 +54,26 @@ const Login = () => {
             }
           }
         );
-  
+
         if (response.data.success) {
           // Store user data and token
           const userData = response.data.user;
           const token = response.data.token;
-          
+
           dispatch(login(userData));
           localStorage.setItem('userData', JSON.stringify(userData));
           localStorage.setItem('token', token); // Store JWT token
-          
+
           // Set default axios authorization header
           axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-          
+
           // Redirect to home
           navigate('/');
         }
       } catch (error) {
         console.error('Login error:', error);
         setLoginError(
-          error.response?.data?.message || 
+          error.response?.data?.message ||
           'Failed to login. Please try again.'
         );
       } finally {

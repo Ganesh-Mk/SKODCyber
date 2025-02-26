@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import ConfirmationModal from '../components/confirmationModal';
+import ConfirmationModal from '../components/ConfirmationModal';
 import UpdateCourseModal from '../components/UpdateCourseModal';
 import CreateCourseModal from '../components/CreateCourseModal';
 

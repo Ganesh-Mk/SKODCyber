@@ -11,13 +11,14 @@ const CommunityPage = () => {
   const [error, setError] = useState(null);
   const blogsPerPage = 9; // Changed from 12 to 9 to match 3 blogs per row
   const navigate = useNavigate();
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   // Fetch blogs from backend
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('http://localhost:3000/allBlog');
+        const response = await axios.get(`${BACKEND_URL}/allBlog`);
         setBlogs(response.data);
         setError(null);
       } catch (err) {

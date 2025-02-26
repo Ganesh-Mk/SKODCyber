@@ -8,7 +8,7 @@ import { Eye, EyeOff } from 'lucide-react';
 const Signup = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -19,6 +19,7 @@ const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [serverError, setServerError] = useState("");
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   const roles = [
     { value: "user", label: "User" },
@@ -57,36 +58,36 @@ const Signup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setServerError("");
-  
+
     if (validateForm()) {
       setIsLoading(true);
       try {
         const response = await axios.post(
-          "http://localhost:3000/signup", 
+          `${BACKEND_URL}/signup`,
           formData,
-          { 
+          {
             headers: {
               'Content-Type': 'application/json'
             }
           }
         );
-  
+
         if (response.data.success) {
           const userData = response.data.user;
           const token = response.data.token;
-          
+
           dispatch(login(userData));
           localStorage.setItem('userData', JSON.stringify(userData));
           localStorage.setItem('token', token);
-          
+
           axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-          
+
           navigate('/');
         }
       } catch (error) {
         console.error("Signup error:", error);
         setServerError(
-          error.response?.data?.message || 
+          error.response?.data?.message ||
           "Failed to register. Please try again."
         );
       } finally {

@@ -16,6 +16,7 @@ const BlogManage = () => {
   const [error, setError] = useState(null);
   const [blogs, setBlogs] = useState([]);
   const [trigger, setTrigger] = useState(false);
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   const blogsPerPage = 4;
   const totalPages = Math.ceil(blogs.length / blogsPerPage);
@@ -24,7 +25,7 @@ const BlogManage = () => {
     const userData = JSON.parse(localStorage.getItem("userData"));
     const userId = userData ? userData._id : null;
     try {
-      const response = await axios.get(`http://localhost:3000/authorBlogs/${userId}`);
+      const response = await axios.get(`${BACKEND_URL}/authorBlogs/${userId}`);
       setBlogs(response.data);
       setError(null);
     } catch (err) {
@@ -59,7 +60,7 @@ const BlogManage = () => {
       createBlog();
     }
   };
-  
+
 
   const createBlog = async () => {
     if (!newBlog.title || !newBlog.description || !newBlog.image) {
@@ -82,7 +83,7 @@ const BlogManage = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:3000/createBlog", {
+      const response = await fetch(`${BACKEND_URL}/createBlog`, {
         method: "POST",
         body: formData,
       });
@@ -105,32 +106,32 @@ const BlogManage = () => {
 
   const updateBlog = async () => {
     if (!editingBlog) return;
-  
+
     setIsLoading(true);
-  
+
     const formData = new FormData();
     formData.append("blogId", editingBlog._id);
     formData.append("title", editingBlog.title);
     formData.append("description", editingBlog.description);
-  
+
     // Handle image update - only append if it's a new image (starts with data:image)
     if (editingBlog.image && editingBlog.image.startsWith('data:image')) {
       // Convert base64 to blob and append
       const imageBlob = dataURItoBlob(editingBlog.image);
       formData.append("image", imageBlob, "image.jpg"); // Add filename
     }
-  
+
     try {
-      const response = await fetch("http://localhost:3000/updateBlog", {
+      const response = await fetch(`${BACKEND_URL}/updateBlog`, {
         method: "PUT",
         body: formData,
       });
-  
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Failed to update blog');
       }
-  
+
       const updatedBlog = await response.json();
       setTrigger((prev) => !prev);
       console.log("Blog updated successfully", updatedBlog);
@@ -143,7 +144,7 @@ const BlogManage = () => {
       setIsLoading(false);
     }
   };
-  
+
 
   const dataURItoBlob = (dataURI) => {
     let byteString = atob(dataURI.split(",")[1]);
@@ -160,7 +161,7 @@ const BlogManage = () => {
     setEditingBlog(blog);
     setIsModalOpen(true);
   };
-  
+
 
   const handleDelete = (blog) => {
     setDeletingBlog(blog);
@@ -172,7 +173,7 @@ const BlogManage = () => {
     const userID = userData ? userData._id : null;
 
     try {
-      const response = await fetch("http://localhost:3000/deleteBlog", {
+      const response = await fetch(`${BACKEND_URL}/deleteBlog`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -260,11 +261,10 @@ const BlogManage = () => {
             <button
               key={index}
               onClick={() => setCurrentPage(index + 1)}
-              className={`px-4 py-2 rounded-lg transition-colors duration-200 ${
-                currentPage === index + 1
-                  ? "bg-indigo-600 text-white"
-                  : "bg-gray-700 text-gray-300 hover:bg-gray-600"
-              }`}
+              className={`px-4 py-2 rounded-lg transition-colors duration-200 ${currentPage === index + 1
+                ? "bg-indigo-600 text-white"
+                : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                }`}
             >
               {index + 1}
             </button>

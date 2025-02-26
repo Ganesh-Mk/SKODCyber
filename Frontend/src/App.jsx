@@ -12,7 +12,7 @@ import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import Community from "./pages/Community";
 import UserProfilePage from "./pages/Userprofile";
-import ProtectedRoute from "./components/ProtectedRoute";
+import ProtectedRoute from "./Components/ProtectedRoute";
 import { useEffect } from "react";
 import BlogDetailPage from "./pages/BlogDetailPage";
 import ModulesPage from "./pages/ModulesPage";

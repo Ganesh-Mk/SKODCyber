@@ -11,6 +11,7 @@ const BlogDetailPage = () => {
   const [showMessageForm, setShowMessageForm] = useState(false);
   const [message, setMessage] = useState("");
 
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
   // Custom Button Component
   const Button = ({
     children,
@@ -116,12 +117,12 @@ const BlogDetailPage = () => {
       try {
         setLoading(true);
         const blogResponse = await axios.get(
-          `http://localhost:3000/blog/${blogId}`
+          `${BACKEND_URL}/blog/${blogId}`
         );
         setBlog(blogResponse.data);
 
         const authorBlogsResponse = await axios.get(
-          `http://localhost:3000/authorBlogs/${blogResponse.data.userId}`
+          `${BACKEND_URL}/authorBlogs/${blogResponse.data.userId}`
         );
         setAuthorBlogs(
           authorBlogsResponse.data.filter(
@@ -141,7 +142,7 @@ const BlogDetailPage = () => {
 
   const handleConnect = async () => {
     try {
-      await axios.post(`http://localhost:3000/connect/${blog.userId}`);
+      await axios.post(`${BACKEND_URL}/connect/${blog.userId}`);
     } catch (err) {
       console.error("Error connecting with author:", err);
     }
@@ -149,7 +150,7 @@ const BlogDetailPage = () => {
 
   const handleSendMessage = async () => {
     try {
-      await axios.post(`http://localhost:3000/message/${blog.userId}`, {
+      await axios.post(`${BACKEND_URL}/message/${blog.userId}`, {
         message: message,
       });
       setMessage("");
