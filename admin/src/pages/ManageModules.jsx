@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { motion } from 'framer-motion';
-import ConfirmationModal from '../components/confirmationModal';
+import ConfirmationModal from '../components/ConfirmationModal';
 import UpdateModuleModal from '../components/UpdateModuleModal';
 
 const ManageModules = () => {
