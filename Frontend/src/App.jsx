@@ -16,6 +16,8 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import { useEffect } from "react";
 import BlogDetailPage from "./pages/BlogDetailPage";
 import ModulesPage from "./pages/ModulesPage";
+import CourseModules from "./Components/CourseModulesManage";
+import ModuleContentPage from "./Components/ModuleContentPage";
 
 
 const App = () => {
@@ -79,6 +81,22 @@ const App = () => {
             element={
               <ProtectedRoute>
                 <ModulesPage />{" "}
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/course-modules/:courseId"
+            element={
+              <ProtectedRoute>
+                <CourseModules />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/courses/:courseId/modules/:moduleId"
+            element={
+              <ProtectedRoute>
+                <ModuleContentPage />
               </ProtectedRoute>
             }
           />

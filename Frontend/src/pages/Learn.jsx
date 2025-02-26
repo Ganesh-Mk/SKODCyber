@@ -196,8 +196,6 @@ const LearningPage = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Demo courses */}
-          {demoCourses.map((course, index) => renderCourseCard(course, index))}
           
           {/* API fetched courses */}
           {filteredCourses.length > 0 && filteredCourses.map((course, index) => 

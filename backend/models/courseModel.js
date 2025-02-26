@@ -14,7 +14,7 @@ const courseSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['admin', 'developer'],
+    enum: ['admin', 'user', 'developer'],
     required: [true, 'role is required']
   },
   userId: {

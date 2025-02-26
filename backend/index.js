@@ -43,6 +43,8 @@ const getModules = require('./routes/getModules');
 const getAllModules = require('./routes/getAllModules');
 const getSingleUserBlog = require('./routes/getSingleUserBlog');
 const getAllQuiz = require('./routes/getAllQuiz');
+const getUserCourses = require("./routes/userCourse")
+const getSingleModule = require("./routes/getSingleModule")
 
 // User
 app.use(getAll);
@@ -63,6 +65,7 @@ app.use(createCourse);
 app.use(deleteCourse);
 app.use(getAllCourse);
 app.use(updateCourse);
+app.use(getUserCourses);
 
 // Module
 app.use(createModule);
@@ -71,6 +74,7 @@ app.use(deleteModule);
 app.use(getModules);
 app.use(getAllModules);
 app.use(getAllQuiz);
+app.use(getSingleModule);
 
 // Test Route
 app.get("/", (req, res) => {

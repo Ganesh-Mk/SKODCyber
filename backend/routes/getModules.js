@@ -20,5 +20,4 @@ router.get('/getModules', async (req, res) => {
   }
 });
 
-
 module.exports = router;
