@@ -6,6 +6,10 @@ require("dotenv").config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Set EJS as the view engine
+app.set("view engine", "ejs");
+app.set("views", "./views");
+
 // Middleware
 app.use(express.json());
 app.use(cors({
@@ -74,7 +78,10 @@ app.use(getAllQuiz);
 
 // Test Route
 app.get("/", (req, res) => {
-  res.send("✅ Backend Server is Running!");
+  res.render("status", {
+    serverStatus: "✅ Running",
+    mongoStatus: mongoose.connection.readyState === 1 ? "✅ Connected" : "❌ Not Connected"
+  });
 });
 
 // Error handling middleware
