@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { motion } from 'framer-motion';
-import ConfirmationModal from '../components/confirmationModal';
+import ConfirmationModal from '../components/ConfirmationModal';
 import UpdateBlogModal from '../components/UpdateBlogModal';
 
 const ManageAllBlogs = () => {
