@@ -13,7 +13,7 @@ router.post('/createModule', upload.single('video'), async (req, res) => {
   try {
     let { title, description, courseId, quizzes } = req.body;
     const file = req.file;
-    quizzes = JSON.parse(quizzes);
+    quizzes = quizzes ? JSON.parse(quizzes) : [];
 
     if (!file) {
       return res.status(400).json({ message: 'Video file is required' });

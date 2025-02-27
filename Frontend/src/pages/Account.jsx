@@ -25,6 +25,7 @@
     Trash2,
   } from "lucide-react";
   import BlogManage from "../Components/BlogManage"
+import CourseManage from "../Components/CourseManage";
 
 
   const Account = () => {
@@ -284,6 +285,7 @@
           </div>
 
           <BlogManage/>
+          <CourseManage/>
 
           {/* Charts */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">

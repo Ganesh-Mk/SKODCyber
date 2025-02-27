@@ -13,7 +13,9 @@ router.post("/createCourse", upload.single("thumbnail"), async (req, res) => {
   try {
     let { title, description, userId, quizzes } = req.body;
     const thumbnailFile = req.file;
-    quizzes = JSON.parse(quizzes);
+    
+    // Handle case when quizzes is not provided
+    quizzes = quizzes ? JSON.parse(quizzes) : [];
 
     const user = await User.findById(userId);
     if (!user) {
