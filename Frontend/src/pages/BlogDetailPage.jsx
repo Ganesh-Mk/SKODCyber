@@ -11,6 +11,7 @@ const BlogDetailPage = () => {
   const [showMessageForm, setShowMessageForm] = useState(false);
   const [message, setMessage] = useState("");
 
+
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
   // Custom Button Component
   const Button = ({

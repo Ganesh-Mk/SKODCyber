@@ -23,6 +23,7 @@ const CourseModules = () => {
     description: "",
   });
 
+
   useEffect(() => {
     fetchModules();
   }, [courseId]);

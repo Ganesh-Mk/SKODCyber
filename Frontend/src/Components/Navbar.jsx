@@ -15,6 +15,7 @@ const Navbar = () => {
   const { isLoggedIn: isLoggedInStore } = useSelector((state) => state.user);
 
   useEffect(() => {
+
     const checkAuth = () => {
       const storedData = localStorage.getItem('userData');
       if (storedData) {

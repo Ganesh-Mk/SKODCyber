@@ -9,6 +9,7 @@ const CreateCourseModal = ({ isOpen, onClose, onCreate, loading = false }) => {
     quizzes: [createEmptyQuiz()]
   });
 
+
   function createEmptyQuiz() {
     return {
       question: '',

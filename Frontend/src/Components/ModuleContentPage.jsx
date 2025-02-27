@@ -8,10 +8,11 @@ const ModuleContentPage = () => {
   const { courseId, moduleId } = useParams();
   const navigate = useNavigate();
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
-  
+
   const [moduleData, setModuleData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
   const [showQuiz, setShowQuiz] = useState(false);
   const [quizzes, setQuizzes] = useState([]);
   const [quizLoading, setQuizLoading] = useState(false);
@@ -31,11 +32,11 @@ const ModuleContentPage = () => {
     try {
       setLoading(true);
       setError(null);
-      
+
       const response = await axios.get(`${BACKEND_URL}/getSingleModule`, {
         params: { moduleId },
       });
-      
+
       // Check if the response contains the success flag and module data
       if (response.data.success && response.data.module) {
         setModuleData(response.data.module);
@@ -55,7 +56,7 @@ const ModuleContentPage = () => {
     try {
       // Get completed quizzes from localStorage
       const completedQuizzes = JSON.parse(localStorage.getItem('completedQuizzes') || '[]');
-      
+
       // Check if current moduleId is in the completed quizzes array
       if (completedQuizzes.includes(moduleId)) {
         setQuizCompleted(true);
@@ -70,15 +71,15 @@ const ModuleContentPage = () => {
     try {
       // Get current completed quizzes
       const completedQuizzes = JSON.parse(localStorage.getItem('completedQuizzes') || '[]');
-      
+
       // Add current moduleId if not already in the array
       if (!completedQuizzes.includes(moduleId)) {
         completedQuizzes.push(moduleId);
-        
+
         // Save updated array back to localStorage
         localStorage.setItem('completedQuizzes', JSON.stringify(completedQuizzes));
       }
-      
+
       setQuizCompleted(true);
     } catch (err) {
       console.error("Error saving quiz completion:", err);
@@ -94,25 +95,25 @@ const ModuleContentPage = () => {
     try {
       setQuizLoading(true);
       setQuizError(null);
-      
+
       // Fetch all quizzes
       const response = await axios.get(`${BACKEND_URL}/allQuiz`);
-      
+
       if (response.data) {
         // Filter quizzes that belong to this module
-        const moduleQuizzes = response.data.filter(quiz => 
+        const moduleQuizzes = response.data.filter(quiz =>
           moduleData.quizzes.includes(quiz._id)
         );
-        
+
         // Ensure each quiz has the expected structure
         const processedQuizzes = moduleQuizzes.map(quiz => {
           // Ensure options is an array
-          const options = Array.isArray(quiz.options) 
-            ? quiz.options 
-            : typeof quiz.options === 'object' 
-              ? Object.values(quiz.options) 
+          const options = Array.isArray(quiz.options)
+            ? quiz.options
+            : typeof quiz.options === 'object'
+              ? Object.values(quiz.options)
               : [];
-              
+
           return {
             ...quiz,
             options: options,
@@ -120,9 +121,9 @@ const ModuleContentPage = () => {
             correctAnswer: quiz.correctAnswer !== undefined ? quiz.correctAnswer : 0,
           };
         });
-        
+
         setQuizzes(processedQuizzes);
-        
+
         // Initialize user answers object
         const initialAnswers = {};
         processedQuizzes.forEach((_, index) => {
@@ -156,7 +157,7 @@ const ModuleContentPage = () => {
 
   const handleAnswerSelect = (optionIndex) => {
     if (quizSubmitted) return;
-    
+
     setUserAnswers({
       ...userAnswers,
       [currentQuizIndex]: optionIndex
@@ -177,13 +178,13 @@ const ModuleContentPage = () => {
 
   const calculateScore = () => {
     let correctAnswers = 0;
-    
+
     quizzes.forEach((quiz, index) => {
       if (userAnswers[index] !== null && quiz.correctAnswer === userAnswers[index]) {
         correctAnswers++;
       }
     });
-    
+
     return {
       score: correctAnswers,
       total: quizzes.length,
@@ -195,7 +196,7 @@ const ModuleContentPage = () => {
     const result = calculateScore();
     setScore(result);
     setQuizSubmitted(true);
-    
+
     // If user passed the quiz (>=70%), mark it as completed
     if (result.percentage >= 70) {
       saveQuizCompletion();
@@ -206,7 +207,7 @@ const ModuleContentPage = () => {
     // Reset quiz state
     setCurrentQuizIndex(0);
     setQuizSubmitted(false);
-    
+
     // Reset user answers
     const initialAnswers = {};
     quizzes.forEach((_, index) => {
@@ -261,7 +262,7 @@ const ModuleContentPage = () => {
             <ArrowLeft size={20} />
             <span>Back to Modules</span>
           </motion.button>
-          
+
           <div className="flex items-center justify-center h-64">
             <p className="text-gray-400">Module not found.</p>
           </div>
@@ -316,7 +317,7 @@ const ModuleContentPage = () => {
               </p>
               <p className="text-gray-400">Correct Answers</p>
             </div>
-            
+
             {score.percentage >= 70 ? (
               <div className="flex items-center justify-center gap-2 text-green-400">
                 <CheckCircle size={24} />
@@ -329,33 +330,31 @@ const ModuleContentPage = () => {
               </div>
             )}
           </div>
-          
+
           <div className="space-y-6">
             {quizzes.map((quiz, index) => {
               const options = Array.isArray(quiz.options) ? quiz.options : [];
-              
+
               return (
-                <div 
-                  key={quiz._id || index} 
-                  className={`bg-gray-800 rounded-lg p-6 border ${
-                    userAnswers[index] === quiz.correctAnswer 
-                      ? 'border-green-400' 
+                <div
+                  key={quiz._id || index}
+                  className={`bg-gray-800 rounded-lg p-6 border ${userAnswers[index] === quiz.correctAnswer
+                      ? 'border-green-400'
                       : 'border-red-400'
-                  }`}
+                    }`}
                 >
                   <p className="text-white font-medium mb-4">{index + 1}. {quiz.question}</p>
-                  
+
                   <div className="space-y-2">
                     {options.map((option, optIdx) => (
-                      <div 
+                      <div
                         key={optIdx}
-                        className={`p-3 rounded-lg flex items-center gap-2 ${
-                          optIdx === quiz.correctAnswer 
-                            ? 'bg-green-400/20 border border-green-400' 
-                            : optIdx === userAnswers[index] 
-                              ? 'bg-red-400/20 border border-red-400' 
+                        className={`p-3 rounded-lg flex items-center gap-2 ${optIdx === quiz.correctAnswer
+                            ? 'bg-green-400/20 border border-green-400'
+                            : optIdx === userAnswers[index]
+                              ? 'bg-red-400/20 border border-red-400'
                               : 'bg-gray-700'
-                        }`}
+                          }`}
                       >
                         {optIdx === quiz.correctAnswer && (
                           <CheckCircle size={18} className="text-green-400 flex-shrink-0" />
@@ -363,19 +362,18 @@ const ModuleContentPage = () => {
                         {optIdx !== quiz.correctAnswer && optIdx === userAnswers[index] && (
                           <XCircle size={18} className="text-red-400 flex-shrink-0" />
                         )}
-                        <span className={`${
-                          optIdx === quiz.correctAnswer 
-                            ? 'text-green-400' 
-                            : optIdx === userAnswers[index] 
-                              ? 'text-red-400' 
+                        <span className={`${optIdx === quiz.correctAnswer
+                            ? 'text-green-400'
+                            : optIdx === userAnswers[index]
+                              ? 'text-red-400'
                               : 'text-gray-300'
-                        }`}>
+                          }`}>
                           {option}
                         </span>
                       </div>
                     ))}
                   </div>
-                  
+
                   {quiz.explanation && (
                     <div className="mt-4 p-4 bg-gray-700/50 rounded-lg">
                       <p className="text-gray-300 text-sm">{quiz.explanation}</p>
@@ -385,7 +383,7 @@ const ModuleContentPage = () => {
               );
             })}
           </div>
-          
+
           <div className="flex justify-center mt-8 gap-4">
             <button
               onClick={handleRetakeQuiz}
@@ -406,7 +404,7 @@ const ModuleContentPage = () => {
 
     // Current quiz question
     const currentQuiz = quizzes[currentQuizIndex];
-    
+
     // Guard against missing options or invalid data structure
     if (!currentQuiz) {
       return (
@@ -421,12 +419,12 @@ const ModuleContentPage = () => {
         </div>
       );
     }
-    
+
     // Ensure options is an array
-    const options = Array.isArray(currentQuiz.options) 
-      ? currentQuiz.options 
+    const options = Array.isArray(currentQuiz.options)
+      ? currentQuiz.options
       : [];
-      
+
     if (options.length === 0) {
       return (
         <div className="text-center py-12">
@@ -450,7 +448,7 @@ const ModuleContentPage = () => {
         </div>
       );
     }
-    
+
     return (
       <div className="py-8">
         <div className="flex justify-between items-center mb-6">
@@ -461,50 +459,47 @@ const ModuleContentPage = () => {
             Question {currentQuizIndex + 1} of {quizzes.length}
           </div>
         </div>
-        
+
         <div className="bg-gray-800 rounded-lg p-6 mb-6">
           <p className="text-xl font-medium text-white mb-6">{currentQuiz.question}</p>
-          
+
           <div className="space-y-3">
             {options.map((option, optionIndex) => (
-              <div 
+              <div
                 key={optionIndex}
                 onClick={() => handleAnswerSelect(optionIndex)}
-                className={`p-4 rounded-lg cursor-pointer transition-all ${
-                  userAnswers[currentQuizIndex] === optionIndex 
-                    ? 'bg-cyan-500/20 border border-cyan-400' 
+                className={`p-4 rounded-lg cursor-pointer transition-all ${userAnswers[currentQuizIndex] === optionIndex
+                    ? 'bg-cyan-500/20 border border-cyan-400'
                     : 'bg-gray-700 hover:bg-gray-600'
-                }`}
+                  }`}
               >
                 <span className="text-gray-200">{option}</span>
               </div>
             ))}
           </div>
         </div>
-        
+
         <div className="flex justify-between">
           <button
             onClick={handlePrevQuestion}
             disabled={currentQuizIndex === 0}
-            className={`px-4 py-2 rounded-lg flex items-center gap-2 ${
-              currentQuizIndex === 0 
-                ? 'bg-gray-700 text-gray-500 cursor-not-allowed' 
+            className={`px-4 py-2 rounded-lg flex items-center gap-2 ${currentQuizIndex === 0
+                ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
                 : 'bg-gray-700 text-white hover:bg-gray-600'
-            }`}
+              }`}
           >
             <ArrowLeft size={16} />
             Previous
           </button>
-          
+
           {currentQuizIndex < quizzes.length - 1 ? (
             <button
               onClick={handleNextQuestion}
               disabled={userAnswers[currentQuizIndex] === null}
-              className={`px-4 py-2 rounded-lg ${
-                userAnswers[currentQuizIndex] === null 
-                  ? 'bg-gray-700 text-gray-500 cursor-not-allowed' 
+              className={`px-4 py-2 rounded-lg ${userAnswers[currentQuizIndex] === null
+                  ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
                   : 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white hover:from-cyan-600 hover:to-blue-600'
-              }`}
+                }`}
             >
               Next
             </button>
@@ -512,29 +507,27 @@ const ModuleContentPage = () => {
             <button
               onClick={handleSubmitQuiz}
               disabled={Object.values(userAnswers).some(answer => answer === null)}
-              className={`px-6 py-2 rounded-lg font-medium ${
-                Object.values(userAnswers).some(answer => answer === null)
-                  ? 'bg-gray-700 text-gray-500 cursor-not-allowed' 
+              className={`px-6 py-2 rounded-lg font-medium ${Object.values(userAnswers).some(answer => answer === null)
+                  ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
                   : 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white hover:from-cyan-600 hover:to-blue-600'
-              }`}
+                }`}
             >
               Submit Quiz
             </button>
           )}
         </div>
-        
+
         <div className="flex justify-center mt-8">
           <div className="flex gap-1">
             {quizzes.map((_, index) => (
-              <div 
+              <div
                 key={index}
-                className={`w-3 h-3 rounded-full ${
-                  index === currentQuizIndex 
-                    ? 'bg-cyan-400' 
-                    : userAnswers[index] !== null 
-                      ? 'bg-gray-400' 
+                className={`w-3 h-3 rounded-full ${index === currentQuizIndex
+                    ? 'bg-cyan-400'
+                    : userAnswers[index] !== null
+                      ? 'bg-gray-400'
                       : 'bg-gray-700'
-                }`}
+                  }`}
               />
             ))}
           </div>
@@ -567,7 +560,7 @@ const ModuleContentPage = () => {
                 <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
                   {moduleData.title}
                 </h1>
-                
+
                 {/* Quiz completion badge */}
                 {quizCompleted && (
                   <div className="flex items-center gap-1 px-3 py-1 bg-green-500/20 border border-green-500 rounded-full">
@@ -576,7 +569,7 @@ const ModuleContentPage = () => {
                   </div>
                 )}
               </div>
-              
+
               {moduleData.duration && (
                 <div className="mt-2 px-3 py-1 bg-gray-800 rounded-full text-sm font-medium text-cyan-400 border border-gray-700/50 w-fit">
                   {moduleData.duration}
@@ -604,18 +597,18 @@ const ModuleContentPage = () => {
                     />
                   </div>
                 )}
-                
+
                 {/* Fallback to thumbnail if no video */}
                 {!moduleData.videoUrl && moduleData.thumbnail && (
                   <div className="mb-6">
-                    <img 
-                      src={moduleData.thumbnail} 
-                      alt={moduleData.title} 
-                      className="w-full h-64 object-cover rounded-xl" 
+                    <img
+                      src={moduleData.thumbnail}
+                      alt={moduleData.title}
+                      className="w-full h-64 object-cover rounded-xl"
                     />
                   </div>
                 )}
-                
+
                 <div className="prose prose-invert max-w-none">
                   {moduleData.content ? (
                     <div dangerouslySetInnerHTML={{ __html: moduleData.content }} />
@@ -626,16 +619,16 @@ const ModuleContentPage = () => {
                     </div>
                   )}
                 </div>
-                
+
                 {moduleData.resources && moduleData.resources.length > 0 && (
                   <div className="mt-8">
                     <h3 className="text-xl font-semibold text-gray-100 mb-4">Additional Resources</h3>
                     <ul className="space-y-2">
                       {moduleData.resources.map((resource, index) => (
                         <li key={index}>
-                          <a 
-                            href={resource.url} 
-                            target="_blank" 
+                          <a
+                            href={resource.url}
+                            target="_blank"
                             rel="noopener noreferrer"
                             className="text-cyan-400 hover:text-cyan-300 underline"
                           >
@@ -646,22 +639,21 @@ const ModuleContentPage = () => {
                     </ul>
                   </div>
                 )}
-                
+
                 <div className="mt-8 flex justify-between">
                   {moduleData.quizzes && moduleData.quizzes.length > 0 && (
                     <button
                       onClick={handleQuizButtonClick}
-                      className={`px-6 py-3 font-semibold rounded-lg transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg ${
-                        quizCompleted
+                      className={`px-6 py-3 font-semibold rounded-lg transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg ${quizCompleted
                           ? 'bg-green-600 hover:bg-green-700 text-white hover:shadow-green-500/25 flex items-center gap-2'
                           : 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white hover:shadow-purple-500/25'
-                      }`}
+                        }`}
                     >
                       {quizCompleted && <Check size={18} />}
                       {quizCompleted ? 'Review Completed Quiz' : 'Take Module Quiz'}
                     </button>
                   )}
-                  
+
                   {moduleData.nextModule && (
                     <button
                       onClick={() => navigate(`/courses/${courseId}/modules/${moduleData.nextModule._id}`)}

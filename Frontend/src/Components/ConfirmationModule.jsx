@@ -12,6 +12,7 @@ const ConfirmationModal = ({
   type = "danger", // 'danger' | 'warning' | 'info'
   loading = false
 }) => {
+
   useEffect(() => {
     const handleEscape = (e) => {
       if (e.key === 'Escape') onClose();

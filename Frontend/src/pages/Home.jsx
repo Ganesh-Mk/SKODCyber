@@ -14,6 +14,7 @@ const Home = () => {
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.8)_100%)]" />
         </div>
 
+
         <div className="relative container mx-auto py-44 sm:py-24">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-16">
             <div className="lg:w-1/2 text-white">

@@ -9,6 +9,7 @@ const UserModal = ({ user, isOpen, onClose }) => {
       onClick={onClose}>
       <div className="min-h-screen px-4 flex items-center justify-center">
         {/* Modal Content */}
+
         <div
           className="w-full max-w-4xl bg-gradient-to-b from-gray-900 to-gray-950 rounded-2xl shadow-2xl relative transform transition-all duration-500 animate-modalEntry"
           onClick={e => e.stopPropagation()}

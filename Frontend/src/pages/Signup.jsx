@@ -24,7 +24,6 @@ const Signup = () => {
   const roles = [
     { value: "user", label: "User" },
     { value: "developer", label: "Developer" },
-    { value: "admin", label: "Admin" }
   ];
 
   const validateForm = () => {

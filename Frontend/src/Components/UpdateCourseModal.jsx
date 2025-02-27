@@ -11,6 +11,7 @@ const UpdateCourseModal = ({
 }) => {
   if (!isOpen) return null;
 
+
   useEffect(() => {
     const handleEscape = (e) => {
       if (e.key === 'Escape') onClose();

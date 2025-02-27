@@ -172,6 +172,7 @@ const BlogManage = () => {
     const userData = JSON.parse(localStorage.getItem("userData"));
     const userID = userData ? userData._id : null;
 
+
     try {
       const response = await fetch(`${BACKEND_URL}/deleteBlog`, {
         method: "DELETE",

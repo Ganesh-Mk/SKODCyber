@@ -14,6 +14,7 @@ const CourseManage = () => {
     thumbnail: "",
     quizzes: [createEmptyQuiz()],
   });
+
   const [editingCourse, setEditingCourse] = useState(null);
   const [deletingCourse, setDeletingCourse] = useState(null);
   const [trigger, setTrigger] = useState(false);
@@ -210,9 +211,9 @@ const CourseManage = () => {
 
       console.log("Course created successfully:", responseData);
       setTrigger((prev) => !prev);
-      setNewCourse({ 
-        title: "", 
-        description: "", 
+      setNewCourse({
+        title: "",
+        description: "",
         thumbnail: "",
         quizzes: [createEmptyQuiz()]
       });
@@ -298,12 +299,12 @@ const CourseManage = () => {
       }
       return quiz;
     });
-    
+
     // If no quizzes exist, add a default one
     if (normalizedQuizzes.length === 0) {
       normalizedQuizzes.push(createEmptyQuiz());
     }
-    
+
     setEditingCourse({
       ...course,
       thumbnail: course.thumbnail,
@@ -357,7 +358,7 @@ const CourseManage = () => {
     if (!quizzes || !Array.isArray(quizzes) || quizzes.length === 0) {
       return [createEmptyQuiz()];
     }
-    
+
     return quizzes.map(quiz => {
       // Ensure each quiz has valid options
       if (!quiz.options) {
@@ -494,9 +495,9 @@ const CourseManage = () => {
                   onChange={(e) =>
                     editingCourse
                       ? setEditingCourse({
-                          ...editingCourse,
-                          title: e.target.value,
-                        })
+                        ...editingCourse,
+                        title: e.target.value,
+                      })
                       : setNewCourse({ ...newCourse, title: e.target.value })
                   }
                   className="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg text-white"
@@ -514,13 +515,13 @@ const CourseManage = () => {
                   onChange={(e) =>
                     editingCourse
                       ? setEditingCourse({
-                          ...editingCourse,
-                          description: e.target.value,
-                        })
+                        ...editingCourse,
+                        description: e.target.value,
+                      })
                       : setNewCourse({
-                          ...newCourse,
-                          description: e.target.value,
-                        })
+                        ...newCourse,
+                        description: e.target.value,
+                      })
                   }
                   rows={4}
                   className="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg text-white"
@@ -533,7 +534,7 @@ const CourseManage = () => {
                 </label>
                 <div className="flex flex-col gap-4">
                   {(editingCourse && editingCourse.thumbnail) ||
-                  (!editingCourse && newCourse.thumbnail) ? (
+                    (!editingCourse && newCourse.thumbnail) ? (
                     <div className="aspect-video w-full rounded-lg overflow-hidden">
                       <img
                         src={
@@ -573,68 +574,68 @@ const CourseManage = () => {
                 </div>
 
                 <div className="space-y-6">
-                  {(editingCourse 
-                    ? ensureValidQuizzes(editingCourse.quizzes) 
+                  {(editingCourse
+                    ? ensureValidQuizzes(editingCourse.quizzes)
                     : newCourse.quizzes).map((quiz, quizIndex) => (
-                    <div
-                      key={quizIndex}
-                      className="p-4 bg-gray-700 border border-gray-600 rounded-lg"
-                    >
-                      <div className="flex justify-between items-center mb-3">
-                        <h4 className="font-medium text-indigo-400">Quiz #{quizIndex + 1}</h4>
-                        {(editingCourse ? (editingCourse.quizzes || []).length : newCourse.quizzes.length) > 1 && (
-                          <button
-                            onClick={() => handleRemoveQuiz(quizIndex)}
-                            className="p-1 text-gray-400 hover:text-red-400 rounded-full hover:bg-gray-600 transition-all"
-                          >
-                            <Trash className="w-4 h-4" />
-                          </button>
-                        )}
-                      </div>
-
-                      <div className="space-y-4">
-                        <div>
-                          <label className="text-sm font-medium text-gray-300 mb-1 block">
-                            Question
-                          </label>
-                          <input
-                            type="text"
-                            placeholder="Enter quiz question"
-                            className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
-                            value={quiz.question || ""}
-                            onChange={(e) => handleQuizChange(quizIndex, 'question', e.target.value)}
-                          />
+                      <div
+                        key={quizIndex}
+                        className="p-4 bg-gray-700 border border-gray-600 rounded-lg"
+                      >
+                        <div className="flex justify-between items-center mb-3">
+                          <h4 className="font-medium text-indigo-400">Quiz #{quizIndex + 1}</h4>
+                          {(editingCourse ? (editingCourse.quizzes || []).length : newCourse.quizzes.length) > 1 && (
+                            <button
+                              onClick={() => handleRemoveQuiz(quizIndex)}
+                              className="p-1 text-gray-400 hover:text-red-400 rounded-full hover:bg-gray-600 transition-all"
+                            >
+                              <Trash className="w-4 h-4" />
+                            </button>
+                          )}
                         </div>
 
-                        <div className="space-y-3">
-                          <label className="text-sm font-medium text-gray-300 block">
-                            Options
-                          </label>
-                          {quiz.options && Object.keys(quiz.options).map((optionKey) => (
-                            <div key={optionKey} className="flex items-center gap-2">
-                              <div className="flex items-center gap-2">
+                        <div className="space-y-4">
+                          <div>
+                            <label className="text-sm font-medium text-gray-300 mb-1 block">
+                              Question
+                            </label>
+                            <input
+                              type="text"
+                              placeholder="Enter quiz question"
+                              className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                              value={quiz.question || ""}
+                              onChange={(e) => handleQuizChange(quizIndex, 'question', e.target.value)}
+                            />
+                          </div>
+
+                          <div className="space-y-3">
+                            <label className="text-sm font-medium text-gray-300 block">
+                              Options
+                            </label>
+                            {quiz.options && Object.keys(quiz.options).map((optionKey) => (
+                              <div key={optionKey} className="flex items-center gap-2">
+                                <div className="flex items-center gap-2">
+                                  <input
+                                    type="radio"
+                                    name={`correct-answer-${quizIndex}`}
+                                    checked={quiz.answer === optionKey}
+                                    onChange={() => handleCorrectAnswerChange(quizIndex, optionKey)}
+                                    className="w-4 h-4 text-indigo-600 bg-gray-700 border-gray-600"
+                                  />
+                                  <span className="text-gray-300 w-6">{optionKey})</span>
+                                </div>
                                 <input
-                                  type="radio"
-                                  name={`correct-answer-${quizIndex}`}
-                                  checked={quiz.answer === optionKey}
-                                  onChange={() => handleCorrectAnswerChange(quizIndex, optionKey)}
-                                  className="w-4 h-4 text-indigo-600 bg-gray-700 border-gray-600"
+                                  type="text"
+                                  placeholder={`Option ${optionKey.toUpperCase()}`}
+                                  className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                                  value={quiz.options[optionKey] || ""}
+                                  onChange={(e) => handleOptionChange(quizIndex, optionKey, e.target.value)}
                                 />
-                                <span className="text-gray-300 w-6">{optionKey})</span>
                               </div>
-                              <input
-                                type="text"
-                                placeholder={`Option ${optionKey.toUpperCase()}`}
-                                className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
-                                value={quiz.options[optionKey] || ""}
-                                onChange={(e) => handleOptionChange(quizIndex, optionKey, e.target.value)}
-                              />
-                            </div>
-                          ))}
+                            ))}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
                 </div>
               </div>
 
@@ -659,8 +660,8 @@ const CourseManage = () => {
                       ? "Updating..."
                       : "Creating..."
                     : editingCourse
-                    ? "Update Course"
-                    : "Create Course"}
+                      ? "Update Course"
+                      : "Create Course"}
                 </button>
               </div>
             </div>

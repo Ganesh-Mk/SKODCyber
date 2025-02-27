@@ -13,6 +13,7 @@ const QuizModal = ({ isOpen, onClose, quiz, moduleId }) => {
     return stored ? JSON.parse(stored) : {};
   };
 
+
   // Initialize from localStorage on mount
   useEffect(() => {
     const storedProgress = getStoredQuizState();

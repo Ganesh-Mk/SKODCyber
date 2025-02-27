@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
-import { 
-  Trophy, 
-  BookOpen, 
-  Award, 
-  Github, 
-  Twitter, 
-  Linkedin, 
-  Instagram, 
-  ExternalLink, 
+import {
+  Trophy,
+  BookOpen,
+  Award,
+  Github,
+  Twitter,
+  Linkedin,
+  Instagram,
+  ExternalLink,
   ChevronLeft,
-  Send 
+  Send
 } from 'lucide-react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { AllUsers } from '../Data/AllUsers';
@@ -181,19 +181,19 @@ const UserProfilePage = () => {
             <div className="absolute -bottom-2 -right-2 w-6 h-6 bg-green-500 rounded-full 
                          border-4 border-gray-900"></div>
           </div>
-          
+
           {/* Action Buttons */}
           <div className="flex justify-center gap-4 mt-6">
             <button
               onClick={handleConnect}
               className={`px-6 py-2 rounded-lg transition-colors duration-300 
-                       ${isConnected 
-                         ? 'bg-gray-700 text-white hover:bg-gray-600' 
-                         : 'bg-blue-500 text-white hover:bg-blue-600'}`}
+                       ${isConnected
+                  ? 'bg-gray-700 text-white hover:bg-gray-600'
+                  : 'bg-blue-500 text-white hover:bg-blue-600'}`}
             >
               {isConnected ? 'Connected' : 'Connect'}
             </button>
-            
+
             <button
               onClick={() => setIsDialogOpen(true)}
               className="px-6 py-2 rounded-lg border border-gray-600 text-white 
@@ -322,6 +322,7 @@ const UserProfilePage = () => {
       </div>
     </div>
   );
+
 };
 
 export default UserProfilePage;

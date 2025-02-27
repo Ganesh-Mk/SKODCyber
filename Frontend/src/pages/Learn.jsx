@@ -13,24 +13,6 @@ const LearningPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Demo courses data
-  const demoCourses = [
-    {
-      _id: "demo-1",
-      title: "Introduction to Web Development",
-      role: "developer",
-      description: "Learn the fundamentals of web development including HTML, CSS, and JavaScript. This comprehensive course covers everything from basic markup to advanced interactive features.",
-      thumbnail: "/api/placeholder/400/320"
-    },
-    {
-      _id: "demo-2",
-      title: "Advanced React Patterns",
-      role: "developer",
-      description: "Master advanced React concepts including hooks, context, performance optimization, and state management. Perfect for developers looking to level up their React skills.",
-      thumbnail: "/api/placeholder/400/320"
-    }
-  ];
-
   useEffect(() => {
     fetchCourses();
   }, []);
@@ -83,6 +65,7 @@ const LearningPage = () => {
       whileHover={{ y: -5, transition: { duration: 0.2 } }}
       className="group bg-gray-800/90 backdrop-blur-sm rounded-xl overflow-hidden border border-gray-700/50 hover:border-cyan-400/50 transition-all duration-300 shadow-lg hover:shadow-cyan-400/20 h-[380px] flex flex-col"
     >
+
       <div className="relative h-40 flex-shrink-0">
         <motion.img
           src={course.thumbnail}
@@ -91,7 +74,7 @@ const LearningPage = () => {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 to-transparent" />
       </div>
-  
+
       <div className="p-4 flex flex-col flex-grow">
         <div className="flex justify-between items-start gap-2 mb-2">
           <motion.h3
@@ -111,7 +94,7 @@ const LearningPage = () => {
             {course.role}
           </motion.span>
         </div>
-  
+
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -120,7 +103,7 @@ const LearningPage = () => {
         >
           {course.description}
         </motion.p>
-  
+
         <motion.button
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -160,7 +143,7 @@ const LearningPage = () => {
         {error && (
           <div className="bg-red-500/10 border border-red-500/50 rounded-lg p-4 text-red-500">
             {error}
-            <button 
+            <button
               onClick={fetchCourses}
               className="ml-4 text-sm underline hover:text-red-400"
             >
@@ -205,14 +188,14 @@ const LearningPage = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          
+
           {/* API fetched courses */}
-          {filteredCourses.length > 0 && filteredCourses.map((course, index) => 
-            renderCourseCard(course, index + demoCourses.length)
+          {filteredCourses.length > 0 && filteredCourses.map((course, index) =>
+            renderCourseCard(course, index + course.length)
           )}
         </div>
 
-        {filteredCourses.length === 0 && !demoCourses.length && (
+        {filteredCourses.length === 0 && (
           <div className="text-center py-12">
             <p className="text-gray-400">No courses found matching your criteria.</p>
           </div>

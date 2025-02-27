@@ -20,6 +20,7 @@ import CourseModules from "./Components/CourseModulesManage";
 import ModuleContentPage from "./Components/ModuleContentPage";
 
 
+
 const App = () => {
   useEffect(() => {
     // Initialize authentication on app load
