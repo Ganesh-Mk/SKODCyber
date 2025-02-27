@@ -51,42 +51,33 @@ const ModuleContentPage = () => {
   };
 
   // Check if the user has completed this module's quizzes
-  const checkQuizCompletion = async () => {
+  const checkQuizCompletion = () => {
     try {
-      // Get the current user
-      const token = localStorage.getItem('token');
+      // Get completed quizzes from localStorage
+      const completedQuizzes = JSON.parse(localStorage.getItem('completedQuizzes') || '[]');
       
-      if (!token) {
-        return;
-      }
-
-      const userResponse = await axios.get(`${BACKEND_URL}/users/profile`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      
-      if (userResponse.data && userResponse.data.completedQuizzes) {
-        // Check if the current moduleId is in the user's completed quizzes
-        setQuizCompleted(userResponse.data.completedQuizzes.includes(moduleId));
+      // Check if current moduleId is in the completed quizzes array
+      if (completedQuizzes.includes(moduleId)) {
+        setQuizCompleted(true);
       }
     } catch (err) {
-      console.error("Error checking quiz completion status:", err);
+      console.error("Error checking quiz completion:", err);
     }
   };
 
-  // Save completed quiz to user profile
-  const saveQuizCompletion = async () => {
+  // Save completed quiz to localStorage
+  const saveQuizCompletion = () => {
     try {
-      const token = localStorage.getItem('token');
+      // Get current completed quizzes
+      const completedQuizzes = JSON.parse(localStorage.getItem('completedQuizzes') || '[]');
       
-      if (!token) {
-        return;
+      // Add current moduleId if not already in the array
+      if (!completedQuizzes.includes(moduleId)) {
+        completedQuizzes.push(moduleId);
+        
+        // Save updated array back to localStorage
+        localStorage.setItem('completedQuizzes', JSON.stringify(completedQuizzes));
       }
-
-      await axios.post(`${BACKEND_URL}/users/completeQuiz`, {
-        moduleId: moduleId
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
       
       setQuizCompleted(true);
     } catch (err) {
@@ -200,14 +191,14 @@ const ModuleContentPage = () => {
     };
   };
 
-  const handleSubmitQuiz = async () => {
+  const handleSubmitQuiz = () => {
     const result = calculateScore();
     setScore(result);
     setQuizSubmitted(true);
     
     // If user passed the quiz (>=70%), mark it as completed
     if (result.percentage >= 70) {
-      await saveQuizCompletion();
+      saveQuizCompletion();
     }
   };
 

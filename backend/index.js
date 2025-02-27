@@ -45,6 +45,7 @@ const getSingleUserBlog = require('./routes/getSingleUserBlog');
 const getAllQuiz = require('./routes/getAllQuiz');
 const getUserCourses = require("./routes/userCourse")
 const getSingleModule = require("./routes/getSingleModule")
+const getSingleCourse = require("./routes/getTheSignleCourse")
 
 // User
 app.use(getAll);
@@ -66,6 +67,7 @@ app.use(deleteCourse);
 app.use(getAllCourse);
 app.use(updateCourse);
 app.use(getUserCourses);
+app.use(getSingleCourse);
 
 // Module
 app.use(createModule);
