@@ -64,7 +64,7 @@ const Dashboard = () => {
           </nav>
 
           <div className="p-6">
-            <button className="w-full flex items-center space-x-3 px-4 py-3 text-gray-400 hover:text-white rounded-lg hover:bg-slate-700 transition-all duration-300">
+            <button onClick={() => { localStorage.removeItem('isAdminAuthenticated'); navigate('/'); window.location.reload() }} className="w-full flex items-center space-x-3 px-4 py-3 text-gray-400 hover:text-white rounded-lg hover:bg-slate-700 transition-all duration-300">
               <LogOut className="w-5 h-5" />
               <span>Logout</span>
             </button>
