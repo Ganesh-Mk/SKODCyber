@@ -13,7 +13,7 @@ const ModulesPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const thumbnailRefs = useRef({});
-  
+
   // Quiz related states
   const [showQuiz, setShowQuiz] = useState(false);
   const [quizzes, setQuizzes] = useState([]);
@@ -49,10 +49,12 @@ const ModulesPage = () => {
       setError(null);
 
       // Fetch the course data
-      const courseResponse = await axios.get(`${BACKEND_URL}/getSingleCourse/${courseId}`);
+      const courseResponse = await axios.get(
+        `${BACKEND_URL}/getSingleCourse/${courseId}`
+      );
       setCourse(courseResponse.data);
       console.log("Course : ", course);
-      
+
       // Fetch modules for this course
       const modulesResponse = await axios.get(`${BACKEND_URL}/getModules`, {
         params: { courseId },
@@ -70,11 +72,11 @@ const ModulesPage = () => {
   const checkQuizCompletion = () => {
     try {
       // Get completed quizzes from localStorage
-      const completedQuizzesJSON = localStorage.getItem('completedQuizzes');
-      
+      const completedQuizzesJSON = localStorage.getItem("completedQuizzes");
+
       if (completedQuizzesJSON) {
         const completedQuizzes = JSON.parse(completedQuizzesJSON);
-        
+
         // Check if current courseId is in the completed quizzes
         setQuizCompleted(completedQuizzes.includes(courseId));
       }
@@ -87,21 +89,24 @@ const ModulesPage = () => {
   const saveQuizCompletion = () => {
     try {
       // Get current completed quizzes
-      const completedQuizzesJSON = localStorage.getItem('completedQuizzes');
+      const completedQuizzesJSON = localStorage.getItem("completedQuizzes");
       let completedQuizzes = [];
-      
+
       if (completedQuizzesJSON) {
         completedQuizzes = JSON.parse(completedQuizzesJSON);
       }
-      
+
       // Add current courseId if not already included
       if (!completedQuizzes.includes(courseId)) {
         completedQuizzes.push(courseId);
       }
-      
+
       // Save back to localStorage
-      localStorage.setItem('completedQuizzes', JSON.stringify(completedQuizzes));
-      
+      localStorage.setItem(
+        "completedQuizzes",
+        JSON.stringify(completedQuizzes)
+      );
+
       setQuizCompleted(true);
     } catch (err) {
       console.error("Error saving quiz completion:", err);
@@ -117,35 +122,36 @@ const ModulesPage = () => {
     try {
       setQuizLoading(true);
       setQuizError(null);
-      
+
       // Fetch all quizzes
       const response = await axios.get(`${BACKEND_URL}/allQuiz`);
-      
+
       if (response.data) {
         // Filter quizzes that belong to this course
-        const courseQuizzes = response.data.filter(quiz => 
+        const courseQuizzes = response.data.filter((quiz) =>
           course.quizzes.includes(quiz._id)
         );
-        
+
         // Ensure each quiz has the expected structure
-        const processedQuizzes = courseQuizzes.map(quiz => {
+        const processedQuizzes = courseQuizzes.map((quiz) => {
           // Ensure options is an array
-          const options = Array.isArray(quiz.options) 
-            ? quiz.options 
-            : typeof quiz.options === 'object' 
-              ? Object.values(quiz.options) 
-              : [];
-              
+          const options = Array.isArray(quiz.options)
+            ? quiz.options
+            : typeof quiz.options === "object"
+            ? Object.values(quiz.options)
+            : [];
+
           return {
             ...quiz,
             options: options,
             // Default correctAnswer to 0 if not provided
-            correctAnswer: quiz.correctAnswer !== undefined ? quiz.correctAnswer : 0,
+            correctAnswer:
+              quiz.correctAnswer !== undefined ? quiz.correctAnswer : 0,
           };
         });
-        
+
         setQuizzes(processedQuizzes);
-        
+
         // Initialize user answers object
         const initialAnswers = {};
         processedQuizzes.forEach((_, index) => {
@@ -176,10 +182,10 @@ const ModulesPage = () => {
 
   const handleAnswerSelect = (optionIndex) => {
     if (quizSubmitted) return;
-    
+
     setUserAnswers({
       ...userAnswers,
-      [currentQuizIndex]: optionIndex
+      [currentQuizIndex]: optionIndex,
     });
   };
 
@@ -197,17 +203,20 @@ const ModulesPage = () => {
 
   const calculateScore = () => {
     let correctAnswers = 0;
-    
+
     quizzes.forEach((quiz, index) => {
-      if (userAnswers[index] !== null && quiz.correctAnswer === userAnswers[index]) {
+      if (
+        userAnswers[index] !== null &&
+        quiz.correctAnswer === userAnswers[index]
+      ) {
         correctAnswers++;
       }
     });
-    
+
     return {
       score: correctAnswers,
       total: quizzes.length,
-      percentage: Math.round((correctAnswers / quizzes.length) * 100)
+      percentage: Math.round((correctAnswers / quizzes.length) * 100),
     };
   };
 
@@ -215,7 +224,7 @@ const ModulesPage = () => {
     const result = calculateScore();
     setScore(result);
     setQuizSubmitted(true);
-    
+
     // If user passed the quiz (>=70%), mark it as completed
     if (result.percentage >= 70) {
       saveQuizCompletion();
@@ -226,7 +235,7 @@ const ModulesPage = () => {
     // Reset quiz state
     setCurrentQuizIndex(0);
     setQuizSubmitted(false);
-    
+
     // Reset user answers
     const initialAnswers = {};
     quizzes.forEach((_, index) => {
@@ -287,7 +296,7 @@ const ModulesPage = () => {
               </p>
               <p className="text-gray-400">Correct Answers</p>
             </div>
-            
+
             {score.percentage >= 70 ? (
               <div className="flex items-center justify-center gap-2 text-green-400">
                 <CheckCircle size={24} />
@@ -300,63 +309,76 @@ const ModulesPage = () => {
               </div>
             )}
           </div>
-          
+
           <div className="space-y-6">
             {quizzes.map((quiz, index) => {
               const options = Array.isArray(quiz.options) ? quiz.options : [];
-              
+
               return (
-                <div 
-                  key={quiz._id || index} 
+                <div
+                  key={quiz._id || index}
                   className={`bg-gray-800 rounded-lg p-6 border ${
-                    userAnswers[index] === quiz.correctAnswer 
-                      ? 'border-green-400' 
-                      : 'border-red-400'
+                    userAnswers[index] === quiz.correctAnswer
+                      ? "border-green-400"
+                      : "border-red-400"
                   }`}
                 >
-                  <p className="text-white font-medium mb-4">{index + 1}. {quiz.question}</p>
-                  
+                  <p className="text-white font-medium mb-4">
+                    {index + 1}. {quiz.question}
+                  </p>
+
                   <div className="space-y-2">
                     {options.map((option, optIdx) => (
-                      <div 
+                      <div
                         key={optIdx}
                         className={`p-3 rounded-lg flex items-center gap-2 ${
-                          optIdx === quiz.correctAnswer 
-                            ? 'bg-green-400/20 border border-green-400' 
-                            : optIdx === userAnswers[index] 
-                              ? 'bg-red-400/20 border border-red-400' 
-                              : 'bg-gray-700'
+                          optIdx === quiz.correctAnswer
+                            ? "bg-green-400/20 border border-green-400"
+                            : optIdx === userAnswers[index]
+                            ? "bg-red-400/20 border border-red-400"
+                            : "bg-gray-700"
                         }`}
                       >
                         {optIdx === quiz.correctAnswer && (
-                          <CheckCircle size={18} className="text-green-400 flex-shrink-0" />
+                          <CheckCircle
+                            size={18}
+                            className="text-green-400 flex-shrink-0"
+                          />
                         )}
-                        {optIdx !== quiz.correctAnswer && optIdx === userAnswers[index] && (
-                          <XCircle size={18} className="text-red-400 flex-shrink-0" />
-                        )}
-                        <span className={`${
-                          optIdx === quiz.correctAnswer 
-                            ? 'text-green-400' 
-                            : optIdx === userAnswers[index] 
-                              ? 'text-red-400' 
-                              : 'text-gray-300'
-                        }`}>
+                        {optIdx !== quiz.correctAnswer &&
+                          optIdx === userAnswers[index] && (
+                            <XCircle
+                              size={18}
+                              className="text-red-400 flex-shrink-0"
+                            />
+                          )}
+                        <span
+                          className={`${
+                            optIdx === quiz.correctAnswer
+                              ? "text-green-400"
+                              : optIdx === userAnswers[index]
+                              ? "text-red-400"
+                              : "text-gray-300"
+                          }`}
+                        >
                           {option}
                         </span>
                       </div>
                     ))}
                   </div>
-                  
+
                   {quiz.explanation && (
                     <div className="mt-4 p-4 bg-gray-700/50 rounded-lg">
-                      <p className="text-gray-300 text-sm">{quiz.explanation}</p>
+                      <p className="text-gray-300 text-sm">
+                        {quiz.explanation}
+                      </p>
                     </div>
                   )}
                 </div>
               );
             })}
           </div>
-          
+
           <div className="flex justify-center mt-8 gap-4">
             <button
               onClick={handleRetakeQuiz}
@@ -377,7 +399,7 @@ const ModulesPage = () => {
 
     // Current quiz question
     const currentQuiz = quizzes[currentQuizIndex];
-    
+
     // Guard against missing options or invalid data structure
     if (!currentQuiz) {
       return (
@@ -392,12 +414,12 @@ const ModulesPage = () => {
         </div>
       );
     }
-    
+
     // Ensure options is an array
-    const options = Array.isArray(currentQuiz.options) 
-      ? currentQuiz.options 
+    const options = Array.isArray(currentQuiz.options)
+      ? currentQuiz.options
       : [];
-      
+
     if (options.length === 0) {
       return (
         <div className="text-center py-12">
@@ -421,7 +443,7 @@ const ModulesPage = () => {
         </div>
       );
     }
-    
+
     return (
       <div className="py-8">
         <div className="flex justify-between items-center mb-6">
@@ -432,19 +454,21 @@ const ModulesPage = () => {
             Question {currentQuizIndex + 1} of {quizzes.length}
           </div>
         </div>
-        
+
         <div className="bg-gray-800 rounded-lg p-6 mb-6">
-          <p className="text-xl font-medium text-white mb-6">{currentQuiz.question}</p>
-          
+          <p className="text-xl font-medium text-white mb-6">
+            {currentQuiz.question}
+          </p>
+
           <div className="space-y-3">
             {options.map((option, optionIndex) => (
-              <div 
+              <div
                 key={optionIndex}
                 onClick={() => handleAnswerSelect(optionIndex)}
                 className={`p-4 rounded-lg cursor-pointer transition-all ${
-                  userAnswers[currentQuizIndex] === optionIndex 
-                    ? 'bg-cyan-500/20 border border-cyan-400' 
-                    : 'bg-gray-700 hover:bg-gray-600'
+                  userAnswers[currentQuizIndex] === optionIndex
+                    ? "bg-cyan-500/20 border border-cyan-400"
+                    : "bg-gray-700 hover:bg-gray-600"
                 }`}
               >
                 <span className="text-gray-200">{option}</span>
@@ -452,29 +476,29 @@ const ModulesPage = () => {
             ))}
           </div>
         </div>
-        
+
         <div className="flex justify-between">
           <button
             onClick={handlePrevQuestion}
             disabled={currentQuizIndex === 0}
             className={`px-4 py-2 rounded-lg flex items-center gap-2 ${
-              currentQuizIndex === 0 
-                ? 'bg-gray-700 text-gray-500 cursor-not-allowed' 
-                : 'bg-gray-700 text-white hover:bg-gray-600'
+              currentQuizIndex === 0
+                ? "bg-gray-700 text-gray-500 cursor-not-allowed"
+                : "bg-gray-700 text-white hover:bg-gray-600"
             }`}
           >
             <ArrowLeft size={16} />
             Previous
           </button>
-          
+
           {currentQuizIndex < quizzes.length - 1 ? (
             <button
               onClick={handleNextQuestion}
               disabled={userAnswers[currentQuizIndex] === null}
               className={`px-4 py-2 rounded-lg ${
-                userAnswers[currentQuizIndex] === null 
-                  ? 'bg-gray-700 text-gray-500 cursor-not-allowed' 
-                  : 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white hover:from-cyan-600 hover:to-blue-600'
+                userAnswers[currentQuizIndex] === null
+                  ? "bg-gray-700 text-gray-500 cursor-not-allowed"
+                  : "bg-gradient-to-r from-cyan-500 to-blue-500 text-white hover:from-cyan-600 hover:to-blue-600"
               }`}
             >
               Next
@@ -482,29 +506,31 @@ const ModulesPage = () => {
           ) : (
             <button
               onClick={handleSubmitQuiz}
-              disabled={Object.values(userAnswers).some(answer => answer === null)}
+              disabled={Object.values(userAnswers).some(
+                (answer) => answer === null
+              )}
               className={`px-6 py-2 rounded-lg font-medium ${
-                Object.values(userAnswers).some(answer => answer === null)
-                  ? 'bg-gray-700 text-gray-500 cursor-not-allowed' 
-                  : 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white hover:from-cyan-600 hover:to-blue-600'
+                Object.values(userAnswers).some((answer) => answer === null)
+                  ? "bg-gray-700 text-gray-500 cursor-not-allowed"
+                  : "bg-gradient-to-r from-cyan-500 to-blue-500 text-white hover:from-cyan-600 hover:to-blue-600"
               }`}
             >
               Submit Quiz
             </button>
           )}
         </div>
-        
+
         <div className="flex justify-center mt-8">
           <div className="flex gap-1">
             {quizzes.map((_, index) => (
-              <div 
+              <div
                 key={index}
                 className={`w-3 h-3 rounded-full ${
-                  index === currentQuizIndex 
-                    ? 'bg-cyan-400' 
-                    : userAnswers[index] !== null 
-                      ? 'bg-gray-400' 
-                      : 'bg-gray-700'
+                  index === currentQuizIndex
+                    ? "bg-cyan-400"
+                    : userAnswers[index] !== null
+                    ? "bg-gray-400"
+                    : "bg-gray-700"
                 }`}
               />
             ))}
@@ -587,12 +613,14 @@ const ModulesPage = () => {
                 <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
                   {course?.title || "Course Modules"}
                 </h1>
-                
+
                 {/* Quiz completion badge */}
                 {quizCompleted && (
                   <div className="flex items-center gap-1 px-3 py-1 bg-green-500/20 border border-green-500 rounded-full">
                     <Check size={16} className="text-green-400" />
-                    <span className="text-sm font-medium text-green-400">Quiz Completed</span>
+                    <span className="text-sm font-medium text-green-400">
+                      Quiz Completed
+                    </span>
                   </div>
                 )}
               </div>
@@ -621,14 +649,16 @@ const ModulesPage = () => {
                       ease: [0.43, 0.13, 0.23, 0.96],
                     }}
                     whileHover={{ y: -5, transition: { duration: 0.2 } }}
-                    className="group bg-gray-800/90 backdrop-blur-sm rounded-xl overflow-hidden border border-gray-700/50 hover:border-cyan-400/50 transition-all duration-300 shadow-lg hover:shadow-cyan-400/20"
+                    className="group bg-gray-800/90 backdrop-blur-sm rounded-xl overflow-hidden border border-gray-700/50 hover:border-cyan-400/50 transition-all duration-300 shadow-lg hover:shadow-cyan-400/20 h-auto" // Changed from fixed height to auto
                   >
                     <div className="relative overflow-hidden h-48">
                       {module.videoUrl ? (
                         // Video thumbnail generation
                         <div className="absolute inset-0 bg-gray-900 overflow-hidden">
                           <video
-                            ref={(el) => (thumbnailRefs.current[module._id] = el)}
+                            ref={(el) =>
+                              (thumbnailRefs.current[module._id] = el)
+                            }
                             src={module.videoUrl}
                             className="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-105"
                             muted
@@ -656,34 +686,41 @@ const ModulesPage = () => {
                       )}
                     </div>
 
-                    <div className="p-6 space-y-4">
+                    <div className="p-6 space-y-4 flex flex-col min-h-[200px]"> {/* Minimum height for content */}
                       <motion.h3
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: index * 0.1 + 0.2 }}
-                        className="text-xl font-semibold text-gray-100 group-hover:text-cyan-400 transition-colors duration-300"
+                        className="text-xl font-semibold text-gray-100 group-hover:text-cyan-400 transition-colors duration-300 line-clamp-1" // Limit title to 1 line
                       >
                         {module.title}
                       </motion.h3>
-
-                      <motion.p
+                      {/* Updated description with better line-clamp handling */}
+                      <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: index * 0.1 + 0.3 }}
-                        className="text-gray-400 text-sm leading-relaxed"
+                        className="flex-grow"
                       >
-                        {module.description}
-                      </motion.p>
-
-                      <motion.button
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.1 + 0.4 }}
-                        onClick={() => handleViewModule(module._id)}
-                        className="w-full px-6 py-3 mt-4 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-semibold rounded-lg transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-cyan-500/25"
-                      >
-                        View Module
-                      </motion.button>
+                        <p className="text-gray-400 text-sm leading-relaxed line-clamp-3 overflow-hidden">
+                          {module.description}
+                        </p>
+                        {/* Show ellipsis if description is likely longer than 3 lines */}
+                        {module.description && module.description.length > 150 && (
+                          <p className="text-gray-500 text-sm mt-1">...</p>
+                        )}
+                      </motion.div>
+                      <div className="mt-auto pt-2"> {/* Push button to bottom */}
+                        <motion.button
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: index * 0.1 + 0.4 }}
+                          onClick={() => handleViewModule(module._id)}
+                          className="w-full px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-semibold rounded-lg transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-cyan-500/25"
+                        >
+                          View Module
+                        </motion.button>
+                      </div>
                     </div>
                   </motion.div>
                 ))}
@@ -696,12 +733,12 @@ const ModulesPage = () => {
                     onClick={handleQuizButtonClick}
                     className={`px-8 py-4 font-semibold rounded-lg transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg ${
                       quizCompleted
-                        ? 'bg-green-600 hover:bg-green-700 text-white hover:shadow-green-500/25 flex items-center gap-2'
-                        : 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white hover:shadow-purple-500/25'
+                        ? "bg-green-600 hover:bg-green-700 text-white hover:shadow-green-500/25 flex items-center gap-2"
+                        : "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white hover:shadow-purple-500/25"
                     }`}
                   >
                     {quizCompleted && <Check size={20} />}
-                    {quizCompleted ? 'Review Course Quiz' : 'Take Course Quiz'}
+                    {quizCompleted ? "Review Course Quiz" : "Take Course Quiz"}
                   </button>
                 </div>
               )}
