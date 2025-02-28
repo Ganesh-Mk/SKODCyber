@@ -14,6 +14,8 @@ const ManageAllBlogs = () => {
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedBlog, setSelectedBlog] = useState(null);
+  const [fetchLoading, setFetchLoading] = useState(false);
+
   const [updateFormData, setUpdateFormData] = useState({
     title: '',
     image: '',
@@ -31,11 +33,13 @@ const ManageAllBlogs = () => {
   const fetchBlogs = async () => {
     try {
       setLoading(true);
+      setFetchLoading(true);
       const response = await axios.get(`${BACKEND_URL}/allBlog`);
       setBlogs(response.data);
     } catch (error) {
       console.error('Error fetching blogs:', error);
     } finally {
+      setFetchLoading(false);
       setLoading(false);
     }
   };
@@ -93,6 +97,15 @@ const ManageAllBlogs = () => {
       setLoading(false);
     }
   };
+
+  if (fetchLoading) {
+    return (
+      <div className="flex justify-center flex-col items-center h-screen">
+        <div className="animate-spin rounded-full h-10 w-10 border-t-4 border-blue-500"></div>
+        <p className="text-gray-400 text-md ml-4">Loading...</p>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gray-900 pt-16 md:pt-0">
