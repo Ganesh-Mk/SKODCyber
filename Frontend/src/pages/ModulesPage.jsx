@@ -98,7 +98,6 @@ const ModulesPage = () => {
     }
   };
 
-
   const markModuleAsCompleted = async (moduleId) => {
     try {
       // Get current completed modules
@@ -130,8 +129,10 @@ const ModulesPage = () => {
   const updateUserProgress = async () => {
     try {
       // Get counts from localStorage
-      const completedQuizzesJSON = localStorage.getItem("completedQuizzes") || "[]";
-      const completedModulesJSON = localStorage.getItem("completedModules") || "[]";
+      const completedQuizzesJSON =
+        localStorage.getItem("completedQuizzes") || "[]";
+      const completedModulesJSON =
+        localStorage.getItem("completedModules") || "[]";
 
       const quizzes = JSON.parse(completedQuizzesJSON);
       const modules = JSON.parse(completedModulesJSON);
@@ -145,7 +146,7 @@ const ModulesPage = () => {
       await axios.post(`${BACKEND_URL}/updateUser`, {
         quizzesCompleted: quizzes.length,
         modulesCompleted: modules.length,
-        badges: badges
+        badges: badges,
       });
 
       console.log("User progress updated successfully");
@@ -210,8 +211,8 @@ const ModulesPage = () => {
           const options = Array.isArray(quiz.options)
             ? quiz.options
             : typeof quiz.options === "object"
-              ? Object.values(quiz.options)
-              : [];
+            ? Object.values(quiz.options)
+            : [];
 
           return {
             ...quiz,
@@ -390,10 +391,11 @@ const ModulesPage = () => {
               return (
                 <div
                   key={quiz._id || index}
-                  className={`bg-gray-800 rounded-lg p-6 border ${userAnswers[index] === quiz.correctAnswer
-                    ? "border-green-400"
-                    : "border-red-400"
-                    }`}
+                  className={`bg-gray-800 rounded-lg p-6 border ${
+                    userAnswers[index] === quiz.correctAnswer
+                      ? "border-green-400"
+                      : "border-red-400"
+                  }`}
                 >
                   <p className="text-white font-medium mb-4">
                     {index + 1}. {quiz.question}
@@ -403,12 +405,13 @@ const ModulesPage = () => {
                     {options.map((option, optIdx) => (
                       <div
                         key={optIdx}
-                        className={`p-3 rounded-lg flex items-center gap-2 ${optIdx === quiz.correctAnswer
-                          ? "bg-green-400/20 border border-green-400"
-                          : optIdx === userAnswers[index]
+                        className={`p-3 rounded-lg flex items-center gap-2 ${
+                          optIdx === quiz.correctAnswer
+                            ? "bg-green-400/20 border border-green-400"
+                            : optIdx === userAnswers[index]
                             ? "bg-red-400/20 border border-red-400"
                             : "bg-gray-700"
-                          }`}
+                        }`}
                       >
                         {optIdx === quiz.correctAnswer && (
                           <CheckCircle
@@ -424,12 +427,13 @@ const ModulesPage = () => {
                             />
                           )}
                         <span
-                          className={`${optIdx === quiz.correctAnswer
-                            ? "text-green-400"
-                            : optIdx === userAnswers[index]
+                          className={`${
+                            optIdx === quiz.correctAnswer
+                              ? "text-green-400"
+                              : optIdx === userAnswers[index]
                               ? "text-red-400"
                               : "text-gray-300"
-                            }`}
+                          }`}
                         >
                           {option}
                         </span>
@@ -535,10 +539,11 @@ const ModulesPage = () => {
               <div
                 key={optionIndex}
                 onClick={() => handleAnswerSelect(optionIndex)}
-                className={`p-4 rounded-lg cursor-pointer transition-all ${userAnswers[currentQuizIndex] === optionIndex
-                  ? "bg-cyan-500/20 border border-cyan-400"
-                  : "bg-gray-700 hover:bg-gray-600"
-                  }`}
+                className={`p-4 rounded-lg cursor-pointer transition-all ${
+                  userAnswers[currentQuizIndex] === optionIndex
+                    ? "bg-cyan-500/20 border border-cyan-400"
+                    : "bg-gray-700 hover:bg-gray-600"
+                }`}
               >
                 <span className="text-gray-200">{option}</span>
               </div>
@@ -550,10 +555,11 @@ const ModulesPage = () => {
           <button
             onClick={handlePrevQuestion}
             disabled={currentQuizIndex === 0}
-            className={`px-4 py-2 rounded-lg flex items-center gap-2 ${currentQuizIndex === 0
-              ? "bg-gray-700 text-gray-500 cursor-not-allowed"
-              : "bg-gray-700 text-white hover:bg-gray-600"
-              }`}
+            className={`px-4 py-2 rounded-lg flex items-center gap-2 ${
+              currentQuizIndex === 0
+                ? "bg-gray-700 text-gray-500 cursor-not-allowed"
+                : "bg-gray-700 text-white hover:bg-gray-600"
+            }`}
           >
             <ArrowLeft size={16} />
             Previous
@@ -563,10 +569,11 @@ const ModulesPage = () => {
             <button
               onClick={handleNextQuestion}
               disabled={userAnswers[currentQuizIndex] === null}
-              className={`px-4 py-2 rounded-lg ${userAnswers[currentQuizIndex] === null
-                ? "bg-gray-700 text-gray-500 cursor-not-allowed"
-                : "bg-gradient-to-r from-cyan-500 to-blue-500 text-white hover:from-cyan-600 hover:to-blue-600"
-                }`}
+              className={`px-4 py-2 rounded-lg ${
+                userAnswers[currentQuizIndex] === null
+                  ? "bg-gray-700 text-gray-500 cursor-not-allowed"
+                  : "bg-gradient-to-r from-cyan-500 to-blue-500 text-white hover:from-cyan-600 hover:to-blue-600"
+              }`}
             >
               Next
             </button>
@@ -576,10 +583,11 @@ const ModulesPage = () => {
               disabled={Object.values(userAnswers).some(
                 (answer) => answer === null
               )}
-              className={`px-6 py-2 rounded-lg font-medium ${Object.values(userAnswers).some((answer) => answer === null)
-                ? "bg-gray-700 text-gray-500 cursor-not-allowed"
-                : "bg-gradient-to-r from-cyan-500 to-blue-500 text-white hover:from-cyan-600 hover:to-blue-600"
-                }`}
+              className={`px-6 py-2 rounded-lg font-medium ${
+                Object.values(userAnswers).some((answer) => answer === null)
+                  ? "bg-gray-700 text-gray-500 cursor-not-allowed"
+                  : "bg-gradient-to-r from-cyan-500 to-blue-500 text-white hover:from-cyan-600 hover:to-blue-600"
+              }`}
             >
               Submit Quiz
             </button>
@@ -591,12 +599,13 @@ const ModulesPage = () => {
             {quizzes.map((_, index) => (
               <div
                 key={index}
-                className={`w-3 h-3 rounded-full ${index === currentQuizIndex
-                  ? "bg-cyan-400"
-                  : userAnswers[index] !== null
+                className={`w-3 h-3 rounded-full ${
+                  index === currentQuizIndex
+                    ? "bg-cyan-400"
+                    : userAnswers[index] !== null
                     ? "bg-gray-400"
                     : "bg-gray-700"
-                  }`}
+                }`}
               />
             ))}
           </div>
@@ -751,44 +760,38 @@ const ModulesPage = () => {
                       )}
                     </div>
 
-                    <div className="p-6 space-y-4 flex flex-col min-h-[200px]"> {/* Minimum height for content */}
-                      <motion.h3
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: index * 0.1 + 0.2 }}
-                        className="text-xl font-semibold text-gray-100 group-hover:text-cyan-400 transition-colors duration-300 line-clamp-1" // Limit title to 1 line
-                      >
+                    <div className="p-6 space-y-4 flex flex-col min-h-[200px]">
+                      {/* Minimum height for content */}
+                      <motion.h3 className="text-xl font-semibold text-gray-100 group-hover:text-cyan-400 transition-colors duration-300 line-clamp-1">
                         {module.title}
                       </motion.h3>
+
+                      {/* Completed badge */}
                       {completedModules.includes(module._id) && (
-                        <div className="absolute top-4 right-4 p-1 bg-green-500/80 rounded-full">
-                          <Check size={16} className="text-white" />
+                        <div className="absolute top-4 right-4 px-3 py-1 bg-green-500/80 backdrop-blur-sm rounded-full text-sm font-medium text-white border border-green-400/50">
+                          Completed
                         </div>
                       )}
-                      {/* Updated description with better line-clamp handling */}
-                      <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: index * 0.1 + 0.3 }}
-                        className="flex-grow"
-                      >
-                        <p className="text-gray-400 text-sm leading-relaxed line-clamp-3 overflow-hidden">
+
+                      {/* Module description */}
+                      <motion.div className="flex-grow">
+                        <p className="text-gray-400 text-sm leading-relaxed line-clamp-3">
                           {module.description}
                         </p>
-                        {/* Show ellipsis if description is likely longer than 3 lines */}
-                        {module.description && module.description.length > 150 && (
-                          <p className="text-gray-500 text-sm mt-1">...</p>
-                        )}
                       </motion.div>
-                      <div className="mt-auto pt-2"> {/* Push button to bottom */}
+
+                      <div className="mt-auto pt-2">
                         <motion.button
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: index * 0.1 + 0.4 }}
                           onClick={() => handleViewModule(module._id)}
-                          className="w-full px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-semibold rounded-lg transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-cyan-500/25"
+                          className={`w-full px-6 py-3 text-white font-semibold rounded-lg transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg ${
+                            completedModules.includes(module._id)
+                              ? "bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 hover:shadow-green-500/25"
+                              : "bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 hover:shadow-cyan-500/25"
+                          }`}
                         >
-                          View Module
+                          {completedModules.includes(module._id)
+                            ? "Review Module"
+                            : "View Module"}
                         </motion.button>
                       </div>
                     </div>
@@ -801,10 +804,11 @@ const ModulesPage = () => {
                 <div className="flex justify-center mt-12">
                   <button
                     onClick={handleQuizButtonClick}
-                    className={`px-8 py-4 font-semibold rounded-lg transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg ${quizCompleted
-                      ? "bg-green-600 hover:bg-green-700 text-white hover:shadow-green-500/25 flex items-center gap-2"
-                      : "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white hover:shadow-purple-500/25"
-                      }`}
+                    className={`px-8 py-4 font-semibold rounded-lg transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg ${
+                      quizCompleted
+                        ? "bg-green-600 hover:bg-green-700 text-white hover:shadow-green-500/25 flex items-center gap-2"
+                        : "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white hover:shadow-purple-500/25"
+                    }`}
                   >
                     {quizCompleted && <Check size={20} />}
                     {quizCompleted ? "Review Course Quiz" : "Take Course Quiz"}

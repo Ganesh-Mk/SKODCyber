@@ -28,7 +28,7 @@ const userSchema = new mongoose.Schema({
   },
   image: {
     type: String,
-    default: "https://cdn-icons-png.flaticon.com/512/10398/10398223.png"
+    default: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/2048px-Default_pfp.svg.png "
   },
   social: {
     twitter: String,

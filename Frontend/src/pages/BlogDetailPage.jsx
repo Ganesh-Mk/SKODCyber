@@ -11,7 +11,6 @@ const BlogDetailPage = () => {
   const [showMessageForm, setShowMessageForm] = useState(false);
   const [message, setMessage] = useState("");
 
-
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
   // Custom Button Component
   const Button = ({
@@ -117,9 +116,7 @@ const BlogDetailPage = () => {
     const fetchBlogAndAuthor = async () => {
       try {
         setLoading(true);
-        const blogResponse = await axios.get(
-          `${BACKEND_URL}/blog/${blogId}`
-        );
+        const blogResponse = await axios.get(`${BACKEND_URL}/blog/${blogId}`);
         setBlog(blogResponse.data);
 
         const authorBlogsResponse = await axios.get(
@@ -184,7 +181,7 @@ const BlogDetailPage = () => {
         <div className="flex flex-col items-center mb-8">
           <div className="relative mb-4">
             <img
-              src={blog.author?.profileImage || "/default-avatar.png"}
+              src={blog.author?.image || "/default-avatar.png"}
               alt={blog.author?.name || "Author"}
               className="w-24 h-24 rounded-full object-cover border-4 border-blue-500/30"
             />
@@ -192,7 +189,7 @@ const BlogDetailPage = () => {
           </div>
 
           <h2 className="text-2xl font-bold mb-2">
-            {blog.userName || "Anonymous"}
+            {blog.author?.name || "Anonymous"}
           </h2>
           <div className="flex gap-4 mb-4">
             <Button onClick={handleConnect} className="flex items-center gap-2">
@@ -260,7 +257,7 @@ const BlogDetailPage = () => {
         {authorBlogs.length > 0 && (
           <div>
             <h2 className="text-2xl font-bold mb-6">
-              More from {blog.userName}
+              More from {blog.author?.name}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {authorBlogs.map((authorBlog) => (

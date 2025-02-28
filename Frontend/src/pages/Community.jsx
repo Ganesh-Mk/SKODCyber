@@ -1,18 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { Search } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import { Search, ChevronDown } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const CommunityPage = () => {
   const [blogs, setBlogs] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const blogsPerPage = 9; // Changed from 12 to 9 to match 3 blogs per row
+  const [userTypeFilter, setUserTypeFilter] = useState("All");
+  const [showFilterDropdown, setShowFilterDropdown] = useState(false);
+  const blogsPerPage = 9;
   const navigate = useNavigate();
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
-
 
   // Fetch blogs from backend
   useEffect(() => {
@@ -20,11 +21,14 @@ const CommunityPage = () => {
       try {
         setLoading(true);
         const response = await axios.get(`${BACKEND_URL}/allBlog`);
+        console.log("Hello", response.data);
+
         setBlogs(response.data);
+
         setError(null);
       } catch (err) {
-        setError('Failed to fetch blogs. Please try again later.');
-        console.error('Error fetching blogs:', err);
+        setError("Failed to fetch blogs. Please try again later.");
+        console.error("Error fetching blogs:", err);
       } finally {
         setLoading(false);
       }
@@ -33,11 +37,19 @@ const CommunityPage = () => {
     fetchBlogs();
   }, []);
 
-  // Filter blogs based on search term
-  const filteredBlogs = blogs.filter(blog =>
-    blog.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    blog.description.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Filter blogs based on search term and user type
+  const filteredBlogs = blogs.filter((blog) => {
+    const matchesSearch =
+      blog.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      blog.description.toLowerCase().includes(searchTerm.toLowerCase());
+
+    // Apply user type filter
+    if (userTypeFilter === "All") {
+      return matchesSearch;
+    } else {
+      return matchesSearch && blog.role === userTypeFilter.toLowerCase();
+    }
+  });
 
   // Pagination logic
   const totalPages = Math.ceil(filteredBlogs.length / blogsPerPage);
@@ -68,6 +80,13 @@ const CommunityPage = () => {
     setCurrentPage(1);
   };
 
+  // Handle filter change
+  const handleFilterChange = (type) => {
+    setUserTypeFilter(type);
+    setShowFilterDropdown(false);
+    setCurrentPage(1);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen mt-16 bg-[#0a0a0a] text-white flex items-center justify-center">
@@ -94,35 +113,65 @@ const CommunityPage = () => {
             <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">
               Developer Community
             </h1>
-            <p className="text-gray-400 text-lg">
-              Connect, Share, and Learn
-            </p>
+            <p className="text-gray-400 text-lg">Connect, Share, and Learn</p>
           </div>
 
-          {/* Search Form */}
-          <form
-            onSubmit={handleSearchSubmit}
-            className="w-full md:w-1/2 relative"
-          >
-            <input
-              type="text"
-              placeholder="Search blogs..."
-              className="w-full pl-12 pr-24 py-3 bg-gray-800/50 border border-gray-700 rounded-xl 
-                      text-white placeholder-gray-400 focus:outline-none focus:border-blue-500/50 
-                      focus:ring-2 focus:ring-blue-500/20 transition-all duration-300"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <button
-              type="submit"
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 px-4 py-1.5 
-                      bg-blue-500 text-white rounded-lg hover:bg-blue-600 
-                      transition-colors duration-300"
-            >
-              Search
-            </button>
-          </form>
+          {/* Search and Filter Form */}
+          <div className="w-full md:w-1/2 flex flex-col sm:flex-row gap-3">
+            <form onSubmit={handleSearchSubmit} className="w-full relative">
+              <input
+                type="text"
+                placeholder="Search blogs..."
+                className="w-full pl-12 pr-24 py-3 bg-gray-800/50 border border-gray-700 rounded-xl 
+                        text-white placeholder-gray-400 focus:outline-none focus:border-blue-500/50 
+                        focus:ring-2 focus:ring-blue-500/20 transition-all duration-300"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <button
+                type="submit"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 px-4 py-1.5 
+                        bg-blue-500 text-white rounded-lg hover:bg-blue-600 
+                        transition-colors duration-300"
+              >
+                Search
+              </button>
+            </form>
+
+            {/* Filter Dropdown */}
+            <div className="relative min-w-40">
+              <button
+                type="button"
+                className="w-full flex items-center justify-between px-4 py-3 bg-gray-800/50 border 
+                         border-gray-700 rounded-xl text-white focus:outline-none focus:border-blue-500/50 
+                         focus:ring-2 focus:ring-blue-500/20 transition-all duration-300"
+                onClick={() => setShowFilterDropdown(!showFilterDropdown)}
+              >
+                {userTypeFilter}
+                <ChevronDown className="ml-2 h-4 w-4" />
+              </button>
+
+              {showFilterDropdown && (
+                <div className="absolute z-10 mt-1 w-full bg-gray-800 border border-gray-700 rounded-lg shadow-lg">
+                  {["All", "User", "Developer", "Admin"].map((type) => (
+                    <button
+                      key={type}
+                      className={`w-full text-left px-4 py-2 hover:bg-gray-700 transition-colors duration-200
+                              ${
+                                userTypeFilter === type
+                                  ? "text-blue-400"
+                                  : "text-gray-300"
+                              }`}
+                      onClick={() => handleFilterChange(type)}
+                    >
+                      {type}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 
@@ -146,21 +195,26 @@ const CommunityPage = () => {
                 </div>
               )}
               <div className="p-6">
-                <Link to={`/user/${blog.userId}`} className="group-hover:text-blue-400 transition-colors duration-300">
+                <Link
+                  to={`/user/${blog.userId}`}
+                  className="group-hover:text-blue-400 transition-colors duration-300"
+                >
                   <div className="flex items-center space-x-4 mb-4">
                     <div className="relative">
                       <img
-                        src={blog.author?.profileImage || '/default-avatar.png'}
-                        alt={blog.author?.name || 'Author'}
+                        src={blog.userImage || "/default-avatar.png"}
+                        alt={blog.userName || "Author"}
                         className="w-10 h-10 rounded-full object-cover border-2 border-transparent 
-                               group-hover:border-blue-500 transition-all duration-300 cursor-pointer"
+               group-hover:border-blue-500 transition-all duration-300 cursor-pointer"
                       />
-                      <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full 
-                                border-2 border-gray-800"></div>
+                      <div
+                        className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full 
+                border-2 border-gray-800"
+                      ></div>
                     </div>
                     <div>
                       <h3 className="font-medium text-white cursor-pointer hover:text-blue-400 transition-colors duration-300">
-                        {blog.userName || 'Anonymous'}
+                        {blog.userName || "Anonymous"}
                       </h3>
                       <div className="text-xs text-blue-400">
                         {new Date(blog.createdAt).toLocaleDateString()}
@@ -168,15 +222,21 @@ const CommunityPage = () => {
                     </div>
                   </div>
                 </Link>
-                <h2 className="text-xl font-semibold text-white mb-3 group-hover:text-blue-400 
-                            transition-colors duration-300">
+                <h2
+                  className="text-xl font-semibold text-white mb-3 group-hover:text-blue-400 
+                            transition-colors duration-300"
+                >
                   {blog.title}
                 </h2>
                 <p className="text-gray-400 line-clamp-2">{blog.description}</p>
                 <div className="mt-4 pt-4 border-t border-gray-700/50">
                   <div className="flex items-center justify-between text-sm text-gray-400">
                     <div className="flex items-center gap-2">
-                      <span>{blog.readTime || '5 min'} read</span>
+                      <span>Explore</span>
+                      <span>•</span>
+                      <span className="text-xs px-2 py-1 rounded bg-gray-700/50">
+                        {blog.role || "User"}
+                      </span>
                     </div>
                     <button
                       onClick={() => navigate(`/blog/${blog._id}`)}
@@ -195,36 +255,44 @@ const CommunityPage = () => {
         {totalPages > 1 && (
           <div className="flex justify-center items-center space-x-2 mt-12">
             <button
-              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
               className={`px-4 py-2 rounded-lg transition-all duration-300 
-                      ${currentPage === 1
-                  ? 'bg-gray-800/50 text-gray-500 cursor-not-allowed'
-                  : 'bg-gray-800 text-white hover:bg-gray-700'}`}
+                      ${
+                        currentPage === 1
+                          ? "bg-gray-800/50 text-gray-500 cursor-not-allowed"
+                          : "bg-gray-800 text-white hover:bg-gray-700"
+                      }`}
             >
               Previous
             </button>
 
-            {getPageNumbers().map(number => (
+            {getPageNumbers().map((number) => (
               <button
                 key={number}
                 onClick={() => setCurrentPage(number)}
                 className={`w-10 h-10 rounded-lg transition-all duration-300 
-                        ${currentPage === number
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}`}
+                        ${
+                          currentPage === number
+                            ? "bg-blue-500 text-white"
+                            : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+                        }`}
               >
                 {number}
               </button>
             ))}
 
             <button
-              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+              }
               disabled={currentPage === totalPages}
               className={`px-4 py-2 rounded-lg transition-all duration-300 
-                      ${currentPage === totalPages
-                  ? 'bg-gray-800/50 text-gray-500 cursor-not-allowed'
-                  : 'bg-gray-800 text-white hover:bg-gray-700'}`}
+                      ${
+                        currentPage === totalPages
+                          ? "bg-gray-800/50 text-gray-500 cursor-not-allowed"
+                          : "bg-gray-800 text-white hover:bg-gray-700"
+                      }`}
             >
               Next
             </button>
@@ -234,8 +302,12 @@ const CommunityPage = () => {
         {/* Empty State */}
         {currentBlogs.length === 0 && (
           <div className="text-center py-20">
-            <h3 className="text-xl font-semibold text-gray-400 mb-2">No results found</h3>
-            <p className="text-gray-500">Try adjusting your search criteria</p>
+            <h3 className="text-xl font-semibold text-gray-400 mb-2">
+              No results found
+            </h3>
+            <p className="text-gray-500">
+              Try adjusting your search criteria or filter
+            </p>
           </div>
         )}
       </div>
