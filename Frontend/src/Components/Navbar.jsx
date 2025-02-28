@@ -37,6 +37,7 @@ const Navbar = () => {
     dispatch(logout());
     setIsLoggedIn(false);
     setUserData(null);
+    localStorage.clear();
     navigate('/');
   };
 

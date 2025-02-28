@@ -15,6 +15,7 @@ const ModulesPage = () => {
   const thumbnailRefs = useRef({});
 
   // Quiz related states
+  const [completedModules, setCompletedModules] = useState([]);
   const [showQuiz, setShowQuiz] = useState(false);
   const [quizzes, setQuizzes] = useState([]);
   const [quizLoading, setQuizLoading] = useState(false);
@@ -28,7 +29,20 @@ const ModulesPage = () => {
   useEffect(() => {
     fetchCourseAndModules();
     checkQuizCompletion();
+    checkModuleCompletion();
   }, [courseId]);
+
+  const checkModuleCompletion = () => {
+    try {
+      const completedModulesJSON = localStorage.getItem("completedModules");
+      if (completedModulesJSON) {
+        const completed = JSON.parse(completedModulesJSON);
+        setCompletedModules(completed);
+      }
+    } catch (err) {
+      console.error("Error checking module completion status:", err);
+    }
+  };
 
   useEffect(() => {
     modules.forEach((module) => {
@@ -84,8 +98,64 @@ const ModulesPage = () => {
     }
   };
 
-  // Save completed quiz to localStorage
-  const saveQuizCompletion = () => {
+
+  const markModuleAsCompleted = async (moduleId) => {
+    try {
+      // Get current completed modules
+      const completedModulesJSON = localStorage.getItem("completedModules");
+      let completed = [];
+
+      if (completedModulesJSON) {
+        completed = JSON.parse(completedModulesJSON);
+      }
+
+      // Add module if not already included
+      if (!completed.includes(moduleId)) {
+        completed.push(moduleId);
+
+        // Update state
+        setCompletedModules(completed);
+
+        // Save to localStorage
+        localStorage.setItem("completedModules", JSON.stringify(completed));
+
+        // Update user profile via API
+        await updateUserProgress();
+      }
+    } catch (err) {
+      console.error("Error saving module completion:", err);
+    }
+  };
+
+  const updateUserProgress = async () => {
+    try {
+      // Get counts from localStorage
+      const completedQuizzesJSON = localStorage.getItem("completedQuizzes") || "[]";
+      const completedModulesJSON = localStorage.getItem("completedModules") || "[]";
+
+      const quizzes = JSON.parse(completedQuizzesJSON);
+      const modules = JSON.parse(completedModulesJSON);
+
+      // Calculate badge count (can be based on your criteria)
+      // For example, 1 badge for every 5 completed modules + quizzes
+      const totalCompletions = quizzes.length + modules.length;
+      const badges = Math.floor(totalCompletions / 5);
+
+      // Update user profile via API
+      await axios.post(`${BACKEND_URL}/updateUser`, {
+        quizzesCompleted: quizzes.length,
+        modulesCompleted: modules.length,
+        badges: badges
+      });
+
+      console.log("User progress updated successfully");
+    } catch (err) {
+      console.error("Error updating user progress:", err);
+    }
+  };
+
+  // Modified saveQuizCompletion to also update user profile
+  const saveQuizCompletion = async () => {
     try {
       // Get current completed quizzes
       const completedQuizzesJSON = localStorage.getItem("completedQuizzes");
@@ -98,15 +168,18 @@ const ModulesPage = () => {
       // Add current courseId if not already included
       if (!completedQuizzes.includes(courseId)) {
         completedQuizzes.push(courseId);
+
+        // Save back to localStorage
+        localStorage.setItem(
+          "completedQuizzes",
+          JSON.stringify(completedQuizzes)
+        );
+
+        setQuizCompleted(true);
+
+        // Update user profile via API
+        await updateUserProgress();
       }
-
-      // Save back to localStorage
-      localStorage.setItem(
-        "completedQuizzes",
-        JSON.stringify(completedQuizzes)
-      );
-
-      setQuizCompleted(true);
     } catch (err) {
       console.error("Error saving quiz completion:", err);
     }
@@ -169,6 +242,7 @@ const ModulesPage = () => {
   };
 
   const handleViewModule = (moduleId) => {
+    markModuleAsCompleted(moduleId);
     navigate(`/courses/${courseId}/modules/${moduleId}`);
   };
 
@@ -317,8 +391,8 @@ const ModulesPage = () => {
                 <div
                   key={quiz._id || index}
                   className={`bg-gray-800 rounded-lg p-6 border ${userAnswers[index] === quiz.correctAnswer
-                      ? "border-green-400"
-                      : "border-red-400"
+                    ? "border-green-400"
+                    : "border-red-400"
                     }`}
                 >
                   <p className="text-white font-medium mb-4">
@@ -330,10 +404,10 @@ const ModulesPage = () => {
                       <div
                         key={optIdx}
                         className={`p-3 rounded-lg flex items-center gap-2 ${optIdx === quiz.correctAnswer
-                            ? "bg-green-400/20 border border-green-400"
-                            : optIdx === userAnswers[index]
-                              ? "bg-red-400/20 border border-red-400"
-                              : "bg-gray-700"
+                          ? "bg-green-400/20 border border-green-400"
+                          : optIdx === userAnswers[index]
+                            ? "bg-red-400/20 border border-red-400"
+                            : "bg-gray-700"
                           }`}
                       >
                         {optIdx === quiz.correctAnswer && (
@@ -351,10 +425,10 @@ const ModulesPage = () => {
                           )}
                         <span
                           className={`${optIdx === quiz.correctAnswer
-                              ? "text-green-400"
-                              : optIdx === userAnswers[index]
-                                ? "text-red-400"
-                                : "text-gray-300"
+                            ? "text-green-400"
+                            : optIdx === userAnswers[index]
+                              ? "text-red-400"
+                              : "text-gray-300"
                             }`}
                         >
                           {option}
@@ -462,8 +536,8 @@ const ModulesPage = () => {
                 key={optionIndex}
                 onClick={() => handleAnswerSelect(optionIndex)}
                 className={`p-4 rounded-lg cursor-pointer transition-all ${userAnswers[currentQuizIndex] === optionIndex
-                    ? "bg-cyan-500/20 border border-cyan-400"
-                    : "bg-gray-700 hover:bg-gray-600"
+                  ? "bg-cyan-500/20 border border-cyan-400"
+                  : "bg-gray-700 hover:bg-gray-600"
                   }`}
               >
                 <span className="text-gray-200">{option}</span>
@@ -477,8 +551,8 @@ const ModulesPage = () => {
             onClick={handlePrevQuestion}
             disabled={currentQuizIndex === 0}
             className={`px-4 py-2 rounded-lg flex items-center gap-2 ${currentQuizIndex === 0
-                ? "bg-gray-700 text-gray-500 cursor-not-allowed"
-                : "bg-gray-700 text-white hover:bg-gray-600"
+              ? "bg-gray-700 text-gray-500 cursor-not-allowed"
+              : "bg-gray-700 text-white hover:bg-gray-600"
               }`}
           >
             <ArrowLeft size={16} />
@@ -490,8 +564,8 @@ const ModulesPage = () => {
               onClick={handleNextQuestion}
               disabled={userAnswers[currentQuizIndex] === null}
               className={`px-4 py-2 rounded-lg ${userAnswers[currentQuizIndex] === null
-                  ? "bg-gray-700 text-gray-500 cursor-not-allowed"
-                  : "bg-gradient-to-r from-cyan-500 to-blue-500 text-white hover:from-cyan-600 hover:to-blue-600"
+                ? "bg-gray-700 text-gray-500 cursor-not-allowed"
+                : "bg-gradient-to-r from-cyan-500 to-blue-500 text-white hover:from-cyan-600 hover:to-blue-600"
                 }`}
             >
               Next
@@ -503,8 +577,8 @@ const ModulesPage = () => {
                 (answer) => answer === null
               )}
               className={`px-6 py-2 rounded-lg font-medium ${Object.values(userAnswers).some((answer) => answer === null)
-                  ? "bg-gray-700 text-gray-500 cursor-not-allowed"
-                  : "bg-gradient-to-r from-cyan-500 to-blue-500 text-white hover:from-cyan-600 hover:to-blue-600"
+                ? "bg-gray-700 text-gray-500 cursor-not-allowed"
+                : "bg-gradient-to-r from-cyan-500 to-blue-500 text-white hover:from-cyan-600 hover:to-blue-600"
                 }`}
             >
               Submit Quiz
@@ -518,10 +592,10 @@ const ModulesPage = () => {
               <div
                 key={index}
                 className={`w-3 h-3 rounded-full ${index === currentQuizIndex
-                    ? "bg-cyan-400"
-                    : userAnswers[index] !== null
-                      ? "bg-gray-400"
-                      : "bg-gray-700"
+                  ? "bg-cyan-400"
+                  : userAnswers[index] !== null
+                    ? "bg-gray-400"
+                    : "bg-gray-700"
                   }`}
               />
             ))}
@@ -686,6 +760,11 @@ const ModulesPage = () => {
                       >
                         {module.title}
                       </motion.h3>
+                      {completedModules.includes(module._id) && (
+                        <div className="absolute top-4 right-4 p-1 bg-green-500/80 rounded-full">
+                          <Check size={16} className="text-white" />
+                        </div>
+                      )}
                       {/* Updated description with better line-clamp handling */}
                       <motion.div
                         initial={{ opacity: 0 }}
@@ -723,8 +802,8 @@ const ModulesPage = () => {
                   <button
                     onClick={handleQuizButtonClick}
                     className={`px-8 py-4 font-semibold rounded-lg transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg ${quizCompleted
-                        ? "bg-green-600 hover:bg-green-700 text-white hover:shadow-green-500/25 flex items-center gap-2"
-                        : "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white hover:shadow-purple-500/25"
+                      ? "bg-green-600 hover:bg-green-700 text-white hover:shadow-green-500/25 flex items-center gap-2"
+                      : "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white hover:shadow-purple-500/25"
                       }`}
                   >
                     {quizCompleted && <Check size={20} />}

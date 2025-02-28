@@ -27,6 +27,7 @@ import {
 import BlogManage from "../Components/BlogManage";
 import CourseManage from "../Components/CourseManage";
 import axios from "axios"; // Make sure axios is installed
+import Stats from "../Components/Stats";
 
 const Account = () => {
   const [userData, setUserData] = useState([]);
@@ -82,7 +83,7 @@ const Account = () => {
     return modules.map((_, index) => ({
       month:
         monthNames[
-          (currentDate.getMonth() - (modules.length - 1) + index + 12) % 12
+        (currentDate.getMonth() - (modules.length - 1) + index + 12) % 12
         ],
       modules: index + 1, // Cumulative count
     }));
@@ -458,115 +459,16 @@ const Account = () => {
           </div>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8 mb-8">
-          <div className="bg-gray-800 p-6 rounded-xl shadow-lg">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-blue-900 rounded-lg">
-                <BookOpen className="w-6 h-6 text-blue-400" />
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-white">
-                  Modules Completed
-                </h3>
-                <p className="text-3xl font-bold text-blue-400">
-                  {completedModules.length}
-                </p>
-              </div>
-            </div>
-          </div>
+        <Stats />
 
-          <div className="bg-gray-800 p-6 rounded-xl shadow-lg">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-green-900 rounded-lg">
-                <CheckSquare className="w-6 h-6 text-green-400" />
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-white">
-                  Quizzes Given
-                </h3>
-                <p className="text-3xl font-bold text-green-400">
-                  {quizzesGiven}
-                </p>
-              </div>
-            </div>
-          </div>
 
-          <div className="bg-gray-800 p-6 rounded-xl shadow-lg">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-purple-900 rounded-lg">
-                <Award className="w-6 h-6 text-purple-400" />
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-white">Badges</h3>
-                <p className="text-3xl font-bold text-purple-400">{badges}</p>
-              </div>
-            </div>
-          </div>
-        </div>
 
         <BlogManage />
         <CourseManage />
 
-        {/* Charts */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="bg-gray-800 p-6 rounded-xl shadow-lg">
-            <h3 className="text-xl font-semibold mb-4 text-white">
-              Achievement Progress
-            </h3>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={prepareAchievementData()}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                  <XAxis dataKey="name" stroke="#9CA3AF" />
-                  <YAxis stroke="#9CA3AF" allowDecimals={false} />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "#1F2937",
-                      border: "none",
-                    }}
-                    formatter={(value, name) => [
-                      value,
-                      name === "total" ? "Target" : "Completed",
-                    ]}
-                  />
-                  <Bar dataKey="completed" fill="#4F46E5" name="Completed" />
-                  <Bar dataKey="total" fill="#6B7280" name="Target" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
 
-          <div className="bg-gray-800 p-6 rounded-xl shadow-lg">
-            <h3 className="text-xl font-semibold mb-4 text-white">
-              Learning Progress
-            </h3>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={progressData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                  <XAxis dataKey="month" stroke="#9CA3AF" />
-                  <YAxis
-                    stroke="#9CA3AF"
-                    domain={[0, (dataMax) => Math.max(dataMax || 1, 1)]} // Handle empty data
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "#1F2937",
-                      border: "none",
-                    }}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="modules"
-                    stroke="#10B981"
-                    strokeWidth={2}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        </div>
+
+
 
         {/* Certifications Section */}
         <div className="mt-8 bg-gray-800 p-6 rounded-xl shadow-lg">

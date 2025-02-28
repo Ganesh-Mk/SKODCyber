@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import {
   Trophy,
   BookOpen,
@@ -9,138 +11,105 @@ import {
   Instagram,
   ExternalLink,
   ChevronLeft,
-  Send
+  Send,
+  Mail,
+  UserPlus,
+  Check,
+  Pencil
 } from 'lucide-react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { AllUsers } from '../Data/AllUsers';
 
 const UserProfilePage = () => {
   const { userId } = useParams();
   const navigate = useNavigate();
-  const user = AllUsers.find(u => u.id === parseInt(userId, 10));
+
+  const [user, setUser] = useState(null);
+  const [blogs, setBlogs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
+  const [message, setMessage] = useState('');
+  const [activeTab, setActiveTab] = useState('blogs');
+
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+
+  useEffect(() => {
+    const fetchUserAndBlogs = async () => {
+      try {
+        setLoading(true);
+
+        // Fetch user data
+        const userResponse = await axios.get(`${BACKEND_URL}/allUser`);
+        const users = userResponse.data;
+        const foundUser = users.find(u => u._id === userId);
+
+        if (!foundUser) {
+          setError("User not found");
+          setLoading(false);
+          return;
+        }
+
+        setUser(foundUser);
+
+        // Fetch user's blogs
+        const blogsResponse = await axios.get(`${BACKEND_URL}/authorBlogs/${userId}`);
+        setBlogs(blogsResponse.data);
+
+      } catch (err) {
+        console.error("Error fetching data:", err);
+        setError(err.message || "Failed to load user data");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserAndBlogs();
+  }, [userId, BACKEND_URL]);
 
   const handleConnect = () => {
     setIsConnected(!isConnected);
+    // Here you would typically call an API to update the connection status
   };
 
-  const handleSendMessage = (message) => {
-    console.log('Sending message:', message);
-    setIsDialogOpen(false);
+  const handleMessageOpen = () => {
+    setIsMessageModalOpen(true);
   };
 
-  // Custom Dialog Component
-  const MessageDialog = ({ isOpen, onClose, onSend }) => {
-    const [messageText, setMessageText] = useState('');
+  const handleMessageClose = () => {
+    setIsMessageModalOpen(false);
+    setMessage('');
+  };
 
-    if (!isOpen) return null;
+  const handleMessageSend = () => {
+    // Here you would typically send the message via an API
+    console.log(`Sending message to ${user.name}: ${message}`);
+    handleMessageClose();
+    // Show a success notification or feedback
+  };
 
-    const handleSubmit = () => {
-      onSend(messageText);
-      setMessageText('');
-    };
+  const formatDate = (dateString) => {
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  };
 
+  if (loading) {
     return (
-      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-        <div className="bg-gray-800 rounded-xl p-6 w-full max-w-md mx-4">
-          <div className="mb-4">
-            <h2 className="text-xl font-semibold text-white">Send Message</h2>
-            <p className="text-gray-400">Send a message to {user.name}</p>
-          </div>
-          <textarea
-            value={messageText}
-            onChange={(e) => setMessageText(e.target.value)}
-            placeholder="Type your message here..."
-            className="w-full h-32 p-3 bg-gray-700 rounded-lg text-white placeholder-gray-400 
-                     resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <div className="flex justify-end gap-3 mt-4">
-            <button
-              onClick={onClose}
-              className="px-4 py-2 rounded-lg bg-gray-700 text-white hover:bg-gray-600 
-                       transition-colors duration-300"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleSubmit}
-              disabled={!messageText.trim()}
-              className="px-4 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 
-                       transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed
-                       flex items-center gap-2"
-            >
-              <Send className="w-4 h-4" />
-              Send Message
-            </button>
-          </div>
-        </div>
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-600"></div>
       </div>
     );
-  };
+  }
 
-  // Stats cards data
-  const statsCards = [
-    {
-      icon: <BookOpen className="w-8 h-8 mx-auto mb-3 text-blue-400" />,
-      value: user?.modulesCompleted || 0,
-      label: "Modules Completed",
-      color: "text-blue-400"
-    },
-    {
-      icon: <Trophy className="w-8 h-8 mx-auto mb-3 text-yellow-400" />,
-      value: user?.quizzesCompleted || 0,
-      label: "Quizzes Completed",
-      color: "text-yellow-400"
-    },
-    {
-      icon: <Award className="w-8 h-8 mx-auto mb-3 text-purple-400" />,
-      value: user?.badges || 0,
-      label: "Badges Earned",
-      color: "text-purple-400"
-    }
-  ];
-
-  // Social links data
-  const socialLinks = [
-    {
-      icon: <Github className="w-6 h-6" />,
-      name: "Github",
-      url: user?.socialLinks.github,
-      color: "text-white"
-    },
-    {
-      icon: <Twitter className="w-6 h-6" />,
-      name: "Twitter",
-      url: user?.socialLinks.twitter,
-      color: "text-blue-400"
-    },
-    {
-      icon: <Linkedin className="w-6 h-6" />,
-      name: "LinkedIn",
-      url: user?.socialLinks.linkedin,
-      color: "text-blue-600"
-    },
-    {
-      icon: <Instagram className="w-6 h-6" />,
-      name: "Instagram",
-      url: user?.socialLinks.instagram,
-      color: "text-pink-500"
-    }
-  ];
-
-  if (!user) {
+  if (error) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] text-white flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-400">User not found</h2>
-          <p className="text-gray-500 mt-2">The user you're looking for doesn't exist.</p>
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="text-white bg-red-600 p-6 rounded-lg shadow-lg max-w-md">
+          <h2 className="text-xl font-bold mb-2">Error</h2>
+          <p>{error}</p>
           <button
+            className="mt-4 px-4 py-2 bg-white text-red-600 rounded hover:bg-gray-100"
             onClick={() => navigate(-1)}
-            className="mt-6 px-6 py-3 bg-gray-800 rounded-xl hover:bg-gray-700 
-                     transition-colors duration-300 flex items-center gap-2"
           >
-            <ChevronLeft className="w-5 h-5" />
             Go Back
           </button>
         </div>
@@ -148,181 +117,341 @@ const UserProfilePage = () => {
     );
   }
 
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center text-white">
+        <p>User not found</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white">
-      {/* Back Button */}
-      <button
-        onClick={() => navigate(-1)}
-        className="fixed top-24 left-4 md:left-8 px-4 py-2 bg-gray-800/90 rounded-xl hover:bg-gray-700 
-                 transition-colors duration-300 flex items-center gap-2 backdrop-blur-sm z-10"
-      >
-        <ChevronLeft className="w-5 h-5" />
-        Back
-      </button>
+    <div className="min-h-screen bg-gray-900 text-white">
+      {/* Header with back button */}
+      <div className="bg-blue-900 shadow-lg">
+        <div className="container mx-auto px-4 py-3 flex items-center">
+          <button
+            className="mr-4 flex items-center text-white hover:text-blue-300 transition"
+            onClick={() => navigate(-1)}
+          >
+            <ChevronLeft size={20} />
+            <span className="ml-1">Back</span>
+          </button>
+          <h1 className="text-xl font-semibold">Profile</h1>
+        </div>
+      </div>
 
       {/* Profile Header */}
-      <div className="relative">
-        {/* Background Pattern */}
-        <div className="h-64 w-full bg-gradient-to-r from-blue-600 to-purple-600 opacity-20">
-          <div className="w-full h-full" style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-          }} />
-        </div>
+      <div className="m-10 py-8">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
+            {/* Profile Image */}
+            <div className="flex-shrink-0">
+              <img
+                src={user.image}
+                alt={`${user.name}'s profile`}
+                className="w-32 h-32 rounded-full object-cover border-4 border-blue-600 shadow-lg"
+              />
+            </div>
 
-        {/* Profile Image and Action Buttons */}
-        <div className="absolute -bottom-20 left-1/2 transform -translate-x-1/2">
-          <div className="relative">
-            <img
-              src={user.profileImage}
-              alt={user.name}
-              className="w-40 h-40 rounded-2xl object-cover border-4 border-gray-900 
-                       shadow-[0_0_15px_rgba(0,0,0,0.5)]"
-            />
-            <div className="absolute -bottom-2 -right-2 w-6 h-6 bg-green-500 rounded-full 
-                         border-4 border-gray-900"></div>
+            {/* User Info */}
+            <div className="flex-grow text-center md:text-left">
+              <h1 className="text-3xl font-bold">{user.name}</h1>
+              <p className="text-blue-200 mt-1 capitalize">{user.role}</p>
+              <p className="mt-2 max-w-2xl">{user.about || "No description available"}</p>
+
+              {/* Stats */}
+              <div className="mt-4 flex flex-wrap justify-center md:justify-start gap-4">
+                <div className="flex items-center">
+                  <Trophy size={18} className="text-yellow-400 mr-2" />
+                  <span><strong>{user.badges}</strong> Badges</span>
+                </div>
+                <div className="flex items-center">
+                  <BookOpen size={18} className="text-green-400 mr-2" />
+                  <span><strong>{user.modulesCompleted}</strong> Modules</span>
+                </div>
+                <div className="flex items-center">
+                  <Award size={18} className="text-purple-400 mr-2" />
+                  <span><strong>{user.quizzesCompleted}</strong> Quizzes</span>
+                </div>
+              </div>
+
+              {/* Member since */}
+              <p className="text-sm text-blue-300 mt-2">
+                Member since {formatDate(user.createdAt)}
+              </p>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex flex-col gap-3 mt-4 md:mt-0">
+              <button
+                onClick={handleConnect}
+                className={`px-4 py-2 rounded-lg flex items-center justify-center ${isConnected
+                  ? 'bg-green-600 hover:bg-green-700'
+                  : 'bg-blue-600 hover:bg-blue-700'
+                  } transition`}
+              >
+                {isConnected ? (
+                  <>
+                    <Check size={18} className="mr-2" />
+                    <span>Connected</span>
+                  </>
+                ) : (
+                  <>
+                    <UserPlus size={18} className="mr-2" />
+                    <span>Connect</span>
+                  </>
+                )}
+              </button>
+
+              <button
+                onClick={handleMessageOpen}
+                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg flex items-center justify-center transition"
+              >
+                <Mail size={18} className="mr-2" />
+                <span>Message</span>
+              </button>
+            </div>
           </div>
+        </div>
+        <div className="  mt-10">
+          <div className="container mx-auto px-4">
+            <div className="flex justify-center md:justify-start flex-wrap gap-6">
+              {user.social?.github && (
+                <a
+                  href={`https://github.com/${user.social.github}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center text-blue-300 hover:text-white transition"
+                >
+                  <Github size={20} className="mr-2" />
+                  <span>{user.social.github}</span>
+                </a>
+              )}
 
-          {/* Action Buttons */}
-          <div className="flex justify-center gap-4 mt-6">
-            <button
-              onClick={handleConnect}
-              className={`px-6 py-2 rounded-lg transition-colors duration-300 
-                       ${isConnected
-                  ? 'bg-gray-700 text-white hover:bg-gray-600'
-                  : 'bg-blue-500 text-white hover:bg-blue-600'}`}
-            >
-              {isConnected ? 'Connected' : 'Connect'}
-            </button>
+              {user.social?.twitter && (
+                <a
+                  href={`https://twitter.com/${user.social.twitter}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center text-blue-300 hover:text-white transition"
+                >
+                  <Twitter size={20} className="mr-2" />
+                  <span>{user.social.twitter}</span>
+                </a>
+              )}
 
-            <button
-              onClick={() => setIsDialogOpen(true)}
-              className="px-6 py-2 rounded-lg border border-gray-600 text-white 
-                       hover:bg-gray-800 transition-colors duration-300"
-            >
-              Message
-            </button>
+              {user.social?.linkedin && (
+                <a
+                  href={`https://linkedin.com/in/${user.social.linkedin}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center text-blue-300 hover:text-white transition"
+                >
+                  <Linkedin size={20} className="mr-2" />
+                  <span>{user.social.linkedin}</span>
+                </a>
+              )}
+
+              {user.social?.instagram && (
+                <a
+                  href={`https://instagram.com/${user.social.instagram}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center text-blue-300 hover:text-white transition"
+                >
+                  <Instagram size={20} className="mr-2" />
+                  <span>{user.social.instagram}</span>
+                </a>
+              )}
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Message Dialog */}
-      <MessageDialog
-        isOpen={isDialogOpen}
-        onClose={() => setIsDialogOpen(false)}
-        onSend={handleSendMessage}
-      />
+      {/* Social Links */}
 
-      {/* Main Content */}
-      <div className="max-w-6xl mx-auto px-4 mt-28">
-        {/* User Info */}
-        <div className="text-center mb-16">
-          <h1 className="text-4xl font-bold text-white mb-3">{user.name}</h1>
-          <p className="text-blue-400 text-lg">{user.email}</p>
+
+      {/* Content Tabs */}
+      <div className="container mx-auto px-4 py-6">
+        {/* Tab Navigation */}
+        <div className="flex border-b border-blue-700 mb-6">
+          <button
+            className={`px-6 py-3 font-medium ${activeTab === 'blogs'
+              ? 'border-b-2 border-blue-500 text-blue-500'
+              : 'text-blue-300 hover:text-white'
+              }`}
+            onClick={() => setActiveTab('blogs')}
+          >
+            Blogs
+          </button>
+          <button
+            className={`px-6 py-3 font-medium ${activeTab === 'courses'
+              ? 'border-b-2 border-blue-500 text-blue-500'
+              : 'text-blue-300 hover:text-white'
+              }`}
+            onClick={() => setActiveTab('courses')}
+          >
+            Courses
+          </button>
+          <button
+            className={`px-6 py-3 font-medium ${activeTab === 'about'
+              ? 'border-b-2 border-blue-500 text-blue-500'
+              : 'text-blue-300 hover:text-white'
+              }`}
+            onClick={() => setActiveTab('about')}
+          >
+            About
+          </button>
         </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          {statsCards.map((stat, index) => (
-            <div
-              key={index}
-              className="bg-gray-800/50 rounded-xl p-6 text-center transform hover:scale-105 
-                      transition-all duration-300 hover:bg-gray-800"
-            >
-              {stat.icon}
-              <div className={`text-3xl font-bold ${stat.color} mb-2`}>
-                {stat.value}
-              </div>
-              <div className="text-gray-400">{stat.label}</div>
-            </div>
-          ))}
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* About Section */}
-            <div className="bg-gray-800/30 rounded-xl p-8">
-              <h2 className="text-2xl font-semibold text-white mb-4">About</h2>
-              <p className="text-gray-400 leading-relaxed">{user.about}</p>
+        {/* Blogs Tab */}
+        {activeTab === 'blogs' && (
+          <div>
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold">Blogs</h2>
+              <span className="text-blue-400">{blogs.length} Posts</span>
             </div>
 
-            {/* Blogs Section */}
-            <div className="bg-gray-800/30 rounded-xl p-8">
-              <h2 className="text-2xl font-semibold text-white mb-6">Latest Blogs</h2>
-              <div className="space-y-6">
-                {user.allBlogs.map((blog, index) => (
-                  <div
-                    key={index}
-                    className="group bg-gray-800/50 rounded-xl overflow-hidden hover:bg-gray-800/80 
-                             transition-all duration-300"
+            {blogs.length === 0 ? (
+              <div className="bg-blue-950 rounded-lg p-8 text-center">
+                <p className="text-blue-300 mb-3">No blogs published yet</p>
+                {user._id === localStorage.getItem('userId') && (
+                  <button
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg flex items-center mx-auto"
+                    onClick={() => navigate('/create-blog')}
                   >
-                    {blog.imageUrl && (
-                      <img
-                        src={blog.imageUrl}
-                        alt={blog.title}
-                        className="w-full h-48 object-cover"
-                      />
-                    )}
-                    <div className="p-6">
-                      <h3 className="text-xl font-medium text-white group-hover:text-blue-400 
-                                 transition-colors duration-300 mb-2">
+                    <Pencil size={18} className="mr-2" />
+                    <span>Write your first blog</span>
+                  </button>
+                )}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {blogs.map((blog) => (
+                  <div
+                    key={blog._id}
+                    className="bg-blue-950/10 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition transform hover:-translate-y-1"
+                  >
+                    <img
+                      src={blog.image}
+                      alt={blog.title}
+                      className="w-full h-48 object-cover"
+                    />
+                    <div className="p-4">
+                      <h3 className="text-lg font-bold line-clamp-2 mb-2">
                         {blog.title}
                       </h3>
-                      <p className="text-gray-400 line-clamp-3">{blog.description}</p>
-                      <button className="mt-4 text-blue-400 hover:text-blue-300 transition-colors duration-300">
-                        Read more →
+                      <p className="text-blue-300 text-sm mb-3">
+                        {formatDate(blog.createdAt)}
+                      </p>
+                      <p className="text-gray-300 line-clamp-3 mb-4">
+                        {blog.description}
+                      </p>
+                      <button
+                        className="text-blue-400 hover:text-blue-300 flex items-center"
+                        onClick={() => navigate(`/blog/${blog._id}`)}
+                      >
+                        <span>Read more</span>
+                        <ExternalLink size={16} className="ml-1" />
                       </button>
                     </div>
                   </div>
                 ))}
               </div>
+            )}
+          </div>
+        )}
+
+        {/* Courses Tab */}
+        {activeTab === 'courses' && (
+          <div>
+            <h2 className="text-2xl font-bold mb-6">Courses</h2>
+            {user.courses && user.courses.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {/* Course items would go here */}
+                <p className="text-blue-300 col-span-full">Courses will be displayed here</p>
+              </div>
+            ) : (
+              <div className="bg-blue-950 rounded-lg p-8 text-center">
+                <p className="text-blue-300">No courses enrolled yet</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* About Tab */}
+        {activeTab === 'about' && (
+          <div className=" rounded-lg p-6">
+            <h2 className="text-2xl font-bold mb-4">About {user.name}</h2>
+            <p className="mb-6">{user.about || "No detailed description available"}</p>
+
+            <h3 className="text-xl font-semibold mb-3">Contact Information</h3>
+            <p className="flex items-center mb-3">
+              <Mail size={18} className="mr-2 text-blue-400" />
+              <span>{user.email}</span>
+            </p>
+
+            <h3 className="text-xl font-semibold mb-3 mt-6">Account Details</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <p className="text-blue-300 text-sm">Joined on</p>
+                <p>{formatDate(user.createdAt)}</p>
+              </div>
+              <div>
+                <p className="text-blue-300 text-sm">Last updated</p>
+                <p>{formatDate(user.updatedAt)}</p>
+              </div>
+              <div>
+                <p className="text-blue-300 text-sm">Role</p>
+                <p className="capitalize">{user.role}</p>
+              </div>
+              <div>
+                <p className="text-blue-300 text-sm">Progress</p>
+                <p>{user.modulesCompleted} modules completed</p>
+              </div>
             </div>
           </div>
+        )}
+      </div>
 
-          {/* Right Column */}
-          <div className="space-y-6">
-            {/* Skills Section */}
-            <div className="bg-gray-800/30 rounded-xl p-8">
-              <h2 className="text-2xl font-semibold text-white mb-4">Skills</h2>
-              <div className="flex flex-wrap gap-2">
-                {user.skills.map((skill, index) => (
-                  <span
-                    key={index}
-                    className="px-4 py-2 bg-blue-500/10 text-blue-400 rounded-lg border border-blue-500/20
-                           hover:bg-blue-500/20 transition-colors duration-300"
-                  >
-                    {skill}
-                  </span>
-                ))}
-              </div>
-            </div>
+      {/* Message Modal */}
+      {isMessageModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+          <div className="bg-blue-950 rounded-lg shadow-xl max-w-md w-full p-6">
+            <h2 className="text-xl font-bold mb-4">Send Message to {user.name}</h2>
 
-            {/* Social Links */}
-            <div className="bg-gray-800/30 rounded-xl p-8">
-              <h2 className="text-2xl font-semibold text-white mb-4">Connect</h2>
-              <div className="space-y-3">
-                {socialLinks.map((social, index) => (
-                  <a
-                    key={index}
-                    href={social.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-3 px-6 py-3 bg-gray-800/50 rounded-xl hover:bg-gray-800 
-                             transition-colors duration-300 text-gray-400 hover:text-white w-full group"
-                  >
-                    <span className={social.color}>{social.icon}</span>
-                    <span>{social.name}</span>
-                    <ExternalLink className="w-4 h-4 ml-auto opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  </a>
-                ))}
-              </div>
+            <textarea
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              placeholder="Type your message here..."
+              className="w-full rounded-lg bg-blue-900/20 border border-blue-700 p-3 text-white placeholder-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-600 min-h-32 mb-4"
+            ></textarea>
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={handleMessageClose}
+                className="px-4 py-2 bg-blue-800 hover:bg-blue-700 rounded-lg transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleMessageSend}
+                disabled={!message.trim()}
+                className={`px-4 py-2 rounded-lg flex items-center ${message.trim()
+                    ? 'bg-blue-600 hover:bg-blue-700'
+                    : 'bg-blue-800 opacity-50 cursor-not-allowed'
+                  } transition`}
+              >
+                <Send size={18} className="mr-2" />
+                <span>Send</span>
+              </button>
             </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
-
 };
 
 export default UserProfilePage;

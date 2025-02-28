@@ -17,6 +17,7 @@ const MyCourses = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [fetchLoading, setFetchLoading] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [updateFormData, setUpdateFormData] = useState({
     title: '',
@@ -35,12 +36,14 @@ const MyCourses = () => {
   const fetchCourses = async () => {
     try {
       setLoading(true);
+      setFetchLoading(true);
       const response = await axios.get(`${BACKEND_URL}/allCourse`);
       const adminCourses = response.data.filter(course => course.role === 'admin');
       setCourses(adminCourses);
     } catch (error) {
       console.error('Error fetching courses:', error);
     } finally {
+      setFetchLoading(false);
       setLoading(false);
     }
   };
@@ -121,6 +124,16 @@ const MyCourses = () => {
   const navigateToModules = (courseId) => {
     navigate(`/my-course-module/${courseId}`);
   };
+
+
+  if (fetchLoading) {
+    return (
+      <div className="flex justify-center flex-col items-center h-screen">
+        <div className="animate-spin rounded-full h-10 w-10 border-t-4 border-blue-500"></div>
+        <p className="text-gray-400 text-md ml-4">Loading...</p>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gray-900 pt-16 md:pt-0">
