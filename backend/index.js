@@ -32,6 +32,7 @@ const deleteUser = require("./routes/deleteUser");
 const getAllUser = require("./routes/getAllUser");
 const updateUser = require("./routes/updateUser");
 const getSingleuser = require("./routes/getSingleUser");
+const updatePassword = require("./routes/updatePassword");
 
 const createBlog = require("./routes/createBlog");
 const deleteBlog = require("./routes/deleteBlog");
@@ -62,6 +63,7 @@ app.use(deleteUser);
 app.use(getAllUser);
 app.use(updateUser);
 app.use(getSingleuser);
+app.use(updatePassword);
 
 // Blog
 app.use(createBlog);
