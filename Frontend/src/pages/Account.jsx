@@ -78,9 +78,13 @@ const Account = () => {
       "Dec",
     ];
 
-    return modules.map((moduleId, index) => ({
-      month: monthNames[currentDate.getMonth() - (modules.length - 1) + index],
-      modules: moduleId,
+    // Calculate cumulative count of modules per month
+    return modules.map((_, index) => ({
+      month:
+        monthNames[
+          (currentDate.getMonth() - (modules.length - 1) + index + 12) % 12
+        ],
+      modules: index + 1, // Cumulative count
     }));
   };
 
@@ -544,12 +548,7 @@ const Account = () => {
                   <XAxis dataKey="month" stroke="#9CA3AF" />
                   <YAxis
                     stroke="#9CA3AF"
-                    domain={[
-                      0,
-                      Math.max(
-                        ...(completedModules.length ? completedModules : [1])
-                      ) + 1,
-                    ]}
+                    domain={[0, (dataMax) => Math.max(dataMax || 1, 1)]} // Handle empty data
                   />
                   <Tooltip
                     contentStyle={{
