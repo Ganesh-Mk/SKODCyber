@@ -28,7 +28,7 @@ const BlogManage = () => {
       const response = await axios.get(`${BACKEND_URL}/authorBlogs/${userId}`);
       setBlogs(response.data);
       setError(null);
-    } catch (err) {
+    } catch (err) { 
       setError("Failed to fetch blogs. Please try again later.");
       console.error("Error fetching blogs:", err);
     }

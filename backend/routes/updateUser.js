@@ -7,7 +7,7 @@ const uploadImage = require('../utils/uploadImage');
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-router.put('/updateUser', upload.single('profileImage'), async (req, res) => {
+router.post('/updateUser', upload.single('profileImage'), async (req, res) => {
   try {
     const { userId, name, email, about, social, modulesCompleted, quizzesCompleted, badges } = req.body;
 
@@ -68,4 +68,4 @@ router.put('/updateUser', upload.single('profileImage'), async (req, res) => {
   }
 });
 
-module.exports = router;
+module.exports = router;
