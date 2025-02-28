@@ -178,7 +178,7 @@ const Stats = () => {
   const achievementData = [
     { name: "Modules", completed: completedModules.length, total: 15 },
     { name: "Quizzes", completed: parseInt(quizzesGiven), total: 20 },
-    { name: "Badges", completed: parseInt(badges.length), total: 10 }
+    { name: "Badges", completed: badges || 0, total: 10 }
   ];
 
   // Custom tooltip for charts

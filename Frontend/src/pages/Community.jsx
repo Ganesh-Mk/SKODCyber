@@ -146,26 +146,28 @@ const CommunityPage = () => {
                 </div>
               )}
               <div className="p-6">
-                <div className="flex items-center space-x-4 mb-4">
-                  <div className="relative">
-                    <img
-                      src={blog.author?.profileImage || '/default-avatar.png'}
-                      alt={blog.author?.name || 'Author'}
-                      className="w-10 h-10 rounded-full object-cover border-2 border-transparent 
+                <Link to={`/user/${blog.userId}`} className="group-hover:text-blue-400 transition-colors duration-300">
+                  <div className="flex items-center space-x-4 mb-4">
+                    <div className="relative">
+                      <img
+                        src={blog.author?.profileImage || '/default-avatar.png'}
+                        alt={blog.author?.name || 'Author'}
+                        className="w-10 h-10 rounded-full object-cover border-2 border-transparent 
                                group-hover:border-blue-500 transition-all duration-300 cursor-pointer"
-                    />
-                    <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full 
+                      />
+                      <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full 
                                 border-2 border-gray-800"></div>
-                  </div>
-                  <div>
-                    <h3 className="font-medium text-white cursor-pointer hover:text-blue-400 transition-colors duration-300">
-                      {blog.userName || 'Anonymous'}
-                    </h3>
-                    <div className="text-xs text-blue-400">
-                      {new Date(blog.createdAt).toLocaleDateString()}
+                    </div>
+                    <div>
+                      <h3 className="font-medium text-white cursor-pointer hover:text-blue-400 transition-colors duration-300">
+                        {blog.userName || 'Anonymous'}
+                      </h3>
+                      <div className="text-xs text-blue-400">
+                        {new Date(blog.createdAt).toLocaleDateString()}
+                      </div>
                     </div>
                   </div>
-                </div>
+                </Link>
                 <h2 className="text-xl font-semibold text-white mb-3 group-hover:text-blue-400 
                             transition-colors duration-300">
                   {blog.title}
