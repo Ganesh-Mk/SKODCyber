@@ -125,6 +125,7 @@ const MyCourses = () => {
     navigate(`/my-course-module/${courseId}`);
   };
 
+
   if (fetchLoading) {
     return (
       <div className="flex justify-center flex-col items-center h-screen">
