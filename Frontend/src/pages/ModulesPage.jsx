@@ -359,7 +359,7 @@ const ModulesPage = () => {
 
     if (quizSubmitted) {
       return (
-        <div className="py-8">
+        <div className="py-8 w-full">
           <div className="text-center mb-8">
             <h3 className="text-2xl font-bold text-white mb-2">Quiz Results</h3>
             <div className="inline-block bg-gray-800 rounded-full px-6 py-3 mb-4">
@@ -384,7 +384,7 @@ const ModulesPage = () => {
             )}
           </div>
 
-          <div className="space-y-6">
+          <div className="space-y-6 w-full">
             {quizzes.map((quiz, index) => {
               const options = Array.isArray(quiz.options) ? quiz.options : [];
 
@@ -681,7 +681,7 @@ const ModulesPage = () => {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="border-b border-gray-800 pb-6"
+              className="bg-gray-800/90 backdrop-blur-sm rounded-xl overflow-hidden border border-gray-700/50 p-6"
             >
               <div className="flex items-center space-x-4">
                 <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
@@ -821,7 +821,7 @@ const ModulesPage = () => {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-gray-800/90 backdrop-blur-sm rounded-xl overflow-hidden border border-gray-700/50 p-6"
+              className="bg-gray-800/90 backdrop-blur-sm rounded-xl overflow-hidden border border-gray-700/50 p-6 w-[60vw] mx-auto"
             >
               {renderQuiz()}
             </motion.div>

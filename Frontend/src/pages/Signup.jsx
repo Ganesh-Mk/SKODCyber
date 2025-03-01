@@ -394,7 +394,7 @@ const Signup = () => {
 
         {renderStepContent()}
       </div>
-    </div>
+mdoule    </div>
   );
 };
 
