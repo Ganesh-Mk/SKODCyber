@@ -1,16 +1,5 @@
 import React, { useState, useEffect } from "react";
 import {
-  BarChart,
-  CartesianGrid,
-  XAxis,
-  YAxis,
-  Tooltip,
-  Bar,
-  ResponsiveContainer,
-  LineChart,
-  Line,
-} from "recharts";
-import {
   Camera,
   Github,
   Instagram,
@@ -28,6 +17,7 @@ import BlogManage from "../Components/BlogManage";
 import CourseManage from "../Components/CourseManage";
 import axios from "axios"; // Make sure axios is installed
 import Stats from "../Components/Stats";
+import Certifications from "../Components/Certifications";
 
 const Account = () => {
   const [userData, setUserData] = useState([]);
@@ -261,43 +251,6 @@ const Account = () => {
     }
   };
 
-  const handleAddCertification = () => {
-    const updatedCertifications = [
-      ...(userData.certifications || []),
-      { ...newCertification, id: Date.now() },
-    ];
-
-    const updatedUserData = {
-      ...userData,
-      certifications: updatedCertifications,
-    };
-
-    setUserData(updatedUserData);
-    localStorage.setItem("userData", JSON.stringify(updatedUserData));
-
-    setNewCertification({
-      name: "",
-      issuer: "",
-      date: "",
-      expiry: "",
-      credentialId: "",
-    });
-    setIsAddCertModalOpen(false);
-  };
-
-  const handleRemoveCertification = (id) => {
-    const updatedCertifications = (userData.certifications || []).filter(
-      (cert) => cert.id !== id
-    );
-
-    const updatedUserData = {
-      ...userData,
-      certifications: updatedCertifications,
-    };
-
-    setUserData(updatedUserData);
-    localStorage.setItem("userData", JSON.stringify(updatedUserData));
-  };
 
   // Helper function to prepend http:// if missing from URL
   const formatUrl = (url) => {
@@ -465,55 +418,8 @@ const Account = () => {
 
         <BlogManage />
         <CourseManage />
+        <Certifications />
 
-
-
-
-
-        {/* Certifications Section */}
-        <div className="mt-8 bg-gray-800 p-6 rounded-xl shadow-lg">
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-xl font-semibold text-white">Certifications</h3>
-            <button
-              onClick={() => setIsAddCertModalOpen(true)}
-              className="px-4 py-2 bg-indigo-600 text-white rounded-lg flex items-center gap-2 hover:bg-indigo-700 transition-colors duration-300"
-            >
-              <Plus className="w-4 h-4" />
-              Add Certification
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {(userData.certifications || []).map((cert) => (
-              <div
-                key={cert.id}
-                className="bg-gray-700 p-4 rounded-lg space-y-2"
-              >
-                <div className="flex justify-between items-start">
-                  <h4 className="text-lg font-semibold text-white">
-                    {cert.name}
-                  </h4>
-                  <button
-                    onClick={() => handleRemoveCertification(cert.id)}
-                    className="text-gray-400 hover:text-red-400"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-                <p className="text-gray-300">Issuer: {cert.issuer}</p>
-                <p className="text-gray-300">Issued: {cert.date}</p>
-                {cert.expiry && (
-                  <p className="text-gray-300">Expires: {cert.expiry}</p>
-                )}
-                {cert.credentialId && (
-                  <p className="text-gray-300">
-                    Credential ID: {cert.credentialId}
-                  </p>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
 
         {/* Add Certification Modal */}
         {isAddCertModalOpen && (

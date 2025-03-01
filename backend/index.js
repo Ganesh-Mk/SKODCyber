@@ -43,6 +43,7 @@ const createCourse = require("./routes/createCourse");
 const deleteCourse = require("./routes/deleteCourse");
 const getAllCourse = require("./routes/getAllCourse");
 const updateCourse = require("./routes/updateCourse");
+const getCourses = require("./routes/getCourses");
 
 const createModule = require('./routes/createModule');
 const updateModule = require('./routes/updateModule');
@@ -79,6 +80,7 @@ app.use(getAllCourse);
 app.use(updateCourse);
 app.use(getUserCourses);
 app.use(getSingleCourse);
+app.use(getCourses);
 
 // Module
 app.use(createModule);
