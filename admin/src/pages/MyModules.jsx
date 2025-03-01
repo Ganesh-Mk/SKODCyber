@@ -8,7 +8,6 @@ import CreateModuleModal from '../components/CreateModuleModal';
 
 const MyModules = () => {
   const { courseId } = useParams();
-  const userId = "67a46dbd9e1c926f5f5210e5";
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
   const [modules, setModules] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -24,6 +23,7 @@ const MyModules = () => {
 
   useEffect(() => {
     fetchModules();
+    console.log("My Modules, courseId:", courseId);
   }, [courseId]);
 
   const fetchModules = async () => {

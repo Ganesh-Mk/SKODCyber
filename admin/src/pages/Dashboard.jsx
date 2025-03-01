@@ -15,6 +15,11 @@ const Dashboard = () => {
   ];
 
   useEffect(() => {
+    // Check if we're already on a nested route that we don't want to redirect from
+    if (location.pathname.includes('/my-course-module/')) {
+      return; // Skip the redirect for module routes
+    }
+
     const isOnValidPath = menuItems.some(item => item.path === location.pathname);
     if (!isOnValidPath) {
       navigate('/courses');

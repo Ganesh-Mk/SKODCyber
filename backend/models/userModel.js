@@ -24,7 +24,7 @@ const userSchema = new mongoose.Schema({
   },
   about: {
     type: String,
-    default: "Edit your description"
+    default: ""
   },
   image: {
     type: String,

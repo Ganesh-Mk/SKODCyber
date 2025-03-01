@@ -122,6 +122,8 @@ const MyCourses = () => {
   };
 
   const navigateToModules = (courseId) => {
+    console.log("Navigating to modules for course ID:", courseId);
+    // Use the full path that includes the parent route
     navigate(`/my-course-module/${courseId}`);
   };
 
