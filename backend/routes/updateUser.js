@@ -9,7 +9,7 @@ const upload = multer({ storage });
 
 router.post('/updateUser', upload.single('profileImage'), async (req, res) => {
   try {
-    const { userId, name, email, about, social, modulesCompleted, quizzesCompleted, badges } = req.body;
+    const { userId, name, email, about, social, modulesCompleted, quizzesCompleted, badges, connectionUserId } = req.body;
 
     if (!userId) {
       return res.status(400).json({ message: 'User ID is required' });
@@ -26,6 +26,15 @@ router.post('/updateUser', upload.single('profileImage'), async (req, res) => {
     if (name) updateData.name = name;
     if (email) updateData.email = email;
     if (about) updateData.about = about;
+
+    if (connectionUserId) {
+      if (!user.connections.includes(connectionUserId)) {
+        console.log("user.connections.includes(connectionUserId): ", user.connections.includes(connectionUserId))
+        user.connections.push(connectionUserId);
+        await user.save();
+        console.log("user.connections: ", user.connections)
+      }
+    }
 
     // Handle social media links if provided
     if (social) {
@@ -68,4 +77,4 @@ router.post('/updateUser', upload.single('profileImage'), async (req, res) => {
   }
 });
 
-module.exports = router;
+module.exports = router;

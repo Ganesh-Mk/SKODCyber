@@ -55,6 +55,10 @@ const userSchema = new mongoose.Schema({
   courses: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Course'
+  }],
+  connections: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
   }]
 }, {
   timestamps: true

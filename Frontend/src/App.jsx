@@ -18,6 +18,7 @@ import BlogDetailPage from "./pages/BlogDetailPage";
 import ModulesPage from "./pages/ModulesPage";
 import CourseModules from "./Components/CourseModulesManage";
 import ModuleContentPage from "./Components/ModuleContentPage";
+import Chatting from "./pages/Chatting";
 
 
 
@@ -90,6 +91,14 @@ const App = () => {
             element={
               <ProtectedRoute>
                 <CourseModules />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/chatting/:anotherGuyId"
+            element={
+              <ProtectedRoute>
+                <Chatting />
               </ProtectedRoute>
             }
           />

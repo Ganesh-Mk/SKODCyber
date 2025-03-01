@@ -15,7 +15,8 @@ import {
   Mail,
   UserPlus,
   Check,
-  Pencil
+  Pencil,
+  Loader
 } from 'lucide-react';
 
 const UserProfilePage = () => {
@@ -30,8 +31,11 @@ const UserProfilePage = () => {
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
   const [message, setMessage] = useState('');
   const [activeTab, setActiveTab] = useState('blogs');
+  const accountUserId = JSON.parse(localStorage.getItem('userData'))._id;
+  const [connectionLoader, setConnectionLoader] = useState(false);
 
-  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   useEffect(() => {
     const fetchUserAndBlogs = async () => {
@@ -66,9 +70,27 @@ const UserProfilePage = () => {
     fetchUserAndBlogs();
   }, [userId, BACKEND_URL]);
 
-  const handleConnect = () => {
-    setIsConnected(!isConnected);
-    // Here you would typically call an API to update the connection status
+  const handleConnect = async () => {
+    setConnectionLoader(true);
+    try {
+      const response = await axios.post(`${BACKEND_URL}/updateUser`, {
+        connectionUserId: userId,
+        userId: accountUserId
+      });
+
+      if (response.status === 200) {
+        console.log('User connected successfully');
+        setIsConnected(!isConnected);
+      } else {
+        console.error('Failed to connect user');
+      }
+    }
+    catch (error) {
+      console.error('Error connecting user:', error);
+    }
+    finally {
+      setConnectionLoader(false);
+    }
   };
 
   const handleMessageOpen = () => {
@@ -191,6 +213,7 @@ const UserProfilePage = () => {
                   : 'bg-blue-600 hover:bg-blue-700'
                   } transition`}
               >
+                {connectionLoader && <Loader size={18} className="mr-2" />}
                 {isConnected ? (
                   <>
                     <Check size={18} className="mr-2" />
@@ -439,8 +462,8 @@ const UserProfilePage = () => {
                 onClick={handleMessageSend}
                 disabled={!message.trim()}
                 className={`px-4 py-2 rounded-lg flex items-center ${message.trim()
-                    ? 'bg-blue-600 hover:bg-blue-700'
-                    : 'bg-blue-800 opacity-50 cursor-not-allowed'
+                  ? 'bg-blue-600 hover:bg-blue-700'
+                  : 'bg-blue-800 opacity-50 cursor-not-allowed'
                   } transition`}
               >
                 <Send size={18} className="mr-2" />
