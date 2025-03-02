@@ -128,6 +128,8 @@ const News = () => {
   //   );
   // }
 
+
+
   return (
     <div className="min-h-screen bg-gray-900 text-white">
       <header className="fixed top-[4rem] py-2 left-0 right-0 z-50 bg-gray-900 shadow-md">

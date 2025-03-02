@@ -118,6 +118,7 @@ io.on('connection', (socket) => {
   });
 
   // Listen for messages
+
   socket.on('sendMessage', async (data) => {
 
     console.log(`Received message from ${data.senderId} to ${data.recipientId}`);
