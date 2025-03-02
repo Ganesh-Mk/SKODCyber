@@ -113,7 +113,7 @@ const Navbar = () => {
           {/* Desktop Navigation */}
           <div className="hidden md:flex flex-1 justify-center">
             <div className="flex items-center space-x-8">
-              {['/', '/learn', '/news', '/community'].map((path) => (
+              {['/', '/learn', '/news', '/community', '/chatting'].map((path) => (
                 <Link
                   key={path}
                   to={path}

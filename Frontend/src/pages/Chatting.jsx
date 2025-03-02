@@ -5,7 +5,7 @@ import io from "socket.io-client";
 
 export default function Chatting() {
   const userId = JSON.parse(localStorage.getItem("userData"))._id; // current logged-in user
-  const { anotherGuyId } = useParams();
+  const { anotherGuyId = null } = useParams();
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   const [connections, setConnections] = useState([]);
@@ -166,10 +166,9 @@ export default function Chatting() {
                 <div
                   key={connection._id}
                   className={`flex items-center p-3 hover:bg-gray-900 cursor-pointer transition-colors
-                    ${
-                      selectedUser && selectedUser._id === connection._id
-                        ? "bg-gray-800"
-                        : ""
+                    ${selectedUser && selectedUser._id === connection._id
+                      ? "bg-gray-800"
+                      : ""
                     }`}
                   onClick={() => handleSelectUser(connection)}
                 >
@@ -234,18 +233,16 @@ export default function Chatting() {
                 {messages.map((message) => (
                   <div
                     key={message._id}
-                    className={`flex ${
-                      message.sender === userId
-                        ? "justify-end"
-                        : "justify-start"
-                    }`}
+                    className={`flex ${message.sender === userId
+                      ? "justify-end"
+                      : "justify-start"
+                      }`}
                   >
                     <div
-                      className={`max-w-xs md:max-w-md lg:max-w-lg px-4 py-2 rounded-lg ${
-                        message.sender === userId
-                          ? "bg-blue-900 text-white rounded-br-none"
-                          : "bg-gray-800 text-white rounded-bl-none"
-                      }`}
+                      className={`max-w-xs md:max-w-md lg:max-w-lg px-4 py-2 rounded-lg ${message.sender === userId
+                        ? "bg-blue-900 text-white rounded-br-none"
+                        : "bg-gray-800 text-white rounded-bl-none"
+                        }`}
                     >
                       {message.content}
                       <div className="text-xs text-gray-400 mt-1 text-right">

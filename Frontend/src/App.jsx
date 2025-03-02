@@ -100,6 +100,14 @@ const App = () => {
             }
           />
           <Route
+            path="/chatting"
+            element={
+              <ProtectedRoute>
+                <Chatting />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/courses/:courseId/modules/:moduleId"
             element={
               <ProtectedRoute>
