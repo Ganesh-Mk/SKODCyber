@@ -4,7 +4,12 @@ import { useParams } from "react-router-dom";
 import io from "socket.io-client";
 
 export default function Chatting() {
-  const userId = JSON.parse(localStorage.getItem("userData"))._id; // current logged-in user
+  const userData = localStorage.getItem("userData");
+  const userId = userData ? JSON.parse(userData)._id : null;
+  if (!userId) {
+    console.error("User not logged in!");
+    return;
+  } // current logged-in user
   const { anotherGuyId = null } = useParams();
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -30,12 +35,17 @@ export default function Chatting() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!socket) return;
+    socket.emit("userOnline", userId);
+  }, [socket]);
+
   // Fetch user data and connections
   const fetchUserData = async () => {
     try {
       setLoading(true);
       const response = await axios.get(`${BACKEND_URL}/user/${userId}`);
-      const connectionsData = response.data.connections;
+      const connectionsData = response.data.connections || [];
 
       // Fetch details for each connection
       const connectionPromises = connectionsData.map((connectionId) =>
