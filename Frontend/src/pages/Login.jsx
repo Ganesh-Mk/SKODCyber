@@ -21,6 +21,12 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
+  // Brute force protection states
+  const [loginAttempts, setLoginAttempts] = useState(0);
+  const [isLocked, setIsLocked] = useState(false);
+  const [lockoutEndTime, setLockoutEndTime] = useState(null);
+  const [timeRemaining, setTimeRemaining] = useState(0);
+
   // Forgot password states
   const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
   const [forgotEmail, setForgotEmail] = useState("");
@@ -34,6 +40,51 @@ const Login = () => {
   const [newPasswordError, setNewPasswordError] = useState("");
   const [resetSuccess, setResetSuccess] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
+
+  useEffect(() => {
+    // Load login attempts from localStorage
+    const storedAttempts = localStorage.getItem("loginAttempts");
+    const storedLockoutTime = localStorage.getItem("lockoutEndTime");
+
+    if (storedAttempts) {
+      setLoginAttempts(parseInt(storedAttempts));
+    }
+
+    if (storedLockoutTime) {
+      const lockoutTime = parseInt(storedLockoutTime);
+      if (lockoutTime > Date.now()) {
+        setIsLocked(true);
+        setLockoutEndTime(lockoutTime);
+      } else {
+        // Clear expired lockout
+        localStorage.removeItem("lockoutEndTime");
+        localStorage.removeItem("loginAttempts");
+      }
+    }
+  }, []);
+
+  // Timer effect for countdown
+  useEffect(() => {
+    let interval;
+    if (isLocked && lockoutEndTime) {
+      interval = setInterval(() => {
+        const remaining = Math.max(0, Math.ceil((lockoutEndTime - Date.now()) / 1000));
+        setTimeRemaining(remaining);
+
+        if (remaining === 0) {
+          setIsLocked(false);
+          setLoginAttempts(0);
+          localStorage.removeItem("lockoutEndTime");
+          localStorage.removeItem("loginAttempts");
+          clearInterval(interval);
+        }
+      }, 1000);
+    }
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isLocked, lockoutEndTime]);
 
   const validateForm = () => {
     const newErrors = {};
@@ -57,6 +108,12 @@ const Login = () => {
     e.preventDefault();
     setLoginError("");
 
+    // Check if account is locked
+    if (isLocked) {
+      setLoginError(`Too many failed attempts. Please wait ${formatTime(timeRemaining)} before trying again.`);
+      return;
+    }
+
     if (validateForm()) {
       setIsLoading(true);
       try {
@@ -67,6 +124,11 @@ const Login = () => {
         });
 
         if (response.data.success) {
+          // Reset login attempts on successful login
+          setLoginAttempts(0);
+          localStorage.removeItem("loginAttempts");
+          localStorage.removeItem("lockoutEndTime");
+
           // Store user data and token
           const userData = response.data.user;
           const token = response.data.token;
@@ -83,13 +145,47 @@ const Login = () => {
         }
       } catch (error) {
         console.error("Login error:", error);
-        setLoginError(
-          error.response?.data?.message || "Failed to login. Please try again."
-        );
+        const errorMessage = error.response?.data?.message || "Failed to login. Please try again.";
+        setLoginError(errorMessage);
+
+        // Increment login attempts
+        const newAttempts = loginAttempts + 1;
+        setLoginAttempts(newAttempts);
+        localStorage.setItem("loginAttempts", newAttempts.toString());
+
+        // Lock account after 5 failed attempts
+        if (newAttempts >= 5) {
+          const lockoutDuration = getLockoutDuration(newAttempts);
+          const endTime = Date.now() + lockoutDuration;
+          setIsLocked(true);
+          setLockoutEndTime(endTime);
+          localStorage.setItem("lockoutEndTime", endTime.toString());
+          setLoginError(`Too many failed attempts. Account locked for ${formatTime(lockoutDuration / 1000)}.`);
+        }
       } finally {
         setIsLoading(false);
       }
     }
+  };
+
+  // Calculate lockout duration based on number of attempts
+  const getLockoutDuration = (attempts) => {
+    if (attempts >= 10) {
+      return 30 * 60 * 1000; // 30 minutes
+    } else if (attempts >= 8) {
+      return 15 * 60 * 1000; // 15 minutes
+    } else if (attempts >= 6) {
+      return 5 * 60 * 1000; // 5 minutes
+    } else {
+      return 1 * 60 * 1000; // 1 minute
+    }
+  };
+
+  // Format seconds to MM:SS
+  const formatTime = (seconds) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = Math.floor(seconds % 60);
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
 
   const handleChange = (e) => {
@@ -104,7 +200,9 @@ const Login = () => {
         [name]: "",
       }));
     }
-    setLoginError("");
+    if (!isLocked) {
+      setLoginError("");
+    }
   };
 
   // Generate random 4-digit OTP
@@ -182,25 +280,31 @@ const Login = () => {
     setNewPasswordError("");
     setIsResetting(true);
 
-      try {
-        const response = await fetch(`${BACKEND_URL}/resetPassword`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            email: forgotEmail,
-            newPassword,
-          }),
-        });
-    
-        const data = await response.json();
-    
-        if (!response.ok) {
-          throw new Error(data.message || "Failed to reset password");
-        }
+    try {
+      const response = await fetch(`${BACKEND_URL}/resetPassword`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: forgotEmail,
+          newPassword,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to reset password");
+      }
 
       setResetSuccess(true);
+
+      // Reset login attempts when password is reset successfully
+      setLoginAttempts(0);
+      localStorage.removeItem("loginAttempts");
+      localStorage.removeItem("lockoutEndTime");
+      setIsLocked(false);
 
       setTimeout(() => {
         setShowForgotPasswordModal(false);
@@ -310,8 +414,23 @@ const Login = () => {
           </p>
         </div>
 
+        {isLocked && (
+          <div className="bg-red-500/20 border border-red-500 text-red-500 px-4 py-3 rounded-lg">
+            <p className="text-sm font-medium">Account temporarily locked</p>
+            <p className="text-xs mt-1">
+              Too many failed login attempts. Please wait {formatTime(timeRemaining)} or reset your password.
+            </p>
+            <div className="mt-2 bg-gray-700 rounded-full h-2 overflow-hidden">
+              <div
+                className="bg-red-500 h-full transition-all duration-1000"
+                style={{ width: `${(timeRemaining / (lockoutEndTime - Date.now() + timeRemaining * 1000)) * 100}%` }}
+              ></div>
+            </div>
+          </div>
+        )}
+
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          {loginError && (
+          {loginError && !isLocked && (
             <div className="bg-red-500/20 border border-red-500 text-red-500 px-4 py-3 rounded-lg text-sm">
               {loginError}
             </div>
@@ -330,6 +449,7 @@ const Login = () => {
                 onChange={handleChange}
                 className="mt-1 block w-full px-4 py-3 rounded-lg bg-gray-700/50 border-transparent focus:border-cyan-500 focus:bg-gray-900 focus:ring-0 text-white backdrop-blur-sm transition-all"
                 placeholder="you@example.com"
+                disabled={isLocked}
               />
               {errors.email && (
                 <p className="mt-1 text-red-500 text-sm">{errors.email}</p>
@@ -349,11 +469,13 @@ const Login = () => {
                   onChange={handleChange}
                   className="mt-1 block w-full px-4 py-3 rounded-lg bg-gray-700/50 border-transparent focus:border-cyan-500 focus:bg-gray-900 focus:ring-0 text-white backdrop-blur-sm transition-all pr-12"
                   placeholder="••••••••"
+                  disabled={isLocked}
                 />
                 <button
                   type="button"
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
                   onClick={() => setShowPassword(!showPassword)}
+                  disabled={isLocked}
                 >
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
@@ -367,10 +489,10 @@ const Login = () => {
           <div>
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={isLoading || isLocked}
               className="w-full flex justify-center py-3 px-4 rounded-lg shadow-sm text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isLoading ? "Signing In..." : "Sign In"}
+              {isLoading ? "Signing In..." : isLocked ? "Login Disabled" : "Sign In"}
             </button>
           </div>
 
@@ -388,6 +510,12 @@ const Login = () => {
             </a>
           </div>
         </form>
+
+        {loginAttempts > 0 && loginAttempts < 5 && (
+          <div className="text-xs text-amber-400 text-center mt-2">
+            Failed attempts: {loginAttempts}/5 before temporary lockout
+          </div>
+        )}
       </div>
 
       {/* Forgot Password Modal */}
@@ -407,19 +535,19 @@ const Login = () => {
                 {resetSuccess
                   ? "Password Reset Successfully!"
                   : isOtpVerified
-                  ? "Set New Password"
-                  : isEmailSent
-                  ? "Enter OTP"
-                  : "Forgot Password"}
+                    ? "Set New Password"
+                    : isEmailSent
+                      ? "Enter OTP"
+                      : "Forgot Password"}
               </h3>
               <p className="text-gray-300 text-sm mt-1">
                 {resetSuccess
                   ? "You can now login with your new password"
                   : isOtpVerified
-                  ? "Create a new secure password"
-                  : isEmailSent
-                  ? "Enter the 4-digit code sent to your email"
-                  : "Enter your email to reset the code"}
+                    ? "Create a new secure password"
+                    : isEmailSent
+                      ? "Enter the 4-digit code sent to your email"
+                      : "Enter your email to reset the code"}
               </p>
             </div>
 

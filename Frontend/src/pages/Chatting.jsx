@@ -156,7 +156,7 @@ export default function Chatting() {
   }, []);
 
   return (
-    <div className="flex h-screen bg-black text-white">
+    <div className="flex h-screen bg-black text-white pt-16">
       {/* Sidebar with connections */}
       <div className="w-1/4 border-r border-gray-800 overflow-y-auto">
         <div className="p-4 bg-gray-900 border-b border-gray-800">

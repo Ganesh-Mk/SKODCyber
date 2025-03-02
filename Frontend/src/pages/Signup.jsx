@@ -20,7 +20,7 @@ const Signup = () => {
     password: "",
     role: "user" // Default role
   });
-  
+
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -46,7 +46,7 @@ const Signup = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!formData.email) newErrors.email = 'Email is required';
     else if (!emailRegex.test(formData.email)) newErrors.email = 'Please enter a valid email';
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -57,7 +57,7 @@ const Signup = () => {
     if (!formData.password) newErrors.password = 'Password is required';
     else if (formData.password.length < 6) newErrors.password = 'Password must be at least 6 characters';
     if (!formData.role) newErrors.role = 'Role is required';
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -87,17 +87,17 @@ const Signup = () => {
   // Handle send OTP
   const handleSendOTP = async (e) => {
     e.preventDefault();
-    
+
     if (validateStep1()) {
       setIsSendingOtp(true);
       try {
         const otp = generateOTP();
-        
+
         const templateParams = {
           to_email: formData.email,
           otpnumber: otp,
         };
-        
+
         await EmailVerify(templateParams);
         // console.log("Email sent successfully with OTP:", otp);
         setStep(2); // Move to OTP verification step
@@ -219,7 +219,7 @@ const Signup = () => {
             </button>
           </form>
         );
-        
+
       case 2: // OTP verification step
         return (
           <form className="mt-8 space-y-6" onSubmit={handleVerifyOTP}>
@@ -229,7 +229,7 @@ const Signup = () => {
                   A verification code has been sent to <span className="text-cyan-400 font-medium">{formData.email}</span>
                 </p>
               </div>
-              
+
               <div>
                 <label htmlFor="otp" className="text-white block mb-1">Enter 4-digit verification code</label>
                 <input
@@ -256,7 +256,7 @@ const Signup = () => {
             >
               {isVerifyingOtp ? 'Verifying...' : 'Verify Code'}
             </button>
-            
+
             <div className="text-center">
               <button
                 type="button"
@@ -266,7 +266,7 @@ const Signup = () => {
                     to_email: formData.email,
                     otpnumber: otp,
                   };
-                  
+
                   setIsSendingOtp(true);
                   OtpSendEmail(templateParams)
                     .then(() => {
@@ -344,14 +344,14 @@ const Signup = () => {
             </button>
           </form>
         );
-        
+
       default:
         return null;
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 flex items-center mt-10 justify-center p-6 relative overflow-hidden">
+    <div className="min-h-screen bg-gray-900 flex items-center  mt-10 justify-center p-6 relative overflow-hidden">
       <div className="max-w-md w-full space-y-8 bg-gray-800/90 p-8 rounded-xl shadow-2xl backdrop-blur-sm relative z-10">
         <div className="text-center">
           <div className="text-6xl mb-4 animate-bounce">🛡️</div>
@@ -363,19 +363,18 @@ const Signup = () => {
             </span>
           </h2>
           <p className="text-cyan-400">Begin your cybersecurity learning journey</p>
-          
+
           {/* Step indicator */}
           <div className="flex justify-center mt-4 space-x-2">
             {[1, 2, 3].map((stepNumber) => (
-              <div 
+              <div
                 key={stepNumber}
-                className={`w-3 h-3 rounded-full ${
-                  step === stepNumber 
-                    ? 'bg-cyan-400' 
-                    : step > stepNumber 
-                      ? 'bg-green-400' 
-                      : 'bg-gray-600'
-                }`}
+                className={`w-3 h-3 rounded-full ${step === stepNumber
+                  ? 'bg-cyan-400'
+                  : step > stepNumber
+                    ? 'bg-green-400'
+                    : 'bg-gray-600'
+                  }`}
               />
             ))}
           </div>
@@ -394,7 +393,7 @@ const Signup = () => {
 
         {renderStepContent()}
       </div>
-mdoule    </div>
+    </div>
   );
 };
 

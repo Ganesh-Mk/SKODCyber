@@ -19,6 +19,7 @@ import ModulesPage from "./pages/ModulesPage";
 import CourseModules from "./Components/CourseModulesManage";
 import ModuleContentPage from "./Components/ModuleContentPage";
 import Chatting from "./pages/Chatting";
+import ModuleDetailPage from "./pages/ModuleDetailPage";
 
 
 const App = () => {
@@ -57,6 +58,14 @@ const App = () => {
             element={
               <ProtectedRoute>
                 <News />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/moduleDetailPage"
+            element={
+              <ProtectedRoute>
+                <ModuleDetailPage />
               </ProtectedRoute>
             }
           />
