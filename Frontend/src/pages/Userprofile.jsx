@@ -94,7 +94,7 @@ const UserProfilePage = () => {
   };
 
   const handleMessageOpen = () => {
-    setIsMessageModalOpen(true);
+    navigate(`/chatting/${userId}`);
   };
 
   const handleMessageClose = () => {

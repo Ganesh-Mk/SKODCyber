@@ -1,18 +1,34 @@
-import axios from 'axios';
-import React, { useEffect, useState, useRef } from 'react'
-import { useParams } from 'react-router-dom';
+import axios from "axios";
+import React, { useEffect, useState, useRef } from "react";
+import { useParams } from "react-router-dom";
+import io from "socket.io-client";
 
 export default function Chatting() {
-  const userId = JSON.parse(localStorage.getItem('userData'))._id;  // current logged-in user
+  const userId = JSON.parse(localStorage.getItem("userData"))._id; // current logged-in user
   const { anotherGuyId } = useParams();
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   const [connections, setConnections] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [messages, setMessages] = useState([]);
-  const [messageInput, setMessageInput] = useState('');
+  const [messageInput, setMessageInput] = useState("");
   const [loading, setLoading] = useState(true);
   const chatContainerRef = useRef(null);
+  const [socket, setSocket] = useState(null);
+
+  useEffect(() => {
+    // Connect to Socket.IO
+    const newSocket = io(BACKEND_URL);
+    setSocket(newSocket);
+
+    // Notify server user is online
+    newSocket.emit("userOnline", userId);
+
+    // Cleanup on unmount
+    return () => {
+      newSocket.disconnect();
+    };
+  }, []);
 
   // Fetch user data and connections
   const fetchUserData = async () => {
@@ -22,17 +38,19 @@ export default function Chatting() {
       const connectionsData = response.data.connections;
 
       // Fetch details for each connection
-      const connectionPromises = connectionsData.map(connectionId =>
+      const connectionPromises = connectionsData.map((connectionId) =>
         axios.get(`${BACKEND_URL}/user/${connectionId}`)
       );
 
       const connectionResults = await Promise.all(connectionPromises);
-      const connectionUsers = connectionResults.map(res => res.data);
+      const connectionUsers = connectionResults.map((res) => res.data);
       setConnections(connectionUsers);
 
       // Set initial selected user if anotherGuyId is provided
       if (anotherGuyId) {
-        const initialUser = connectionUsers.find(user => user._id === anotherGuyId);
+        const initialUser = connectionUsers.find(
+          (user) => user._id === anotherGuyId
+        );
         if (initialUser) {
           setSelectedUser(initialUser);
           await fetchMessages(initialUser._id);
@@ -49,54 +67,62 @@ export default function Chatting() {
   // Fetch messages between current user and selected user
   const fetchMessages = async (recipientId) => {
     try {
-      // This is a placeholder - you'd need to implement the actual API endpoint
-      const response = await axios.get(`${BACKEND_URL}/messages/${userId}/${recipientId}`);
-      setMessages(response.data || []);
+      const response = await axios.get(
+        `${BACKEND_URL}/${userId}/${recipientId}`
+      );
+      console.log("Fetched Messages are : ", response.data);
 
-      // Scroll to bottom of chat
-      setTimeout(() => {
-        if (chatContainerRef.current) {
-          chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
-        }
-      }, 100);
+      setMessages(response.data);
+
+      // Scroll logic remains the same
     } catch (error) {
       console.error("Error fetching messages:", error);
-      // Initialize with empty messages array if endpoint not available
       setMessages([]);
     }
   };
+
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleReceiveMessage = (message) => {
+      if (message.sender === selectedUser?._id || message.sender === userId) {
+        setMessages((prev) => [...prev, message]);
+      }
+    };
+
+    socket.on("receiveMessage", handleReceiveMessage);
+    return () => socket.off("receiveMessage", handleReceiveMessage);
+  }, [socket, selectedUser]);
 
   // Handle sending a new message
   const sendMessage = async () => {
     if (!messageInput.trim() || !selectedUser) return;
 
-    try {
-      // This is a placeholder - you'd need to implement the actual API endpoint
-      await axios.post(`${BACKEND_URL}/messages/send`, {
-        senderId: userId,
-        recipientId: selectedUser._id,
-        content: messageInput
-      });
+    const messageData = {
+      senderId: userId,
+      recipientId: selectedUser._id,
+      content: messageInput,
+    };
 
-      // Add message to UI immediately (optimistic update)
-      const newMessage = {
-        _id: Date.now().toString(), // Temporary ID
-        senderId: userId,
-        recipientId: selectedUser._id,
-        content: messageInput,
-        timestamp: new Date().toISOString()
-      };
+    // Optimistic update
+    const tempMessage = {
+      _id: Date.now().toString(),
+      sender: userId,
+      recipient: selectedUser._id,
+      content: messageInput,
+      createdAt: new Date(),
+    };
 
-      setMessages(prevMessages => [...prevMessages, newMessage]);
-      setMessageInput('');
+    setMessages((prev) => [...prev, tempMessage]);
+    setMessageInput("");
 
-      // Scroll to bottom of chat
-      if (chatContainerRef.current) {
-        chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
-      }
+    // Emit via Socket.IO
+    socket.emit("sendMessage", messageData);
 
-    } catch (error) {
-      console.error("Error sending message:", error);
+    // Scroll to bottom
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop =
+        chatContainerRef.current.scrollHeight;
     }
   };
 
@@ -136,16 +162,23 @@ export default function Chatting() {
             {connections.length === 0 ? (
               <div className="p-4 text-gray-400">No connections found</div>
             ) : (
-              connections.map(connection => (
+              connections.map((connection) => (
                 <div
                   key={connection._id}
                   className={`flex items-center p-3 hover:bg-gray-900 cursor-pointer transition-colors
-                    ${selectedUser && selectedUser._id === connection._id ? 'bg-gray-800' : ''}`}
+                    ${
+                      selectedUser && selectedUser._id === connection._id
+                        ? "bg-gray-800"
+                        : ""
+                    }`}
                   onClick={() => handleSelectUser(connection)}
                 >
                   <div className="relative">
                     <img
-                      src={connection.image || "https://cdn-icons-png.flaticon.com/512/10398/10398223.png"}
+                      src={
+                        connection.image ||
+                        "https://cdn-icons-png.flaticon.com/512/10398/10398223.png"
+                      }
                       alt={connection.name}
                       className="w-12 h-12 rounded-full object-cover"
                     />
@@ -153,7 +186,9 @@ export default function Chatting() {
                   </div>
                   <div className="ml-3">
                     <div className="font-semibold">{connection.name}</div>
-                    <div className="text-sm text-gray-400">{connection.email}</div>
+                    <div className="text-sm text-gray-400">
+                      {connection.email}
+                    </div>
                   </div>
                 </div>
               ))
@@ -168,7 +203,10 @@ export default function Chatting() {
         {selectedUser ? (
           <div className="p-4 bg-gray-900 border-b border-gray-800 flex items-center">
             <img
-              src={selectedUser.image || "https://cdn-icons-png.flaticon.com/512/10398/10398223.png"}
+              src={
+                selectedUser.image ||
+                "https://cdn-icons-png.flaticon.com/512/10398/10398223.png"
+              }
               alt={selectedUser.name}
               className="w-10 h-10 rounded-full object-cover"
             />
@@ -179,7 +217,9 @@ export default function Chatting() {
           </div>
         ) : (
           <div className="p-4 bg-gray-900 border-b border-gray-800">
-            <div className="font-semibold text-gray-400">Select a connection to start chatting</div>
+            <div className="font-semibold text-gray-400">
+              Select a connection to start chatting
+            </div>
           </div>
         )}
 
@@ -191,20 +231,28 @@ export default function Chatting() {
           {selectedUser ? (
             messages.length > 0 ? (
               <div className="space-y-3">
-                {messages.map(message => (
+                {messages.map((message) => (
                   <div
                     key={message._id}
-                    className={`flex ${message.senderId === userId ? 'justify-end' : 'justify-start'}`}
+                    className={`flex ${
+                      message.sender === userId
+                        ? "justify-end"
+                        : "justify-start"
+                    }`}
                   >
                     <div
-                      className={`max-w-xs md:max-w-md lg:max-w-lg px-4 py-2 rounded-lg
-                        ${message.senderId === userId
-                          ? 'bg-blue-900 text-white rounded-br-none'
-                          : 'bg-gray-800 text-white rounded-bl-none'}`}
+                      className={`max-w-xs md:max-w-md lg:max-w-lg px-4 py-2 rounded-lg ${
+                        message.sender === userId
+                          ? "bg-blue-900 text-white rounded-br-none"
+                          : "bg-gray-800 text-white rounded-bl-none"
+                      }`}
                     >
                       {message.content}
                       <div className="text-xs text-gray-400 mt-1 text-right">
-                        {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        {new Date(message.createdAt).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
                       </div>
                     </div>
                   </div>
@@ -212,12 +260,16 @@ export default function Chatting() {
               </div>
             ) : (
               <div className="flex h-full items-center justify-center">
-                <div className="text-gray-500">No messages yet. Start a conversation!</div>
+                <div className="text-gray-500">
+                  No messages yet. Start a conversation!
+                </div>
               </div>
             )
           ) : (
             <div className="flex h-full items-center justify-center">
-              <div className="text-gray-500">Select a connection to view messages</div>
+              <div className="text-gray-500">
+                Select a connection to view messages
+              </div>
             </div>
           )}
         </div>
@@ -230,7 +282,7 @@ export default function Chatting() {
                 type="text"
                 value={messageInput}
                 onChange={(e) => setMessageInput(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
+                onKeyDown={(e) => e.key === "Enter" && sendMessage()}
                 placeholder="Type a message..."
                 className="flex-1 bg-gray-800 text-white rounded-l-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600"
               />
