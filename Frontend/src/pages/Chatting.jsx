@@ -47,6 +47,9 @@ export default function Chatting() {
       const response = await axios.get(`${BACKEND_URL}/user/${userId}`);
       const connectionsData = response.data.connections || [];
 
+      console.log("Connections : ", response.data.connections);
+      
+
       // Fetch details for each connection
       const connectionPromises = connectionsData.map((connectionId) =>
         axios.get(`${BACKEND_URL}/user/${connectionId}`)

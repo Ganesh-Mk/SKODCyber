@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Search, ChevronDown } from "lucide-react";
+import { Search, ChevronDown, Bell } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
@@ -11,9 +11,32 @@ const CommunityPage = () => {
   const [error, setError] = useState(null);
   const [userTypeFilter, setUserTypeFilter] = useState("All");
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
+  const [showNotificationModal, setShowNotificationModal] = useState(false);
+  const [userRequests, setUserRequests] = useState([]);
+  const [notificationCount, setNotificationCount] = useState(0);
   const blogsPerPage = 9;
   const navigate = useNavigate();
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+  const [connectionRequests, setConnectionRequests] = useState([]);
+  const accountUser = JSON.parse(localStorage.getItem("userData"));
+
+  useEffect(() => {
+    const userData = JSON.parse(localStorage.getItem("userData"));
+    const userId = userData ? userData._id : null;
+    const fetchConnectionRequests = async () => {
+      try {
+        const response = await axios.get(
+          `${BACKEND_URL}/requests?userId=${userId}`
+        );
+        console.log("requests res :", response.data.requests);
+
+        setConnectionRequests(response.data.requests || []);
+      } catch (error) {
+        console.error("Error fetching requests:", error);
+      }
+    };
+    fetchConnectionRequests();
+  }, []);
 
   // Fetch blogs from backend
   useEffect(() => {
@@ -36,6 +59,68 @@ const CommunityPage = () => {
 
     fetchBlogs();
   }, []);
+  
+
+  const handleRequest = async (userId, action) => {
+    try {
+      const response = await axios.post(`${BACKEND_URL}/handle-request`, {
+        senderId: userId,
+        receiverId: accountUser._id,
+        action,
+      });
+
+      if (response.data.success) {
+        // Update local state
+        setConnectionRequests((prev) =>
+          prev.filter((request) => request._id !== userId)
+        );
+
+        // If accepted, update connections list
+        if (action === "accept") {
+          // You might want to fetch updated connections here
+          // or update local state directly:
+          setConnections((prev) => [...prev, userId]);
+        }
+      }
+    } catch (error) {
+      console.error("Error handling request:", error);
+      // Add error notification here
+    }
+  };
+
+  // Handle request actions (accept/decline)
+  const handleRequestAction = async (requestId, action) => {
+    try {
+      // In a real app, call your API here
+      await axios.post(`${BACKEND_URL}/userRequests/${requestId}/${action}`);
+
+      // Update local state
+      setUserRequests((prev) =>
+        prev.filter((request) => request._id !== requestId)
+      );
+      setNotificationCount((prev) => prev - 1);
+
+      // If all notifications processed, close modal
+      if (userRequests.length === 1) {
+        setTimeout(() => setShowNotificationModal(false), 300);
+      }
+    } catch (err) {
+      console.error(
+        `Error ${action === "accept" ? "accepting" : "declining"} request:`,
+        err
+      );
+
+      // For demo, still update UI
+      setUserRequests((prev) =>
+        prev.filter((request) => request._id !== requestId)
+      );
+      setNotificationCount((prev) => prev - 1);
+
+      if (userRequests.length === 1) {
+        setTimeout(() => setShowNotificationModal(false), 300);
+      }
+    }
+  };
 
   // Filter blogs based on search term and user type
   const filteredBlogs = blogs.filter((blog) => {
@@ -87,6 +172,26 @@ const CommunityPage = () => {
     setCurrentPage(1);
   };
 
+  // Format time for display in notifications
+  const formatTimeAgo = (dateString) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMins = Math.floor(diffMs / (1000 * 60));
+
+    if (diffMins < 1) return "Just now";
+    if (diffMins < 60) return `${diffMins}m ago`;
+
+    const diffHours = Math.floor(diffMins / 60);
+    if (diffHours < 24) return `${diffHours}h ago`;
+
+    const diffDays = Math.floor(diffHours / 24);
+    if (diffDays === 1) return "Yesterday";
+    if (diffDays < 7) return `${diffDays}d ago`;
+
+    return date.toLocaleDateString();
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen mt-16 bg-[#0a0a0a] text-white flex items-center justify-center">
@@ -116,7 +221,7 @@ const CommunityPage = () => {
             <p className="text-gray-400 text-lg">Connect, Share, and Learn</p>
           </div>
 
-          {/* Search and Filter Form */}
+          {/* Search, Filter and Notification */}
           <div className="w-full md:w-1/2 flex flex-col sm:flex-row gap-3">
             <form onSubmit={handleSearchSubmit} className="w-full relative">
               <input
@@ -139,37 +244,55 @@ const CommunityPage = () => {
               </button>
             </form>
 
-            {/* Filter Dropdown */}
-            <div className="relative min-w-40">
-              <button
-                type="button"
-                className="w-full flex items-center justify-between px-4 py-3 bg-gray-800/50 border 
+            <div className="flex gap-3">
+              {/* Filter Dropdown */}
+              <div className="relative min-w-40">
+                <button
+                  type="button"
+                  className="w-full flex items-center justify-between px-4 py-3 bg-gray-800/50 border 
                          border-gray-700 rounded-xl text-white focus:outline-none focus:border-blue-500/50 
                          focus:ring-2 focus:ring-blue-500/20 transition-all duration-300"
-                onClick={() => setShowFilterDropdown(!showFilterDropdown)}
-              >
-                {userTypeFilter}
-                <ChevronDown className="ml-2 h-4 w-4" />
-              </button>
+                  onClick={() => setShowFilterDropdown(!showFilterDropdown)}
+                >
+                  {userTypeFilter}
+                  <ChevronDown className="ml-2 h-4 w-4" />
+                </button>
 
-              {showFilterDropdown && (
-                <div className="absolute z-10 mt-1 w-full bg-gray-800 border border-gray-700 rounded-lg shadow-lg">
-                  {["All", "User", "Developer", "Admin"].map((type) => (
-                    <button
-                      key={type}
-                      className={`w-full text-left px-4 py-2 hover:bg-gray-700 transition-colors duration-200
-                              ${
-                                userTypeFilter === type
-                                  ? "text-blue-400"
-                                  : "text-gray-300"
-                              }`}
-                      onClick={() => handleFilterChange(type)}
-                    >
-                      {type}
-                    </button>
-                  ))}
-                </div>
-              )}
+                {showFilterDropdown && (
+                  <div className="absolute z-10 mt-1 w-full bg-gray-800 border border-gray-700 rounded-lg shadow-lg">
+                    {["All", "User", "Developer", "Admin"].map((type) => (
+                      <button
+                        key={type}
+                        className={`w-full text-left px-4 py-2 hover:bg-gray-700 transition-colors duration-200
+                                ${
+                                  userTypeFilter === type
+                                    ? "text-blue-400"
+                                    : "text-gray-300"
+                                }`}
+                        onClick={() => handleFilterChange(type)}
+                      >
+                        {type}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Notification Bell */}
+              <button
+                onClick={() => setShowNotificationModal(true)}
+                className="relative p-3 bg-gray-800/50 border border-gray-700 rounded-xl"
+              >
+                <Bell className="h-5 w-5 text-gray-300" />
+                {connectionRequests?.length > 0 && (
+                  <span
+                    className="absolute -top-1 -right-1 bg-red-500 text-white text-xs 
+                         font-bold rounded-full h-5 w-5 flex items-center justify-center"
+                  >
+                    {connectionRequests.length}
+                  </span>
+                )}
+              </button>
             </div>
           </div>
         </div>
@@ -205,11 +328,11 @@ const CommunityPage = () => {
                         src={blog.userImage || "/default-avatar.png"}
                         alt={blog.userName || "Author"}
                         className="w-10 h-10 rounded-full object-cover border-2 border-transparent 
-               group-hover:border-blue-500 transition-all duration-300 cursor-pointer"
+                                group-hover:border-blue-500 transition-all duration-300 cursor-pointer"
                       />
                       <div
                         className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full 
-                border-2 border-gray-800"
+                                border-2 border-gray-800"
                       ></div>
                     </div>
                     <div>
@@ -311,6 +434,56 @@ const CommunityPage = () => {
           </div>
         )}
       </div>
+
+      {/* Notification Modal */}
+      {showNotificationModal && (
+        <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center">
+          <div className="bg-gray-900 w-full max-w-md rounded-2xl p-6">
+            <h3 className="text-xl font-semibold mb-4">Connection Requests</h3>
+
+            {connectionRequests?.length > 0 ? (
+              <div className="space-y-4">
+                {connectionRequests.map((user) => (
+                  <div
+                    key={user._id}
+                    className="flex items-center justify-between p-4 bg-gray-800 rounded-lg"
+                  >
+                    <div className="flex items-center gap-4">
+                      <img
+                        src={user.image}
+                        alt={user.name}
+                        className="w-12 h-12 rounded-full object-cover"
+                      />
+                      <div>
+                        <h4 className="font-medium">{user.name}</h4>
+                        <p className="text-gray-400 text-sm">{user.email}</p>
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        className="px-4 py-2 bg-red-500 rounded-lg hover:bg-red-600"
+                        onClick={() => handleRequest(user._id, "decline")}
+                      >
+                        Decline
+                      </button>
+                      <button
+                        className="px-4 py-2 bg-green-500 rounded-lg hover:bg-green-600"
+                        onClick={() => handleRequest(user._id, "accept")}
+                      >
+                        Accept
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-400 text-center py-6">
+                No pending connection requests
+              </p>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

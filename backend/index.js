@@ -44,6 +44,9 @@ const getAllUser = require("./routes/getAllUser");
 const updateUser = require("./routes/updateUser");
 const getSingleuser = require("./routes/getSingleUser");
 const updatePassword = require("./routes/updatePassword");
+const sendRequests = require("./routes/sendRequest");
+const reqestss = require("./routes/requests");
+const handleRequests = require("./routes/handleRequest");
 
 const createBlog = require("./routes/createBlog");
 const deleteBlog = require("./routes/deleteBlog");
@@ -78,6 +81,9 @@ app.use(getAllUser);
 app.use(updateUser);
 app.use(getSingleuser);
 app.use(updatePassword);
+app.use(sendRequests);
+app.use(reqestss);
+app.use(handleRequests);
 
 // Blog
 app.use(createBlog);

@@ -73,22 +73,20 @@ const UserProfilePage = () => {
   const handleConnect = async () => {
     setConnectionLoader(true);
     try {
-      const response = await axios.post(`${BACKEND_URL}/updateUser`, {
-        connectionUserId: userId,
-        userId: accountUserId
+      const response = await axios.post(`${BACKEND_URL}/send-request`, {
+        senderId: accountUserId,
+        receiverId: userId
       });
-
-      if (response.status === 200) {
-        console.log('User connected successfully');
-        setIsConnected(!isConnected);
-      } else {
-        console.error('Failed to connect user');
+  
+      if (response.data.success) {
+        console.log('Request sent successfully');
+        // Update local state if needed
+        setIsConnected(true); // You might want to change this to track pending state
       }
-    }
-    catch (error) {
-      console.error('Error connecting user:', error);
-    }
-    finally {
+    } catch (error) {
+      console.error('Error sending request:', error);
+      // Handle error (show toast/notification)
+    } finally {
       setConnectionLoader(false);
     }
   };
