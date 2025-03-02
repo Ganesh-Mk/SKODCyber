@@ -790,21 +790,35 @@ const ModulesPage = () => {
                 ))}
               </motion.div>
 
-              {/* Quiz button at bottom of page */}
-              {course?.quizzes && course.quizzes.length > 0 && (
+              <div className="flex gap-2">
                 <div className="flex justify-center mt-12">
                   <button
-                    onClick={handleQuizButtonClick}
-                    className={`px-8 py-4 font-semibold rounded-lg transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg ${quizCompleted
-                      ? "bg-green-600 hover:bg-green-700 text-white hover:shadow-green-500/25 flex items-center gap-2"
-                      : "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white hover:shadow-purple-500/25"
-                      }`}
+                    onClick={() => navigate(`/learn`)}
+                    className="px-8 py-4 font-semibold rounded-lg transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg bg-blue-500 text-white hover:shadow-blue-500/25 flex items-center gap-2"
                   >
-                    {quizCompleted && <Check size={20} />}
-                    {quizCompleted ? "Review Course Quiz" : "Take Course Quiz"}
+                    {quizCompleted && <ArrowLeft size={20} />}
+                    Go Back
                   </button>
                 </div>
-              )}
+                {course?.quizzes && course.quizzes.length > 0 && (
+                  <div className="flex justify-center mt-12">
+                    <button
+                      onClick={handleQuizButtonClick}
+                      className={`px-8 py-4 font-semibold rounded-lg transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg ${quizCompleted
+                        ? "bg-green-600 hover:bg-green-700 text-white hover:shadow-green-500/25 flex items-center gap-2"
+                        : "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white hover:shadow-purple-500/25"
+                        }`}
+                    >
+                      {quizCompleted && <Check size={20} />}
+                      {quizCompleted ? "Review Course Quiz" : "Take Course Quiz"}
+                    </button>
+                  </div>
+                )}
+
+              </div>
+              {/* Quiz button at bottom of page */}
+
+
             </>
           ) : (
             // Show quiz component when user clicks on quiz button

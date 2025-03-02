@@ -8,9 +8,6 @@ const ModuleContentPage = () => {
   const { courseId, moduleId } = useParams();
   const navigate = useNavigate();
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
-
-
-
   const [moduleData, setModuleData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -352,8 +349,8 @@ const ModuleContentPage = () => {
                 <div
                   key={quiz._id || index}
                   className={`bg-gray-800 rounded-lg p-6 border ${userAnswers[index] === quiz.correctAnswer
-                      ? "border-green-400"
-                      : "border-red-400"
+                    ? "border-green-400"
+                    : "border-red-400"
                     }`}
                 >
                   <p className="text-white font-medium mb-4">
@@ -365,10 +362,10 @@ const ModuleContentPage = () => {
                       <div
                         key={optIdx}
                         className={`p-3 rounded-lg flex items-center gap-2 ${optIdx === quiz.correctAnswer
-                            ? "bg-green-400/20 border border-green-400"
-                            : optIdx === userAnswers[index]
-                              ? "bg-red-400/20 border border-red-400"
-                              : "bg-gray-700"
+                          ? "bg-green-400/20 border border-green-400"
+                          : optIdx === userAnswers[index]
+                            ? "bg-red-400/20 border border-red-400"
+                            : "bg-gray-700"
                           }`}
                       >
                         {optIdx === quiz.correctAnswer && (
@@ -386,10 +383,10 @@ const ModuleContentPage = () => {
                           )}
                         <span
                           className={`${optIdx === quiz.correctAnswer
-                              ? "text-green-400"
-                              : optIdx === userAnswers[index]
-                                ? "text-red-400"
-                                : "text-gray-300"
+                            ? "text-green-400"
+                            : optIdx === userAnswers[index]
+                              ? "text-red-400"
+                              : "text-gray-300"
                             }`}
                         >
                           {option}
@@ -497,8 +494,8 @@ const ModuleContentPage = () => {
                 key={optionIndex}
                 onClick={() => handleAnswerSelect(optionIndex)}
                 className={`p-4 rounded-lg cursor-pointer transition-all ${userAnswers[currentQuizIndex] === optionIndex
-                    ? "bg-cyan-500/20 border border-cyan-400"
-                    : "bg-gray-700 hover:bg-gray-600"
+                  ? "bg-cyan-500/20 border border-cyan-400"
+                  : "bg-gray-700 hover:bg-gray-600"
                   }`}
               >
                 <span className="text-gray-200">{option}</span>
@@ -512,8 +509,8 @@ const ModuleContentPage = () => {
             onClick={handlePrevQuestion}
             disabled={currentQuizIndex === 0}
             className={`px-4 py-2 rounded-lg flex items-center gap-2 ${currentQuizIndex === 0
-                ? "bg-gray-700 text-gray-500 cursor-not-allowed"
-                : "bg-gray-700 text-white hover:bg-gray-600"
+              ? "bg-gray-700 text-gray-500 cursor-not-allowed"
+              : "bg-gray-700 text-white hover:bg-gray-600"
               }`}
           >
             <ArrowLeft size={16} />
@@ -525,8 +522,8 @@ const ModuleContentPage = () => {
               onClick={handleNextQuestion}
               disabled={userAnswers[currentQuizIndex] === null}
               className={`px-4 py-2 rounded-lg ${userAnswers[currentQuizIndex] === null
-                  ? "bg-gray-700 text-gray-500 cursor-not-allowed"
-                  : "bg-gradient-to-r from-cyan-500 to-blue-500 text-white hover:from-cyan-600 hover:to-blue-600"
+                ? "bg-gray-700 text-gray-500 cursor-not-allowed"
+                : "bg-gradient-to-r from-cyan-500 to-blue-500 text-white hover:from-cyan-600 hover:to-blue-600"
                 }`}
             >
               Next
@@ -538,8 +535,8 @@ const ModuleContentPage = () => {
                 (answer) => answer === null
               )}
               className={`px-6 py-2 rounded-lg font-medium ${Object.values(userAnswers).some((answer) => answer === null)
-                  ? "bg-gray-700 text-gray-500 cursor-not-allowed"
-                  : "bg-gradient-to-r from-cyan-500 to-blue-500 text-white hover:from-cyan-600 hover:to-blue-600"
+                ? "bg-gray-700 text-gray-500 cursor-not-allowed"
+                : "bg-gradient-to-r from-cyan-500 to-blue-500 text-white hover:from-cyan-600 hover:to-blue-600"
                 }`}
             >
               Submit Quiz
@@ -553,10 +550,10 @@ const ModuleContentPage = () => {
               <div
                 key={index}
                 className={`w-3 h-3 rounded-full ${index === currentQuizIndex
-                    ? "bg-cyan-400"
-                    : userAnswers[index] !== null
-                      ? "bg-gray-400"
-                      : "bg-gray-700"
+                  ? "bg-cyan-400"
+                  : userAnswers[index] !== null
+                    ? "bg-gray-400"
+                    : "bg-gray-700"
                   }`}
               />
             ))}
@@ -678,19 +675,26 @@ const ModuleContentPage = () => {
                   </div>
                 )}
 
-                <div className="mt-8 flex justify-between">
+
+                <div className="mt-8 flex flex-wrap gap-4">
+                  <button
+                    onClick={() => navigate(`/modules/${courseId}`)}
+                    className="px-6 py-3 h-12 font-semibold rounded-lg transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg bg-blue-500 text-white hover:shadow-blue-500/25 flex items-center gap-2"
+                  >
+                    {quizCompleted && <ArrowLeft size={20} />}
+                    Go Back
+                  </button>
+
                   {moduleData.quizzes && moduleData.quizzes.length > 0 && (
                     <button
                       onClick={handleQuizButtonClick}
-                      className={`px-6 py-3 font-semibold rounded-lg transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg ${quizCompleted
-                          ? "bg-green-600 hover:bg-green-700 text-white hover:shadow-green-500/25 flex items-center gap-2"
-                          : "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white hover:shadow-purple-500/25"
+                      className={`px-6 py-3 h-12 font-semibold rounded-lg transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg ${quizCompleted
+                        ? "bg-green-600 hover:bg-green-700 text-white hover:shadow-green-500/25 flex items-center gap-2"
+                        : "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white hover:shadow-purple-500/25"
                         }`}
                     >
                       {quizCompleted && <Check size={18} />}
-                      {quizCompleted
-                        ? "Review Completed Quiz"
-                        : "Take Module Quiz"}
+                      {quizCompleted ? "Review Completed Quiz" : "Take Module Quiz"}
                     </button>
                   )}
 
@@ -701,7 +705,7 @@ const ModuleContentPage = () => {
                           `/courses/${courseId}/modules/${moduleData.nextModule._id}`
                         )
                       }
-                      className="px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-semibold rounded-lg transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-cyan-500/25"
+                      className="px-6 py-3 h-12 font-semibold rounded-lg transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white hover:shadow-cyan-500/25 flex items-center"
                     >
                       Next Module: {moduleData.nextModule.title}
                     </button>
