@@ -18,7 +18,7 @@ export default function Chatting() {
 
   useEffect(() => {
     // Connect to Socket.IO
-    const newSocket = io(BACKEND_URL);
+    const newSocket = io(BACKEND_URL, { transports: ["websocket", "polling"], });
     setSocket(newSocket);
 
     // Notify server user is online

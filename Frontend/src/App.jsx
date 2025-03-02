@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Provider } from "react-redux";
 import { store } from "./store/store";
-import { initializeAuth } from "./utils/authUtils"; // Import initialization
+import { initializeAuth } from "./utils/authUtils";
 import "./App.css";
 import Home from "./pages/Home";
 import Learn from "./pages/Learn";
@@ -19,6 +19,7 @@ import ModulesPage from "./pages/ModulesPage";
 import CourseModules from "./Components/CourseModulesManage";
 import ModuleContentPage from "./Components/ModuleContentPage";
 import Chatting from "./pages/Chatting";
+
 
 const App = () => {
   useEffect(() => {
