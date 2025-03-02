@@ -20,11 +20,8 @@ import CourseModules from "./Components/CourseModulesManage";
 import ModuleContentPage from "./Components/ModuleContentPage";
 import Chatting from "./pages/Chatting";
 
-
-
 const App = () => {
   useEffect(() => {
-    // Initialize authentication on app load
     initializeAuth();
   }, []);
 

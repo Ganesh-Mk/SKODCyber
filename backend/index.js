@@ -15,6 +15,7 @@ const io = new Server(httpServer, {
     methods: ["GET", "POST"]
   }
 });
+
 const PORT = process.env.PORT || 3000;
 
 // Set EJS as the view engine
@@ -121,8 +122,8 @@ io.on('connection', (socket) => {
 
     console.log(`Received message from ${data.senderId} to ${data.recipientId}`);
     console.log('Message content:', data.content);
-  
-    
+
+
     try {
       // Save message to database
       const newMessage = new Message({
@@ -133,16 +134,16 @@ io.on('connection', (socket) => {
       await newMessage.save();
 
       // After saving to DB
-    console.log(`Saved message ID: ${newMessage._id}`);
+      console.log(`Saved message ID: ${newMessage._id}`);
 
       // Emit to recipient if online
       const recipientSocketId = onlineUsers.get(data.recipientId);
       if (recipientSocketId) {
-      console.log(`Sending to recipient socket: ${recipientSocketId}`);
+        console.log(`Sending to recipient socket: ${recipientSocketId}`);
 
         io.to(recipientSocketId).emit('receiveMessage', newMessage);
       } else {
-      console.log('Recipient is offline');
+        console.log('Recipient is offline');
 
       }
 
