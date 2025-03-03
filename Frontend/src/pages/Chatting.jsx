@@ -357,7 +357,7 @@ export default function Chatting() {
               </div>
             )
           ) : (
-            <div className="flex h-full items-center justify-center hidden md:flex">
+            <div className="flex h-full items-center justify-center  md:flex">
               <div className="text-gray-500 text-center">
                 Select a connection to view messages
               </div>

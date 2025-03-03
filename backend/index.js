@@ -117,29 +117,16 @@ app.use(getAllQuiz);
 app.use(getSingleModule);
 app.use(messageRoutes);
 
-
-
 const onlineUsers = new Map();
 
+// Socket.io
 io.on('connection', (socket) => {
-  console.log('New client connected:', socket.id);
-
-  // Listen for user online
   socket.on('userOnline', (userId) => {
     onlineUsers.set(userId, socket.id);
-    console.log(`User ${userId} is online`);
   });
 
-  // Listen for messages
-
   socket.on('sendMessage', async (data) => {
-
-    console.log(`Received message from ${data.senderId} to ${data.recipientId}`);
-    console.log('Message content:', data.content);
-
-
     try {
-      // Save message to database
       const newMessage = new Message({
         sender: data.senderId,
         recipient: data.recipientId,
@@ -147,21 +134,11 @@ io.on('connection', (socket) => {
       });
       await newMessage.save();
 
-      // After saving to DB
-      console.log(`Saved message ID: ${newMessage._id}`);
-
-      // Emit to recipient if online
       const recipientSocketId = onlineUsers.get(data.recipientId);
       if (recipientSocketId) {
-        console.log(`Sending to recipient socket: ${recipientSocketId}`);
-
         io.to(recipientSocketId).emit('receiveMessage', newMessage);
-      } else {
-        console.log('Recipient is offline');
-
       }
 
-      // Emit back to sender for confirmation
       socket.emit('messageSent', newMessage);
     } catch (error) {
       console.error('Error handling message:', error);
@@ -169,8 +146,6 @@ io.on('connection', (socket) => {
   });
 
   socket.on('disconnect', () => {
-    console.log('Client disconnected:', socket.id);
-    // Remove from online users
     Array.from(onlineUsers.entries()).forEach(([userId, sockId]) => {
       if (sockId === socket.id) {
         onlineUsers.delete(userId);
