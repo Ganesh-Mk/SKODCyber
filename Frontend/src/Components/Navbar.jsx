@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Shield, Lock, Menu, X, LogOut, UserCircle } from 'lucide-react';
-import { useDispatch, useSelector } from 'react-redux';
-import { logout } from '../store/userSlice';
+import React, { useState, useEffect } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Shield, Lock, Menu, X, LogOut, UserCircle } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../store/userSlice";
+import axios from "axios"; // Add this import since it's missing
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -14,10 +15,32 @@ const Navbar = () => {
   const currentPath = location.pathname;
   const { isLoggedIn: isLoggedInStore } = useSelector((state) => state.user);
 
-  useEffect(() => {
+  const [hasUnreadMessages, setHasUnreadMessages] = useState(false);
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
+  // Check for unread messages
+  useEffect(() => {
+    const checkUnreadMessages = async () => {
+      if (!userData?._id) return;
+      
+      try {
+        const response = await axios.get(
+          `${BACKEND_URL}/unread/${userData._id}`
+        );
+        setHasUnreadMessages(response.data.hasUnread);
+      } catch (error) {
+        console.error("Error checking unread messages:", error);
+      }
+    };
+
+    checkUnreadMessages();
+    const interval = setInterval(checkUnreadMessages, 10000); // Check every 10 seconds
+    return () => clearInterval(interval);
+  }, [userData, BACKEND_URL]);
+
+  useEffect(() => {
     const checkAuth = () => {
-      const storedData = localStorage.getItem('userData');
+      const storedData = localStorage.getItem("userData");
       if (storedData) {
         setIsLoggedIn(true);
         setUserData(JSON.parse(storedData));
@@ -28,33 +51,33 @@ const Navbar = () => {
     };
 
     checkAuth();
-    window.addEventListener('storage', checkAuth);
-    return () => window.removeEventListener('storage', checkAuth);
+    window.addEventListener("storage", checkAuth);
+    return () => window.removeEventListener("storage", checkAuth);
   }, [isLoggedInStore]);
 
   const handleLogout = () => {
-    localStorage.removeItem('userData');
+    localStorage.removeItem("userData");
     dispatch(logout());
     setIsLoggedIn(false);
     setUserData(null);
     localStorage.clear();
-    navigate('/');
+    navigate("/");
   };
 
   const isActive = (path) => {
-    if (path === '/' && currentPath === '/') return true;
-    if (path !== '/' && currentPath.startsWith(path)) return true;
+    if (path === "/" && currentPath === "/") return true;
+    if (path !== "/" && currentPath.startsWith(path)) return true;
     return false;
   };
 
   // Auth buttons for desktop
   const DesktopAuthButtons = () => (
     <div className="hidden md:flex items-center space-x-4">
-      {localStorage.getItem('userData') ? (
+      {localStorage.getItem("userData") ? (
         <div className="flex items-center space-x-4">
           <div className="text-gray-300 px-3">
             <span className="text-purple-400">Hello, </span>
-            {userData?.name?.split(' ')[0]}
+            {userData?.name?.split(" ")[0]}
           </div>
           <div className="flex space-x-2">
             <Link
@@ -113,22 +136,38 @@ const Navbar = () => {
           {/* Desktop Navigation */}
           <div className="hidden md:flex flex-1 justify-center">
             <div className="flex items-center space-x-8">
-              {['/', '/learn', '/news', '/community', '/chatting'].map((path) => (
-                <Link
-                  key={path}
-                  to={path}
-                  className="relative group px-3 py-2"
-                >
-                  <span className={`font-medium relative z-10 transition-colors duration-200 ${isActive(path) ? 'text-purple-100' : 'text-gray-300 group-hover:text-white'
-                    }`}>
-                    {path === '/' ? 'Home' : path.slice(1).charAt(0).toUpperCase() + path.slice(2)}
-                  </span>
-                  <div className={`absolute inset-0 h-full w-full bg-purple-900/30 rounded-lg transition-all duration-300 -z-0 ${isActive(path)
-                    ? 'scale-100 opacity-100'
-                    : 'scale-0 opacity-0 group-hover:scale-100 group-hover:opacity-100'
-                    }`}></div>
-                </Link>
-              ))}
+              {["/", "/learn", "/news", "/community", "/chatting"].map(
+                (path) => (
+                  <Link
+                    key={path}
+                    to={path}
+                    className="relative group px-3 py-2"
+                  >
+                    {path === '/chatting' && hasUnreadMessages && (
+                      <div className="absolute top-0 right-0 -mt-1 -mr-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+                    )}
+                    <span
+                      className={`font-medium relative z-10 transition-colors duration-200 ${
+                        isActive(path)
+                          ? "text-purple-100"
+                          : "text-gray-300 group-hover:text-white"
+                      }`}
+                    >
+                      {path === "/"
+                        ? "Home"
+                        : path.slice(1).charAt(0).toUpperCase() + path.slice(2)
+                        }
+                    </span>
+                    <div
+                      className={`absolute inset-0 h-full w-full bg-purple-900/30 rounded-lg transition-all duration-300 -z-0 ${
+                        isActive(path)
+                          ? "scale-100 opacity-100"
+                          : "scale-0 opacity-0 group-hover:scale-100 group-hover:opacity-100"
+                      }`}
+                    ></div>
+                  </Link>
+                )
+              )}
             </div>
           </div>
 
@@ -152,20 +191,29 @@ const Navbar = () => {
       </div>
 
       {/* Mobile Navigation */}
-      <div className={`md:hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-        } overflow-hidden bg-gray-900`}>
+      <div
+        className={`md:hidden transition-all duration-300 ease-in-out ${
+          isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+        } overflow-hidden bg-gray-900`}
+      >
         <div className="px-4 pt-2 pb-4 space-y-2">
-          {['/', '/learn', '/news', '/community'].map((path) => (
+          {["/", "/learn", "/news", "/community", "/chatting"].map((path) => (
             <Link
               key={path}
               to={path}
               onClick={() => setIsOpen(false)}
-              className={`block px-3 py-2 rounded-lg transition-colors duration-200 ${isActive(path)
-                ? 'bg-purple-900/30 text-purple-100'
-                : 'text-gray-300 hover:bg-purple-900/20 hover:text-white'
-                }`}
+              className={`block px-3 py-2 rounded-lg transition-colors duration-200 ${
+                isActive(path)
+                  ? "bg-purple-900/30 text-purple-100"
+                  : "text-gray-300 hover:bg-purple-900/20 hover:text-white"
+              } relative`}
             >
-              {path === '/' ? 'Home' : path.slice(1).charAt(0).toUpperCase() + path.slice(2)}
+              {path === "/"
+                ? "Home"
+                : path.slice(1).charAt(0).toUpperCase() + path.slice(2)}
+              {path === '/chatting' && hasUnreadMessages && (
+                <span className="absolute right-3 top-3 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+              )}
             </Link>
           ))}
 
@@ -175,7 +223,7 @@ const Navbar = () => {
               <>
                 <div className="px-3 py-2 text-gray-300">
                   <span className="text-purple-400">Hello, </span>
-                  {userData?.name?.split(' ')[0]}
+                  {userData?.name?.split(" ")[0]}
                 </div>
                 <Link
                   to="/account"

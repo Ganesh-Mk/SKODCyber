@@ -47,6 +47,9 @@ const updatePassword = require("./routes/updatePassword");
 const sendRequests = require("./routes/sendRequest");
 const reqestss = require("./routes/requests");
 const handleRequests = require("./routes/handleRequest");
+const hasNotifications = require("./routes/notifications");
+const unreadMessagess = require("./routes/unreadMessages");
+const readUnread = require("./routes/readUndreadNotify");
 
 const createBlog = require("./routes/createBlog");
 const deleteBlog = require("./routes/deleteBlog");
@@ -81,9 +84,12 @@ app.use(getAllUser);
 app.use(updateUser);
 app.use(getSingleuser);
 app.use(updatePassword);
-app.use(sendRequests);
+app.use(sendRequests);  
 app.use(reqestss);
 app.use(handleRequests);
+app.use(hasNotifications);
+app.use(unreadMessagess);
+app.use(readUnread);
 
 // Blog
 app.use(createBlog);

@@ -1,6 +1,6 @@
 import axios from "axios";
 import React, { useEffect, useState, useRef } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import io from "socket.io-client";
 
 export default function Chatting() {
@@ -20,10 +20,54 @@ export default function Chatting() {
   const [loading, setLoading] = useState(true);
   const chatContainerRef = useRef(null);
   const [socket, setSocket] = useState(null);
+  const [unreadStatus, setUnreadStatus] = useState({});
+
+  const checkUnreadFromSender = async (senderId) => {
+    try {
+      const response = await axios.get(
+        `${BACKEND_URL}/unread-messages/${userId}/${senderId}`
+      );
+      return response.data.hasUnread;
+    } catch (error) {
+      console.error("Error checking unread messages:", error);
+      return false;
+    }
+  };
+
+  const markMessagesAsRead = async (senderId) => {
+    if (!userId || !senderId) return;
+
+    try {
+      await axios.patch(`${BACKEND_URL}/mark-read`, {
+        recipientId: userId,
+        senderId: senderId,
+      });
+
+      // Update local unread status
+      setUnreadStatus((prev) => ({
+        ...prev,
+        [senderId]: false,
+      }));
+
+      if (selectedUser) {
+        await fetchMessages(selectedUser._id);
+      }
+    } catch (error) {
+      console.error("Error marking messages as read:", error);
+      navigate("/error");
+    }
+  };
+
+  // Update the useEffect for marking messages as read
+  useEffect(() => {
+    if (selectedUser?._id) {
+      markMessagesAsRead(selectedUser._id);
+    }
+  }, [selectedUser]);
 
   useEffect(() => {
     // Connect to Socket.IO
-    const newSocket = io(BACKEND_URL, { transports: ["websocket", "polling"], });
+    const newSocket = io(BACKEND_URL, { transports: ["websocket", "polling"] });
     setSocket(newSocket);
 
     // Notify server user is online
@@ -48,7 +92,6 @@ export default function Chatting() {
       const connectionsData = response.data.connections || [];
 
       console.log("Connections : ", response.data.connections);
-      
 
       // Fetch details for each connection
       const connectionPromises = connectionsData.map((connectionId) =>
@@ -57,6 +100,18 @@ export default function Chatting() {
 
       const connectionResults = await Promise.all(connectionPromises);
       const connectionUsers = connectionResults.map((res) => res.data);
+      const unreadPromises = connectionUsers.map(async (user) => ({
+        id: user._id,
+        hasUnread: await checkUnreadFromSender(user._id),
+      }));
+      const unreadResults = await Promise.all(unreadPromises);
+
+      const newUnreadStatus = unreadResults.reduce((acc, { id, hasUnread }) => {
+        acc[id] = hasUnread;
+        return acc;
+      }, {});
+
+      setUnreadStatus(newUnreadStatus);
       setConnections(connectionUsers);
 
       // Set initial selected user if anotherGuyId is provided
@@ -98,8 +153,14 @@ export default function Chatting() {
     if (!socket) return;
 
     const handleReceiveMessage = (message) => {
-      if (message.sender === selectedUser?._id || message.sender === userId) {
+      if (message.sender === selectedUser?._id) {
         setMessages((prev) => [...prev, message]);
+      } else {
+        // Update unread status for other senders
+        setUnreadStatus((prev) => ({
+          ...prev,
+          [message.sender]: true,
+        }));
       }
     };
 
@@ -178,23 +239,23 @@ export default function Chatting() {
               connections.map((connection) => (
                 <div
                   key={connection._id}
-                  className={`flex items-center p-3 hover:bg-gray-900 cursor-pointer transition-colors
-                    ${selectedUser && selectedUser._id === connection._id
-                      ? "bg-gray-800"
-                      : ""
-                    }`}
+                  className={`flex items-center p-3 hover:bg-gray-900 cursor-pointer transition-colors ${
+                    selectedUser?.id === connection._id ? "bg-gray-800" : ""
+                  }`}
                   onClick={() => handleSelectUser(connection)}
                 >
                   <div className="relative">
                     <img
-                      src={
-                        connection.image ||
-                        "https://cdn-icons-png.flaticon.com/512/10398/10398223.png"
-                      }
+                      src={connection.image || "default-image-url"}
                       alt={connection.name}
                       className="w-12 h-12 rounded-full object-cover"
                     />
-                    <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-black"></div>
+                    {/* Green dot for unread messages */}
+                    {unreadStatus[connection._id] && (
+                      <div className="absolute top-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-black"></div>
+                    )}
+                    {/* Online status dot (example) */}
+                    <div className="absolute bottom-0 right-0 w-3 h-3 bg-blue-500 rounded-full border-2 border-black"></div>
                   </div>
                   <div className="ml-3">
                     <div className="font-semibold">{connection.name}</div>
@@ -246,16 +307,18 @@ export default function Chatting() {
                 {messages.map((message) => (
                   <div
                     key={message._id}
-                    className={`flex ${message.sender === userId
-                      ? "justify-end"
-                      : "justify-start"
-                      }`}
+                    className={`flex ${
+                      message.sender === userId
+                        ? "justify-end"
+                        : "justify-start"
+                    }`}
                   >
                     <div
-                      className={`max-w-xs md:max-w-md lg:max-w-lg px-4 py-2 rounded-lg ${message.sender === userId
-                        ? "bg-blue-900 text-white rounded-br-none"
-                        : "bg-gray-800 text-white rounded-bl-none"
-                        }`}
+                      className={`max-w-xs md:max-w-md lg:max-w-lg px-4 py-2 rounded-lg ${
+                        message.sender === userId
+                          ? "bg-blue-900 text-white rounded-br-none"
+                          : "bg-gray-800 text-white rounded-bl-none"
+                      }`}
                     >
                       {message.content}
                       <div className="text-xs text-gray-400 mt-1 text-right">
