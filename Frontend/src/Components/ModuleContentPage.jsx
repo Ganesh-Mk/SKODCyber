@@ -685,6 +685,8 @@ const ModuleContentPage = () => {
                     Go Back
                   </button>
 
+
+
                   {moduleData.quizzes && moduleData.quizzes.length > 0 && (
                     <button
                       onClick={handleQuizButtonClick}
