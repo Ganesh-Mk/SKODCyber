@@ -6,10 +6,12 @@ import io from "socket.io-client";
 export default function Chatting() {
   const userData = localStorage.getItem("userData");
   const userId = userData ? JSON.parse(userData)._id : null;
+
   if (!userId) {
     console.error("User not logged in!");
     return;
-  } // current logged-in user
+  }
+
   const { anotherGuyId = null } = useParams();
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -114,7 +116,6 @@ export default function Chatting() {
       setUnreadStatus(newUnreadStatus);
       setConnections(connectionUsers);
 
-      // Set initial selected user if anotherGuyId is provided
       if (anotherGuyId) {
         const initialUser = connectionUsers.find(
           (user) => user._id === anotherGuyId
@@ -138,25 +139,21 @@ export default function Chatting() {
       const response = await axios.get(
         `${BACKEND_URL}/${userId}/${recipientId}`
       );
-      console.log("Fetched Messages are : ", response.data);
 
       setMessages(response.data);
-
-      // Scroll logic remains the same
     } catch (error) {
       console.error("Error fetching messages:", error);
       setMessages([]);
     }
   };
 
+
   useEffect(() => {
     if (!socket) return;
-
     const handleReceiveMessage = (message) => {
       if (message.sender === selectedUser?._id) {
         setMessages((prev) => [...prev, message]);
       } else {
-        // Update unread status for other senders
         setUnreadStatus((prev) => ({
           ...prev,
           [message.sender]: true,
@@ -168,7 +165,6 @@ export default function Chatting() {
     return () => socket.off("receiveMessage", handleReceiveMessage);
   }, [socket, selectedUser]);
 
-  // Handle sending a new message
   const sendMessage = async () => {
     if (!messageInput.trim() || !selectedUser) return;
 
@@ -177,6 +173,7 @@ export default function Chatting() {
       recipientId: selectedUser._id,
       content: messageInput,
     };
+
 
     // Optimistic update
     const tempMessage = {
@@ -277,12 +274,10 @@ export default function Chatting() {
         )}
       </div>
 
-      {/* Chat area (hidden on mobile when no user selected, full screen when user selected) */}
       <div
         className={`${!selectedUser && window.innerWidth < 768 ? "hidden" : "flex"
           } flex-col flex-1 h-full`}
       >
-        {/* Chat header with back button on mobile */}
         {selectedUser ? (
           <div className="p-3 bg-gray-900 border-b border-gray-800 flex items-center sticky top-0 z-10">
             {/* Back button - only visible on mobile */}

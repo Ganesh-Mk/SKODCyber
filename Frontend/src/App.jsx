@@ -21,7 +21,6 @@ import ModuleContentPage from "./Components/ModuleContentPage";
 import Chatting from "./pages/Chatting";
 import ModuleDetailPage from "./pages/ModuleDetailPage";
 
-
 const App = () => {
   useEffect(() => {
     initializeAuth();
