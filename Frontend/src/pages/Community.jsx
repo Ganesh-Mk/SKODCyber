@@ -59,7 +59,7 @@ const CommunityPage = () => {
 
     fetchBlogs();
   }, []);
-  
+
 
   const handleRequest = async (userId, action) => {
     try {
@@ -264,11 +264,10 @@ const CommunityPage = () => {
                       <button
                         key={type}
                         className={`w-full text-left px-4 py-2 hover:bg-gray-700 transition-colors duration-200
-                                ${
-                                  userTypeFilter === type
-                                    ? "text-blue-400"
-                                    : "text-gray-300"
-                                }`}
+                                ${userTypeFilter === type
+                            ? "text-blue-400"
+                            : "text-gray-300"
+                          }`}
                         onClick={() => handleFilterChange(type)}
                       >
                         {type}
@@ -381,11 +380,10 @@ const CommunityPage = () => {
               onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
               className={`px-4 py-2 rounded-lg transition-all duration-300 
-                      ${
-                        currentPage === 1
-                          ? "bg-gray-800/50 text-gray-500 cursor-not-allowed"
-                          : "bg-gray-800 text-white hover:bg-gray-700"
-                      }`}
+                      ${currentPage === 1
+                  ? "bg-gray-800/50 text-gray-500 cursor-not-allowed"
+                  : "bg-gray-800 text-white hover:bg-gray-700"
+                }`}
             >
               Previous
             </button>
@@ -395,11 +393,10 @@ const CommunityPage = () => {
                 key={number}
                 onClick={() => setCurrentPage(number)}
                 className={`w-10 h-10 rounded-lg transition-all duration-300 
-                        ${
-                          currentPage === number
-                            ? "bg-blue-500 text-white"
-                            : "bg-gray-800 text-gray-400 hover:bg-gray-700"
-                        }`}
+                        ${currentPage === number
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+                  }`}
               >
                 {number}
               </button>
@@ -411,11 +408,10 @@ const CommunityPage = () => {
               }
               disabled={currentPage === totalPages}
               className={`px-4 py-2 rounded-lg transition-all duration-300 
-                      ${
-                        currentPage === totalPages
-                          ? "bg-gray-800/50 text-gray-500 cursor-not-allowed"
-                          : "bg-gray-800 text-white hover:bg-gray-700"
-                      }`}
+                      ${currentPage === totalPages
+                  ? "bg-gray-800/50 text-gray-500 cursor-not-allowed"
+                  : "bg-gray-800 text-white hover:bg-gray-700"
+                }`}
             >
               Next
             </button>
@@ -438,7 +434,18 @@ const CommunityPage = () => {
       {/* Notification Modal */}
       {showNotificationModal && (
         <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center">
-          <div className="bg-gray-900 w-full max-w-md rounded-2xl p-6">
+          <div className="bg-gray-900 w-full max-w-md rounded-2xl p-6 relative">
+            {/* Close button */}
+            <button
+              className="absolute top-4 right-4 text-gray-400 hover:text-white"
+              onClick={() => setShowNotificationModal(false)}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+
             <h3 className="text-xl font-semibold mb-4">Connection Requests</h3>
 
             {connectionRequests?.length > 0 ? (
@@ -454,12 +461,12 @@ const CommunityPage = () => {
                         alt={user.name}
                         className="w-12 h-12 rounded-full object-cover"
                       />
-                      <div>
-                        <h4 className="font-medium">{user.name}</h4>
-                        <p className="text-gray-400 text-sm">{user.email}</p>
+                      <div className="min-w-0 flex-1">
+                        <h4 className="font-medium truncate">{user.name}</h4>
+                        <p className="text-gray-400 text-sm truncate">{user.email}</p>
                       </div>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 flex-shrink-0">
                       <button
                         className="px-4 py-2 bg-red-500 rounded-lg hover:bg-red-600"
                         onClick={() => handleRequest(user._id, "decline")}
