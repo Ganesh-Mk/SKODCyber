@@ -56,6 +56,8 @@ const QuizModal = ({ isOpen, onClose, quiz, moduleId }) => {
     setAllQuestionsAnswered(false);
     const progress = getStoredQuizState();
     delete progress[moduleId];
+    console.log("resetQuiz quiz modal: ", JSON.stringify(progress));
+
     localStorage.setItem('quizProgress', JSON.stringify(progress));
   };
 
@@ -84,6 +86,7 @@ const QuizModal = ({ isOpen, onClose, quiz, moduleId }) => {
       score: currentScore,
       completedAt: new Date().toISOString()
     };
+    console.log("handle submit quiz in quiz modal: ", JSON.stringify(progress));
     localStorage.setItem('quizProgress', JSON.stringify(progress));
 
     // If all answers are correct

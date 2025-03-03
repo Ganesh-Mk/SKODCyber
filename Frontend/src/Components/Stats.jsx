@@ -100,17 +100,18 @@ const Stats = () => {
         setUserData(storedUserData);
 
         // Get completed courses, modules, and quizzes from localStorage
-        const storedCompletedCourses = JSON.parse(localStorage.getItem("completedCourses") || "[]");
-        const storedCompletedModules = JSON.parse(localStorage.getItem("completedModules") || "[]");
         const storedCompletedQuizzes = JSON.parse(localStorage.getItem("completedQuizzes") || "[]");
+        const storedCompletedModules = JSON.parse(localStorage.getItem("completedModules") || "[]");
+        const storedCompletedCourses = JSON.parse(localStorage.getItem("completedCourses") || "[]");
 
+        console.log("Stored completed quizzes:", storedCompletedQuizzes);
+        setCompletedQuizzes(storedCompletedQuizzes);
         setCompletedCourses(storedCompletedCourses);
         setCompletedModules(storedCompletedModules);
-        setCompletedQuizzes(storedCompletedQuizzes);
 
         // Get badges and quizzes count
-        setBadges(JSON.parse(localStorage.getItem("completedCourses")).length || 0);
-        setQuizzesGiven(JSON.parse(localStorage.getItem("completedQuizzes")).length || 0);
+        setBadges((JSON.parse(localStorage.getItem("completedCourses")) || []).length);
+        setQuizzesGiven((JSON.parse(localStorage.getItem("completedQuizzes")) || []).length);
 
         // Generate time-based progress data
         setProgressData(generateProgressData(storedCompletedModules));
