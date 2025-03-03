@@ -28,7 +28,7 @@ const BlogManage = () => {
       const response = await axios.get(`${BACKEND_URL}/authorBlogs/${userId}`);
       setBlogs(response.data);
       setError(null);
-    } catch (err) { 
+    } catch (err) {
       setError("Failed to fetch blogs. Please try again later.");
       console.error("Error fetching blogs:", err);
     }
@@ -200,7 +200,7 @@ const BlogManage = () => {
   }, [blogs]);
 
   return (
-    <div className="mt-8 bg-gray-800 mb-8 p-6 rounded-xl shadow-lg">
+    <div className=" bg-gray-800 mb-8 p-6 rounded-xl shadow-lg">
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-xl font-semibold text-white">My Blogs</h3>
         <button
