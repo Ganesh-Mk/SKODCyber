@@ -15,7 +15,7 @@ router.post("/login", async (req, res) => {
       });
     }
 
-    const user = await User.findOne({ 
+    const user = await User.findOne({
       email: { $regex: new RegExp(`^${email}$`, 'i') }
     });
 
@@ -27,7 +27,7 @@ router.post("/login", async (req, res) => {
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
-    
+
     if (!isPasswordValid) {
       return res.status(401).json({
         success: false,
@@ -37,8 +37,8 @@ router.post("/login", async (req, res) => {
 
     // Generate JWT Token
     const token = jwt.sign(
-      { userId: user._id }, 
-      process.env.JWT_SECRET, 
+      { userId: user._id },
+      process.env.JWT_SECRET,
       { expiresIn: '1h' }
     );
 
@@ -48,6 +48,7 @@ router.post("/login", async (req, res) => {
       email: user.email,
       about: user.about,
       image: user.image,
+      role: user.role,
       social: user.social
     };
 

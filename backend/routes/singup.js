@@ -43,8 +43,8 @@ router.post("/signup", async (req, res) => {
 
     // Generate JWT Token
     const token = jwt.sign(
-      { userId: newUser._id }, 
-      process.env.JWT_SECRET, 
+      { userId: newUser._id },
+      process.env.JWT_SECRET,
       { expiresIn: '1h' }
     );
 

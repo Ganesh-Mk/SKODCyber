@@ -413,13 +413,9 @@ const Account = () => {
         </div>
 
         <Stats />
-
-
-
         <BlogManage />
-        <CourseManage />
+        {userData.role !== "user" && <CourseManage />}
         <Certifications />
-
 
         {/* Add Certification Modal */}
         {isAddCertModalOpen && (
