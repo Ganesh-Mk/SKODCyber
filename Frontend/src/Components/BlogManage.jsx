@@ -199,6 +199,7 @@ const BlogManage = () => {
     localStorage.setItem("userBlogs", JSON.stringify(blogs));
   }, [blogs]);
 
+
   return (
     <div className=" bg-gray-800 mb-8 p-6 rounded-xl shadow-lg">
       <div className="flex justify-between items-center mb-6">
