@@ -233,7 +233,7 @@ const Stats = () => {
       case 'overview':
         return (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="bg-gray-800 p-6 rounded-xl shadow-lg">
+            {/* <div className="bg-gray-800 p-6 rounded-xl shadow-lg">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold text-white flex items-center gap-2">
                   <TrendingUp className="w-5 h-5 text-blue-400" />
@@ -254,9 +254,9 @@ const Stats = () => {
                   </LineChart>
                 </ResponsiveContainer>
               </div>
-            </div>
+            </div> */}
 
-            <div className="bg-gray-800 p-6 rounded-xl shadow-lg">
+            {/* <div className="bg-gray-800 p-6 rounded-xl shadow-lg">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold text-white flex items-center gap-2">
                   <Target className="w-5 h-5 text-green-400" />
@@ -286,7 +286,7 @@ const Stats = () => {
                   </PieChart>
                 </ResponsiveContainer>
               </div>
-            </div>
+            </div> */}
 
             <LearningStreakDisplay />
 
@@ -329,7 +329,7 @@ const Stats = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 p-4 sm:p-8 pt-20">
+    <div className="min-h-screen bg-gray-900">
       <div className="max-w-7xl mx-auto">
         {/* Header Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
