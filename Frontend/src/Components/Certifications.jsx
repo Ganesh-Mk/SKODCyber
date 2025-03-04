@@ -45,59 +45,93 @@ const Certifications = () => {
 
     // Create a canvas for the certificate
     const canvas = document.createElement("canvas");
-    canvas.width = 1200;
-    canvas.height = 800;
+    canvas.width = 1500; // Wider canvas for better spacing
+    canvas.height = 1050; // Taller canvas for better spacing
     const ctx = canvas.getContext("2d");
 
-    // Set background
-    ctx.fillStyle = "#1e293b";
+    // Set dark blue background
+    ctx.fillStyle = "#121c2e";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Add border
+    // Add decorative border - outer
     ctx.strokeStyle = "#6366f1";
-    ctx.lineWidth = 15;
+    ctx.lineWidth = 10;
     ctx.strokeRect(50, 50, canvas.width - 100, canvas.height - 100);
 
-    // Add certificate title
+    // Add subtle inner border
+    ctx.strokeStyle = "rgba(99, 102, 241, 0.3)";
+    ctx.lineWidth = 3;
+    ctx.strokeRect(80, 80, canvas.width - 160, canvas.height - 160);
+
+    // Draw the shield logo - positioned better
+    drawShieldLogo(ctx, 180, 105, 0.33);
+
+    // Logo text - right side of the shield with better spacing
     ctx.font = "bold 50px Arial";
+    ctx.fillStyle = "#c084fc"; // Purple for SKOD
+    ctx.textAlign = "left";
+    ctx.fillText("SKOD", 270, 160);
+    ctx.fillStyle = "#818cf8"; // Blue for Cyber
+    ctx.fillText("Cyber", 415, 160);
+
+    // Much more space before the certificate title
+    ctx.font = "bold 70px Arial";
     ctx.fillStyle = "#ffffff";
     ctx.textAlign = "center";
-    ctx.fillText("CERTIFICATE OF COMPLETION", canvas.width / 2, 150);
+    ctx.fillText("CERTIFICATE OF COMPLETION", canvas.width / 2, 320);
 
-    // Add award icon
-    ctx.fillStyle = "#6366f1";
+    // Decorative horizontal line below title
+    ctx.strokeStyle = "#6366f1";
+    ctx.lineWidth = 3;
     ctx.beginPath();
-    ctx.arc(canvas.width / 2, 250, 60, 0, Math.PI * 2);
+    ctx.moveTo(300, 350);
+    ctx.lineTo(canvas.width - 300, 350);
+    ctx.stroke();
+
+    // Add trophy icon in a blue circle - much more space after title
+    ctx.fillStyle = "#6366f1"; // Blue circle
+    ctx.beginPath();
+    ctx.arc(canvas.width / 2, 450, 70, 0, Math.PI * 2);
     ctx.fill();
+
+    // Draw trophy
+    drawTrophy(ctx, canvas.width / 2, 450);
+
+    // Much more space after trophy
     ctx.fillStyle = "#ffffff";
+    ctx.font = "40px Arial";
+    ctx.fillText("This certifies that", canvas.width / 2, 580);
+
+    // Add name - make it stand out with good spacing
     ctx.font = "bold 80px Arial";
-    ctx.fillText("🏆", canvas.width / 2, 275);
+    ctx.fillText(username, canvas.width / 2, 680);
 
-    // Add text
-    ctx.fillStyle = "#ffffff";
-    ctx.font = "30px Arial";
-    ctx.fillText("This certifies that", canvas.width / 2, 350);
+    // Course completion text with more breathing room
+    ctx.font = "40px Arial";
+    ctx.fillText("has successfully completed the course", canvas.width / 2, 760);
 
-    // Add name
-    ctx.font = "bold 60px Arial";
-    ctx.fillText(username, canvas.width / 2, 430);
+    // Course title gets more space - smaller size but still prominent
+    ctx.font = "bold 65px Arial";
+    ctx.fillText(course.title, canvas.width / 2, 850);
 
-    // Add course info
-    ctx.font = "30px Arial";
-    ctx.fillText("has successfully completed the course", canvas.width / 2, 500);
+    // Decorative horizontal line below course title
+    ctx.beginPath();
+    ctx.strokeStyle = "#6366f1";
+    ctx.lineWidth = 3;
+    ctx.moveTo(500, 880);
+    ctx.lineTo(canvas.width - 500, 880);
+    ctx.stroke();
 
-    // Add course title
-    ctx.font = "bold 50px Arial";
-    ctx.fillText(course.title, canvas.width / 2, 580);
-
-    // Add date
+    // Add date - with more space
     const date = new Date().toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
       day: "numeric"
     });
-    ctx.font = "25px Arial";
-    ctx.fillText(`Issued on: ${date}`, canvas.width / 2, 650);
+    ctx.font = "30px Arial";
+    ctx.fillText(`Issued on: ${date}`, canvas.width / 2, 930);
+
+
 
     // Create download link
     const link = document.createElement("a");
@@ -105,6 +139,172 @@ const Certifications = () => {
     link.href = canvas.toDataURL("image/png");
     link.click();
   };
+
+  // Helper function to draw the shield logo
+  function drawShieldLogo(ctx, x, y, scale) {
+    ctx.save();
+
+    // Scale and position the shield SVG
+    ctx.translate(x, y);
+    ctx.scale(scale, scale);
+
+    // Shield in purple
+    ctx.fillStyle = "#c084fc";
+    ctx.beginPath();
+    // Shield outer path
+    ctx.moveTo(196.926, 55.171);
+    ctx.bezierCurveTo(196.816, 49.386, 196.711, 43.921, 196.711, 38.634);
+    ctx.bezierCurveTo(196.711, 34.492, 193.354, 31.134, 189.211, 31.134);
+    ctx.bezierCurveTo(157.136, 31.134, 132.715, 21.916, 112.359, 2.124);
+    ctx.bezierCurveTo(109.447, -0.708, 104.813, -0.707, 101.902, 2.124);
+    ctx.bezierCurveTo(81.548, 21.916, 57.131, 31.134, 25.058, 31.134);
+    ctx.bezierCurveTo(20.916, 31.134, 17.558, 34.492, 17.558, 38.634);
+    ctx.bezierCurveTo(17.558, 43.922, 17.454, 49.389, 17.343, 55.175);
+    ctx.bezierCurveTo(16.315, 109.011, 14.907, 182.742, 104.674, 213.857);
+    ctx.bezierCurveTo(105.47, 214.133, 106.3, 214.271, 107.13, 214.271);
+    ctx.bezierCurveTo(107.96, 214.271, 108.791, 214.133, 109.586, 213.857);
+    ctx.bezierCurveTo(199.36, 182.741, 197.954, 109.008, 196.926, 55.171);
+    ctx.closePath();
+
+    // Inner part of the shield (lighter)
+    ctx.moveTo(107.131, 198.812);
+    ctx.bezierCurveTo(30.144, 170.845, 31.308, 109.58, 32.341, 55.461);
+    ctx.bezierCurveTo(32.403, 52.213, 32.463, 49.065, 32.505, 45.979);
+    ctx.bezierCurveTo(62.545, 44.711, 86.567, 35.608, 107.131, 17.694);
+    ctx.bezierCurveTo(127.697, 35.608, 151.723, 44.712, 181.765, 45.979);
+    ctx.bezierCurveTo(181.807, 49.064, 181.867, 52.21, 181.929, 55.456);
+    ctx.bezierCurveTo(182.961, 109.577, 184.124, 170.844, 107.131, 198.812);
+    ctx.closePath();
+    ctx.fill();
+
+    // Checkmark inside the shield (in white)
+    ctx.fillStyle = "#ffffff";
+    ctx.beginPath();
+    ctx.moveTo(132.958, 81.082);
+    ctx.lineTo(96.759, 117.279);
+    ctx.lineTo(81.312, 101.832);
+    ctx.bezierCurveTo(78.383, 98.904, 73.634, 98.904, 70.706, 101.832);
+    ctx.bezierCurveTo(67.777, 104.762, 67.777, 109.51, 70.706, 112.439);
+    ctx.lineTo(91.456, 133.189);
+    ctx.bezierCurveTo(92.92, 134.653, 94.84, 135.385, 96.759, 135.385);
+    ctx.bezierCurveTo(98.678, 135.385, 100.598, 134.653, 102.062, 133.189);
+    ctx.lineTo(143.563, 91.689);
+    ctx.bezierCurveTo(146.493, 88.76, 146.493, 84.011, 143.564, 81.083);
+    ctx.bezierCurveTo(140.636, 78.154, 135.887, 78.153, 132.958, 81.082);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.restore();
+  }
+
+  // Helper function to draw the trophy
+  function drawTrophy(ctx, x, y) {
+    // Trophy cup
+    ctx.fillStyle = "#fbbf24"; // Gold trophy
+    ctx.beginPath();
+    ctx.moveTo(x - 25, y - 20);
+    ctx.lineTo(x + 25, y - 20);
+    ctx.lineTo(x + 20, y + 5);
+    ctx.lineTo(x - 20, y + 5);
+    ctx.closePath();
+    ctx.fill();
+
+    // Trophy handles
+    ctx.beginPath();
+    ctx.arc(x - 25, y - 10, 10, Math.PI * 1.5, Math.PI * 0.5, true);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(x + 25, y - 10, 10, Math.PI * 0.5, Math.PI * 1.5, true);
+    ctx.fill();
+
+    // Trophy base
+    ctx.fillStyle = "#92400e"; // Brown
+    ctx.fillRect(x - 15, y + 5, 30, 15);
+    ctx.fillRect(x - 25, y + 20, 50, 5);
+  }
+
+  // Helper function to draw the shield logo
+  function drawShieldLogo(ctx, x, y, scale) {
+    ctx.save();
+
+    // Scale and position the shield SVG
+    ctx.translate(x, y);
+    ctx.scale(scale, scale);
+
+    // Shield in purple
+    ctx.fillStyle = "#c084fc";
+    ctx.beginPath();
+    // Shield outer path
+    ctx.moveTo(196.926, 55.171);
+    ctx.bezierCurveTo(196.816, 49.386, 196.711, 43.921, 196.711, 38.634);
+    ctx.bezierCurveTo(196.711, 34.492, 193.354, 31.134, 189.211, 31.134);
+    ctx.bezierCurveTo(157.136, 31.134, 132.715, 21.916, 112.359, 2.124);
+    ctx.bezierCurveTo(109.447, -0.708, 104.813, -0.707, 101.902, 2.124);
+    ctx.bezierCurveTo(81.548, 21.916, 57.131, 31.134, 25.058, 31.134);
+    ctx.bezierCurveTo(20.916, 31.134, 17.558, 34.492, 17.558, 38.634);
+    ctx.bezierCurveTo(17.558, 43.922, 17.454, 49.389, 17.343, 55.175);
+    ctx.bezierCurveTo(16.315, 109.011, 14.907, 182.742, 104.674, 213.857);
+    ctx.bezierCurveTo(105.47, 214.133, 106.3, 214.271, 107.13, 214.271);
+    ctx.bezierCurveTo(107.96, 214.271, 108.791, 214.133, 109.586, 213.857);
+    ctx.bezierCurveTo(199.36, 182.741, 197.954, 109.008, 196.926, 55.171);
+    ctx.closePath();
+
+    // Inner part of the shield (lighter)
+    ctx.moveTo(107.131, 198.812);
+    ctx.bezierCurveTo(30.144, 170.845, 31.308, 109.58, 32.341, 55.461);
+    ctx.bezierCurveTo(32.403, 52.213, 32.463, 49.065, 32.505, 45.979);
+    ctx.bezierCurveTo(62.545, 44.711, 86.567, 35.608, 107.131, 17.694);
+    ctx.bezierCurveTo(127.697, 35.608, 151.723, 44.712, 181.765, 45.979);
+    ctx.bezierCurveTo(181.807, 49.064, 181.867, 52.21, 181.929, 55.456);
+    ctx.bezierCurveTo(182.961, 109.577, 184.124, 170.844, 107.131, 198.812);
+    ctx.closePath();
+    ctx.fill();
+
+    // Checkmark inside the shield (in white)
+    ctx.fillStyle = "#ffffff";
+    ctx.beginPath();
+    ctx.moveTo(132.958, 81.082);
+    ctx.lineTo(96.759, 117.279);
+    ctx.lineTo(81.312, 101.832);
+    ctx.bezierCurveTo(78.383, 98.904, 73.634, 98.904, 70.706, 101.832);
+    ctx.bezierCurveTo(67.777, 104.762, 67.777, 109.51, 70.706, 112.439);
+    ctx.lineTo(91.456, 133.189);
+    ctx.bezierCurveTo(92.92, 134.653, 94.84, 135.385, 96.759, 135.385);
+    ctx.bezierCurveTo(98.678, 135.385, 100.598, 134.653, 102.062, 133.189);
+    ctx.lineTo(143.563, 91.689);
+    ctx.bezierCurveTo(146.493, 88.76, 146.493, 84.011, 143.564, 81.083);
+    ctx.bezierCurveTo(140.636, 78.154, 135.887, 78.153, 132.958, 81.082);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.restore();
+  }
+
+  // Helper function to draw the trophy
+  function drawTrophy(ctx, x, y) {
+    // Trophy cup
+    ctx.fillStyle = "#fbbf24"; // Gold trophy
+    ctx.beginPath();
+    ctx.moveTo(x - 25, y - 20);
+    ctx.lineTo(x + 25, y - 20);
+    ctx.lineTo(x + 20, y + 5);
+    ctx.lineTo(x - 20, y + 5);
+    ctx.closePath();
+    ctx.fill();
+
+    // Trophy handles
+    ctx.beginPath();
+    ctx.arc(x - 25, y - 10, 10, Math.PI * 1.5, Math.PI * 0.5, true);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(x + 25, y - 10, 10, Math.PI * 0.5, Math.PI * 1.5, true);
+    ctx.fill();
+
+    // Trophy base
+    ctx.fillStyle = "#92400e"; // Brown
+    ctx.fillRect(x - 15, y + 5, 30, 15);
+    ctx.fillRect(x - 25, y + 20, 50, 5);
+  }
 
   return (
     <div className="bg-gray-800 rounded-2xl shadow-lg p-6 sm:p-8 mb-8">
